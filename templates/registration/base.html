@@ -1,0 +1,71 @@
+
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css" />
+  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.8.0.min.js"></script>  
+  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.23.custom.min.js"></script>  
+  <script type="text/javascript"> 
+  $(function() {
+          $( "#id_born_date" ).datepicker({dateFormat: 'dd/mm/yy'});
+  });
+  </script>
+
+
+</head>
+
+<body id="{% block body_id %}{% endblock %}">
+  <div id="main">
+    <div id="header">
+      <div id="logo">
+        <div id="logo_text">
+          <!-- class="logo_colour", allows you to change the colour of the text -->
+          <h1><a href="index.html">Fusolab<span class="logo_colour">2.0</span></a></h1>
+          <h2>A nice place</h2>
+        </div>
+      </div>
+      <div id="menubar">
+        <ul id="menu">
+          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
+          <li class="selected"><a href="index.html">Home</a></li>
+          <li><a href="examples.html">Examples</a></li>
+          <li><a href="page.html">A Page</a></li>
+          <li><a href="another_page.html">Another Page</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="content_header"></div>
+    <div id="site_content">
+    {% block body %} 
+      <div id="sidebar_container">
+        <div class="sidebar">
+          <div class="sidebar_top"></div>
+          <div class="sidebar_item">
+            <!-- 
+            <h3>Latest News</h3>
+            <h4>New Website Launched</h4>
+            <h5>January 1st, 2010</h5>
+            <p>2010 sees the redesign of our website. Take a look around and let us know what you think.<br /><a href="#">Read more</a></p>
+            -->
+            {% block sidebar %}
+            {% endblock %}
+          </div>
+          <div class="sidebar_base"></div>
+        </div>
+      </div>
+      <div id="content">
+        <div>{% block content_title %}{% endblock %}</div>
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+    {% endblock %} 
+    <div id="content_footer"></div>
+    <div id="footer">
+        Footer
+    </div>
+  </div>
+</body>
+</html>
