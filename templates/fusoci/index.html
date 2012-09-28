@@ -1,0 +1,24 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Benvenuto al fusolab{% endblock %}
+{% block content %}
+<h1>Benvenuto al fusolab!</h1>
+{% if user.is_authenticated %}
+<h3>Ciao {{ user.username }}</h3>
+<p>Per ora non puoi fare molto:</p>
+
+<a href="/accounts/edit" class="button green">Modifica il tuo profilo</a>
+oppure
+<a href="/accounts/logout" class="button red">Esci</a>
+{% else %}
+<p>
+Per entrare a far parte dell'associazione devi tesserarti. <br />
+Immetti i tuoi dati e ritira al fusolab la tua tessera:
+</p>
+{# scegli colori da qua http://www.webdesignerwall.com/demo/css-buttons.html #}
+<a href="/accounts/register" class="button green">Registrati</a>
+oppure
+<a href="/accounts/login" class="button blue">Accedi</a>
+{% endif %}
+{% endblock %}
+

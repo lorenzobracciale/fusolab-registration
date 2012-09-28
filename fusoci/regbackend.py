@@ -5,6 +5,7 @@ from registration.backends.default import DefaultBackend
 
 from django.contrib.sites.models import Site
 from registration.models import RegistrationProfile
+from registration import signals
 
 class FusolabBackend(DefaultBackend):
     def register(self, request, **kwargs):
@@ -32,7 +33,7 @@ class FusolabBackend(DefaultBackend):
 
         """
         username, email, password = kwargs['username'], kwargs['email'], kwargs['password1']
-        username = 'pippo'
+        username = email
         if Site._meta.installed:
             site = Site.objects.get_current()
         else:

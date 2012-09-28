@@ -7,21 +7,26 @@
 <h1>Log in</h1>
 
 {% if form.errors %}
-<p class="error">Please correct the errors below:</p>
+<p class="error">Correggi i seguenti errori:</p>
 {% endif %}
 
 <form method="post" action="?next={{ next|default:"/" }}">{% csrf_token %}
 <dl>
-<dt><label for="id_username">Username:</label>{% if form.username.errors %} <span class="error">{{ form.username.errors|join:", " }}</span>{% endif %}</dt>
-<dd>{{ form.username }}</dd>
-<dt><label for="id_password">Password:</label>{% if form.password.errors %} <span class="error">{{ form.password.errors|join:", " }}</span>{% endif %}</dt>
-<dd>{{ form.password }}</dd>
-<dt><input type="submit" value="Log in" /></dt>
+<p>
+    <dt><label for="id_username">Username:</label>{% if form.username.errors %} <span class="error">{{ form.username.errors|join:", " }}</span>{% endif %}</dt>
+    <dd>{{ form.username }}</dd>
+</p>
+<p>
+    <dt><label for="id_password">Password:</label>{% if form.password.errors %} <span class="error">{{ form.password.errors|join:", " }}</span>{% endif %}</dt>
+    <dd>{{ form.password }}</dd>
+</p>
+<p>
+<dt><input class="button blue" type="submit" value="Log in" /></dt>
+</p>
 </dl>
 </form>
 {% endblock %}
 
-{% block content-related %}
-<p>If you don't have an account, you can <a href="/accounts/register/">sign
-up</a> for one.
+{% block sidebar %}
+<p>Se non hai ancora un account, puoi sempre <a href="/accounts/register/">registrarti</a>!
 {% endblock %}

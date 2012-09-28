@@ -1,8 +1,8 @@
 from django.http import HttpResponse
-from django.contrib.auth import logout
+from django.shortcuts import render_to_response
+from django.template import RequestContext, loader
 import datetime
 
 
 def home(request):
-   return HttpResponse('<h1>Page was found</h1>')
-
+    return render_to_response('fusoci/index.html', {} , context_instance=RequestContext(request))

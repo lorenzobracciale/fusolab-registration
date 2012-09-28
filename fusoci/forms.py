@@ -8,14 +8,14 @@ import datetime
 
 class RegistrationFormSocio(RegistrationForm):
     # form = MyForm({'charfield1': 'foo', 'charfield2': 'bar'})
-    username = forms.CharField(max_length=30, required=False, label=_(u'username')) 
-    born_date = forms.DateField(input_formats=["%d/%m/%Y"] )
-    born_place = forms.CharField(max_length=50, required=True)
-    first_name = forms.CharField(max_length=50, required=True)
-    last_name = forms.CharField(max_length=50, required=True)
+    username = forms.CharField(max_length=30, required=False, label=_(u'Username/Nickname')) 
+    born_date = forms.DateField(input_formats=["%d/%m/%Y"] , label=_(u'Data di Nascita'))
+    born_place = forms.CharField(max_length=50, required=True, label=_(u'Luogo di Nascita'))
+    first_name = forms.CharField(max_length=50, required=True, label=_(u'Nome'))
+    last_name = forms.CharField(max_length=50, required=True, label=_(u'Cognome'))
     #doc_type = forms.ChoiceField(choices=DOCUMENT_TYPES, required=True)
     #doc_id = forms.CharField(max_length=20, required=True)
-    accepted_eula = forms.BooleanField(required=True)
+    accepted_eula = forms.BooleanField(required=True, label=_(u'Sono d\'accordo'))
     #photo
     def do_save(self):
         new_u = User(username=str(time()),email= self.cleaned_data.get('email'),)
