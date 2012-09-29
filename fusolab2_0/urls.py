@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'fusoci.views.home', name='home'),
 
+    url(r'^accounts/edit/$', 'fusoci.views.edit', name='edit'),
     url(r'^accounts/register/$', register, {'form_class': RegistrationFormSocio,
         'backend': 'fusoci.regbackend.FusolabBackend'},
          name='registration_register'),

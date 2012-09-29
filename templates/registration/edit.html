@@ -1,85 +1,29 @@
 {% extends "registration/base.html" %}
 
-{% block title %}Sign up{% endblock %}
+{% block title %}Modifica {% endblock %}
 
 {% block content %}
 
-  {% if form.errors %}
-  <p class="errors">Please correct the errors below: {{ form.non_field_errors }}</p>
-  {% endif %}
+  <h1>Modifica il tuo profilo</h1>
 
-  <h1>Create an account</h1>
+  {% if form.errors %}
+  <p class="errors">Correggi gli errori qui sotto: {{ form.non_field_errors }}</p>
+  {% endif %}
   
   <form method="post" action="" class="wide">
     <fieldset>  
     <legend>I tuoi dati</legend>  
 	{% csrf_token %}
-    {% comment %}
-    <p>
-      <label for="id_username">Username:</label>
-      {% if form.username.errors %}
-        <p class="errors">{{ form.username.errors.as_text }}</p>
-      {% endif %}
-      {{ form.username }}
-    </p>
-    <p>
-      <label for="id_email">Email address:</label>
-      {% if form.email.errors %}
-        <p class="errors">{{ form.email.errors.as_text }}</p>
-      {% endif %}
-      {{ form.email }}
-    </p>
-    <p>
-      <label for="id_password1">Password:</label>
-      {% if form.password1.errors %}
-        <p class="errors">{{ form.password1.errors.as_text }}</p>
-      {% endif %}
-      {{ form.password1 }}
-    </p>
-    <p>
-      <label for="id_password2">Password (type again to catch typos):</label>
-      {% if form.password2.errors %}
-        <p class="errors">{{ form.password2.errors.as_text }}</p>
-      {% endif %}
-      {{ form.password2 }}
-    </p>
-    aaa
-    <p> {{ form.born_date }}</p>
-    {% endcomment %}
-    {{ form.non_field_errors }}
-    <!-- p>Username: {{ form.username.errors }}
-    {{ form.username }}</p -->
-    <p>Password: {{ form.password1.errors }}
-    {{ form.password1 }}</p>
-    <p>Password (again!):{{ form.password2.errors }}
-    {{ form.password2 }}</p>
-    {{ form.born_date.errors }}
-    <p>born date: {{ form.born_date }}</p>
-    {{ form.born_place.errors }}
-    <p>born place: {{ form.born_place }}</p>
-    {{ form.first_name.errors }}
-    <p>first name: {{ form.first_name}}</p>
-    {{ form.last_name.errors }}
-    <p>last name: {{ form.last_name}}</p>
-    {{ form.email.errors }}
-    <p>email: {{ form.email}}</p>
-
-    {{ form.accepted_eula.errors }}
-    <p>email: {{ form.accepted_eula }}</p>
-
-    <p class="submit"><input type="submit" value="Register &rarr;"></p>
+    {{ form.as_p }}
+    </fieldset>
+    <p class="submit"><input type="submit" value="Salva &rarr;"></p>
   </form>
   
 {% endblock %}
-
 {% block sidebar %}
-<p>Fill out the form to the left (all fields are required), and your
-account will be created; you'll be sent an email with instructions on how
-to finish your registration.</p>
+<h3>Perche' iscriversi?</h3>
 
-<p>We'll only use your email to send you signup instructions. We hate spam
-as much as you do.</p>
-
-<p>This account will let you log into the ticket tracker, claim tickets,
-and be exempt from spam filtering.</p>
+<p>Il fusolab è un'associazione e per legge, per accedere ai locali dell'associazione devi iscriverti</p>
+<p>Inoltre iscrivendoti ti invieremo il calendario delle iniziative mensilmente</p>
+<p>Infine in un futuro non molto lontano, da questo pannello, se iscritto, potrai interagire con il fusolab...</p>
 {% endblock %}
