@@ -1,5 +1,14 @@
 <html>
 
+
+{% load tags %}
+
+{% url home as home %}
+{% url edit as edit %}
+{% url registration_register as register %}
+{% url auth_login as login %}
+{% url auth_logout  as logout %}
+
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>{% block title %}Benvenuto al fusolab{% endblock %}</title>
@@ -28,14 +37,14 @@
       <div id="menubar">
         <ul id="menu">
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
-          <li class="selected"><a href="/">Home</a></li>
+          <li class="{% active request home %}"><a href="/">Home</a></li>
             
         {% if user.is_authenticated %}
-              <li><a href="/accounts/edit">Modifica Profilo</a></li>
-              <li><a href="/accounts/logout">Logout</a></li>
+            <li class="{% active request edit %}"><a href="/accounts/edit">Modifica Profilo</a></li>
+            <li class="{% active request logout %}"><a href="/accounts/logout">Logout</a></li>
         {% else %}
-              <li><a href="/accounts/register">Registrati</a></li>
-              <li><a href="/accounts/login">Log-in</a></li>
+            <li class="{% active request register %}"><a href="/accounts/register">Registrati</a></li>
+            <li class="{% active request login %}"><a href="/accounts/login">Log-in</a></li>
         {% endif %}
           
         </ul>
@@ -49,9 +58,10 @@
           <div class="sidebar_top"></div>
           <div class="sidebar_item">
             {% block sidebar %}
+                <img src="/static/images/logo_fusolab_old_300.png" width="150" heigth="150" />
                 <h3>Che cos'e' il fusolab?</h3>
-                <p>    
-                Oltre che sede romana della web-radio libera <a href="http://www.fusoradio.net">www.fusoradio.net</a> il Fusolab è un'associazione nata nel 2006 senza scopo di lucro e sita in via G. Pitacco 20 a Roma (Prenestina).<br />
+                <p> 
+                Oltre che sede romana della web-radio libera <a href="http://www.fusoradio.net">Fusoradio</a> il Fusolab è un'associazione nata nel 2006 senza scopo di lucro.<br />
                 L'associazione intende sviluppare e diffondere una visione critica, alternativa e antagonista del modello sociale culturale ed economico vigente, attraverso la condivisione di spazi, conoscenze e strumenti che si maturi e concretizzi tramite l'analisi la ricerca e l'azione diretta nei seguenti ambiti:
                 <ul>
                     <li>produzione e organizzazione di iniziative culturali (musica, esposizioni, teatro, cineforum) 

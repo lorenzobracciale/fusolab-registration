@@ -23,6 +23,11 @@ class RegistrationFormSocio(RegistrationForm):
                                 required=False, label=_("Password"))
     password2 = forms.CharField(widget=forms.PasswordInput(render_value=False),
                                 required=False, label=_("Password (di nuovo)"))
+    def clean(self):
+        cdata = self.cleaned_data
+        if User.objects.filter(first_name=cdata['first_name'], last_name=cdata['last_name'], email=cdata['email']).count() > 0:
+            raise forms.ValidationError(_("Risulti gia' iscritto. Se ti sei dimenticato la password, Vai su login->ho dimenticato la password</a>."))
+        return cdata
 
 class EditFormSocio(RegistrationForm):
     first_name = forms.CharField(max_length=50, label=_(u'Nome'))

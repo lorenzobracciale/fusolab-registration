@@ -74,7 +74,4 @@ class FusolabBackend(DefaultBackend):
 
         render_to_response('registration/edit.html', {'form': form} , context_instance=RequestContext(request))
         #return None #if there is not a key, return None
-        s
 
-    def post_activation_redirect(request, account):
-        return 
