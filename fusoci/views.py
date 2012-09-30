@@ -13,7 +13,7 @@ from fusoci.regbackend import FusolabBackend
 def home(request):
     return render_to_response('fusoci/index.html', {} , context_instance=RequestContext(request))
 
-def edit(request, activation_key):
+def edit(request, activation_key=None):
     if request.user.is_authenticated() or activation_key:
         if activation_key:
             #grab user 
@@ -28,10 +28,12 @@ def edit(request, activation_key):
 
         profile = user.get_profile()
         if request.method == 'POST':
-            form = EditFormSocio(request.POST, request=request, activation_key=activation_key)  
+            form = EditFormSocio(request.POST, request=request, activation_key=activation_key, activating_user=user)  
             if form.is_valid():
                 if activation_key:
                     activate(request, backend='fusoci.regbackend.FusolabBackend', activation_key=activation_key)
+                    user.is_active = True
+                    user.save()
                 form.do_save(user=user)
                 return render_to_response('registration/edit_complete.html', { } , context_instance=RequestContext(request))
         else:
@@ -50,7 +52,9 @@ def edit(request, activation_key):
                         'doc_id': profile.doc_id,
                         #TODO pic
                         }
-            form = EditFormSocio(initial=init_dict, request=request)
+            if activation_key:
+                init_dict.pop('username') #force users to choose a username
+            form = EditFormSocio(initial=init_dict, request=request) #create empty form
         return render_to_response('registration/edit.html', {'form': form} , context_instance=RequestContext(request))
 
     else: #user is not authenticated or no activation key is provided

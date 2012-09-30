@@ -613,3 +613,11 @@ label {
     font-weight: bold;    
     display: inline-block;
 }
+
+/* richiesta ammissione fusolab */
+#ammissione-fusolab {
+    height:120px;
+    /* width:120px; */
+    border:1px solid #ccc;
+    overflow:auto;
+}

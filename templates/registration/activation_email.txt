@@ -2,6 +2,6 @@
 Ciao,
 per attivare il tuo profilo Fusolab vai a questo indirizzo: 
 
-http://176.62.53.208/accounts/activate/{{ activation_key }}/
+http://soci.fusolab.net/accounts/activate/{{ activation_key }}/
 
 Se non sei stato tu a registrarti, ti preghiamo di non fare nulla. Non riceverai piùemail e questo account scadra' automaticamente tra {{ expiration_days|apnumber }} giorni.

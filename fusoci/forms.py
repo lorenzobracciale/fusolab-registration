@@ -15,7 +15,7 @@ class RegistrationFormSocio(RegistrationForm):
 
     born_date = forms.DateField(input_formats=["%d/%m/%Y"] , label=_(u'Data di Nascita (gg/mm/aaaa)'))
     born_place = forms.CharField(max_length=50, label=_(u'Luogo di Nascita'))
-    accepted_eula = forms.BooleanField(label=_(u'Sono d\'accordo'))
+    accepted_eula = forms.BooleanField(label=_(u'Si, lo voglio'))
 
     #override
     username = forms.CharField(max_length=30, required=False, label=_(u'Username/Nickname')) 
@@ -53,31 +53,40 @@ class EditFormSocio(RegistrationForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         self.activation_key = kwargs.pop('activation_key', None)
+        self.activating_user = kwargs.pop('activating_user', None)
         super(EditFormSocio, self).__init__(*args, **kwargs)
 
 
     def clean(self):
-        has_password = self.request.user.is_authenticated() and self.request.user.has_usable_password()
-        if not has_password:
-            if 'password1' not in self.cleaned_data and 'password2' not in self.cleaned_data:
-                raise forms.ValidationError(_("Non hai impostato nessuna password."))
+        if self.activation_key:
+            try:
+                user = RegistrationProfile.objects.get(activation_key=self.activation_key).user
+            except RegistrationProfile.DoesNotExist:
+                user = None
+        else:
+            user = self.request.user
 
-        if 'password1' in self.cleaned_data or 'password2' in self.cleaned_data:
+        if not user:
+            return render_to_response('registration/activate.html', { } , context_instance=RequestContext(request))
+
+        has_password = user.is_authenticated() and user.has_usable_password()
+
+        if not has_password:
+            if ('password1' not in self.cleaned_data or len(self.cleaned_data['password1']) <= 0)  or ('password2' not in self.cleaned_data or len(self.cleaned_data['password2']) <= 0 ):
+                    raise forms.ValidationError(_("Non hai nessuna password impostata. Imposta una password per poterti autenticare."))
+
+        if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
             if self.cleaned_data['password1'] != self.cleaned_data['password2']:
                 raise forms.ValidationError(_("Le password non corrispondono."))
 
         return self.cleaned_data
 
     def clean_username(self):
-        if self.activation_key:
-            try:
-                user = RegistrationProfile.objects.get(activation_key=self.activation_key).user
-            except RegistrationProfile.DoesNotExist:
-                user = None
-            if not user:
-                    raise forms.ValidationError(_("Chiave di attivazione errata."))
-            if user.username == self.cleaned_data['username']:
-                return self.cleaned_data['username']
+        if self.activating_user:
+            user = self.activating_user
+
+        if user.username == self.cleaned_data['username']:
+            return self.cleaned_data['username']
 
         # if change username and has activation key, or if just change username:
         if self.request.user.username  != self.cleaned_data['username']:
@@ -100,7 +109,7 @@ class EditFormSocio(RegistrationForm):
         user.email = data['email']
         user.username = data['username']
         if data['password1'] and len(data['password1']) > 0:
-            user.password = data['password1']
+            user.set_password(data['password1'])
 
         profile.born_date, profile.born_place = data['born_date'], data['born_place']
         profile.doc_type, profile.doc_id = data['doc_type'], data['doc_id']

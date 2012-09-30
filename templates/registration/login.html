@@ -8,6 +8,7 @@
 
 {% if form.errors %}
 <p class="error">Correggi i seguenti errori:</p>
+{{  form.non_field_errors }}
 {% endif %}
 
 <form method="post" action="?next={{ next|default:"/" }}">{% csrf_token %}
