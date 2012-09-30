@@ -30,13 +30,16 @@ class RegistrationFormSocio(RegistrationForm):
         # check for funny names
         from funnynames import funny_names
         firstlastname = self.cleaned_data['first_name'] + self.cleaned_data['last_name']
+        firstlastname = firstlastname.lower()
+
         for funny_name in funny_names:
-            found = False
-            for part in funny_name:
-                if firstlastname.find(part) >= 0:
-                    found = True
-            if found:
-                raise forms.ValidationError(_("LOL!"))
+            if len(funny_name) > 0: #sanity check 
+                found = True 
+                for part in funny_name:
+                    if firstlastname.find(part.lower()) < 0:
+                        found = False 
+                if found:
+                    raise forms.ValidationError(_("LOL!"))
 
         return cdata
 
