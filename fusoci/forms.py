@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from models import UserProfile
 import datetime
 
-
 class RegistrationFormSocio(RegistrationForm):
     first_name = forms.CharField(max_length=50, required=True, label=_(u'Nome'))
     last_name = forms.CharField(max_length=50, required=True, label=_(u'Cognome'))
@@ -28,6 +27,17 @@ class RegistrationFormSocio(RegistrationForm):
         if 'first_name' in cdata and 'last_name' in cdata and 'email' in cdata:
             if User.objects.filter(first_name=cdata['first_name'], last_name=cdata['last_name'], email=cdata['email']).count() > 0:
                 raise forms.ValidationError(_("Risulti gia' iscritto. Se ti sei dimenticato la password, Vai su login->ho dimenticato la password."))
+        # check for funny names
+        from funnynames import funny_names
+        firstlastname = self.cleaned_data['first_name'] + self.cleaned_data['last_name']
+        for funny_name in funny_names:
+            found = False
+            for part in funny_name:
+                if firstlastname.find(part) >= 0:
+                    found = True
+            if found:
+                raise forms.ValidationError(_("LOL!"))
+
         return cdata
 
 class EditFormSocio(RegistrationForm):
