@@ -10,10 +10,10 @@ import datetime
 
 
 class RegistrationFormSocio(RegistrationForm):
-    first_name = forms.CharField(max_length=50, label=_(u'Nome'))
-    last_name = forms.CharField(max_length=50, label=_(u'Cognome'))
+    first_name = forms.CharField(max_length=50, required=True, label=_(u'Nome'))
+    last_name = forms.CharField(max_length=50, required=True, label=_(u'Cognome'))
 
-    born_date = forms.DateField(input_formats=["%d/%m/%Y"] , label=_(u'Data di Nascita'))
+    born_date = forms.DateField(input_formats=["%d/%m/%Y"] , label=_(u'Data di Nascita (gg/mm/aaaa)'))
     born_place = forms.CharField(max_length=50, label=_(u'Luogo di Nascita'))
     accepted_eula = forms.BooleanField(label=_(u'Sono d\'accordo'))
 
@@ -25,8 +25,9 @@ class RegistrationFormSocio(RegistrationForm):
                                 required=False, label=_("Password (di nuovo)"))
     def clean(self):
         cdata = self.cleaned_data
-        if User.objects.filter(first_name=cdata['first_name'], last_name=cdata['last_name'], email=cdata['email']).count() > 0:
-            raise forms.ValidationError(_("Risulti gia' iscritto. Se ti sei dimenticato la password, Vai su login->ho dimenticato la password</a>."))
+        if 'first_name' in cdata and 'last_name' in cdata and 'email' in cdata:
+            if User.objects.filter(first_name=cdata['first_name'], last_name=cdata['last_name'], email=cdata['email']).count() > 0:
+                raise forms.ValidationError(_("Risulti gia' iscritto. Se ti sei dimenticato la password, Vai su login->ho dimenticato la password."))
         return cdata
 
 class EditFormSocio(RegistrationForm):
@@ -51,11 +52,12 @@ class EditFormSocio(RegistrationForm):
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
+        self.activation_key = kwargs.pop('activation_key', None)
         super(EditFormSocio, self).__init__(*args, **kwargs)
 
 
     def clean(self):
-        has_password = self.request.user.has_usable_password()
+        has_password = self.request.user.is_authenticated() and self.request.user.has_usable_password()
         if not has_password:
             if 'password1' not in self.cleaned_data and 'password2' not in self.cleaned_data:
                 raise forms.ValidationError(_("Non hai impostato nessuna password."))
@@ -67,14 +69,29 @@ class EditFormSocio(RegistrationForm):
         return self.cleaned_data
 
     def clean_username(self):
+        if self.activation_key:
+            try:
+                user = RegistrationProfile.objects.get(activation_key=self.activation_key).user
+            except RegistrationProfile.DoesNotExist:
+                user = None
+            if not user:
+                    raise forms.ValidationError(_("Chiave di attivazione errata."))
+            if user.username == self.cleaned_data['username']:
+                return self.cleaned_data['username']
+
+        # if change username and has activation key, or if just change username:
         if self.request.user.username  != self.cleaned_data['username']:
             existing = User.objects.filter(username__iexact=self.cleaned_data['username'])
             if existing.exists():
-                raise forms.ValidationError(_("A user with that username already exists."))
+                raise forms.ValidationError(_("Questo username e' stato gia' preso da un altro utente."))
         return self.cleaned_data['username']
     
-    def do_save(self):
-        user = self.request.user
+    def do_save(self, user):
+        if user:
+            user = user
+        else:
+            user = self.request.user
+
         profile = user.get_profile()
 
         data = self.cleaned_data 

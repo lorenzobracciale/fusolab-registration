@@ -86,7 +86,6 @@ def activate(request, backend,
     context = RequestContext(request)
     for key, value in extra_context.items():
         context[key] = callable(value) and value() or value
-
     return render_to_response(template_name,
                               kwargs,
                               context_instance=context)

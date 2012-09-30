@@ -5,17 +5,19 @@ from registration.backends.default import DefaultBackend
 
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User 
+from django.shortcuts import render_to_response
+from django.template import RequestContext, loader
 from registration.models import RegistrationProfile
 from registration import signals
 
 from models import UserProfile
 
-from fusolab2_0.settings import SECRET_KEY
+from fusoci.forms import EditFormSocio
+
 
 class FusolabBackend(DefaultBackend):
     def register(self, request, **kwargs):
         import string, random
-        # username, email, password = kwargs['username'], kwargs['email'], kwargs['password1']
         email = kwargs['email']
         first_name, last_name = kwargs['first_name'], kwargs['last_name']
         born_date, born_place = kwargs['born_date'], kwargs['born_place']
@@ -53,25 +55,3 @@ class FusolabBackend(DefaultBackend):
                                      user=new_user,
                                      request=request)
         return new_user
-
-
-    def activate(self, request, activation_key):
-        """ 
-            ritorniamo acrivated = True solo se ha completato anche il form
-        """
-        if RegistrationProfile.objects.filter(activation_key=activation_key).count() >= 0:
-            if request.method == 'POST':
-                form = EditFormSocio(request.POST)
-                if form.is_valid() :
-                    activated = RegistrationProfile.objects.activate_user(activation_key)
-                    signals.user_activated.send(sender=self.__class__,
-                                            user=activated,
-                                            request=request)
-                    return activated
-            else:
-                form = EditFormSocio()
-            render_to_response('registration/edit.html', {'form': form} , context_instance=RequestContext(request))
-
-        render_to_response('registration/edit.html', {'form': form} , context_instance=RequestContext(request))
-        #return None #if there is not a key, return None
-
