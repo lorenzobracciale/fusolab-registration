@@ -1,5 +1,5 @@
 # regbackend.py
-import profile
+import profile, re, unidecode
 from fusoci.forms import RegistrationFormSocio
 from registration.backends.default import DefaultBackend
 
@@ -14,6 +14,9 @@ from models import UserProfile
 
 from fusoci.forms import EditFormSocio
 
+def slugify(str):
+    str = unidecode.unidecode(str).lower()
+    return re.sub(r'\W+','-',str)
 
 class FusolabBackend(DefaultBackend):
     def register(self, request, **kwargs):
@@ -22,7 +25,7 @@ class FusolabBackend(DefaultBackend):
         first_name, last_name = kwargs['first_name'], kwargs['last_name']
         born_date, born_place = kwargs['born_date'], kwargs['born_place']
         proposed_username = first_name + last_name 
-
+        proposed_username = slugify(proposed_username) 
         #assure username is unique
         username = proposed_username
         unique_n = 0

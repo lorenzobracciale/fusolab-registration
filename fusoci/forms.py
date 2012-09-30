@@ -66,7 +66,7 @@ class EditFormSocio(RegistrationForm):
         else:
             user = self.request.user
 
-        if not user:
+        if not user: #give error
             return render_to_response('registration/activate.html', { } , context_instance=RequestContext(request))
 
         has_password = user.is_authenticated() and user.has_usable_password()
