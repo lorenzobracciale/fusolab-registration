@@ -5,6 +5,7 @@
 
 {% url home as home %}
 {% url edit as edit %}
+{% url manifesto as manifesto %}
 {% url registration_register as register %}
 {% url auth_login as login %}
 {% url auth_logout  as logout %}
@@ -40,6 +41,7 @@
         <ul id="menu">
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
           <li class="{% active request home %}"><a href="/">Home</a></li>
+          <li class="{% active request manifesto %}"><a href="/manifesto/">Manifesto</a></li>
             
         {% if user.is_authenticated %}
             <li class="{% active request edit %}"><a href="/accounts/edit">Modifica Profilo</a></li>
