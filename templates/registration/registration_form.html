@@ -1,9 +1,49 @@
 {% extends "registration/base.html" %}
 
 {% block title %}Iscrizione{% endblock %}
+{% block js %}
+{% if form.non_field_errors %}
+<script src="/static/js/soundmanager2-nodebug-jsmin.js"></script>
+<script>
+    soundManager.setup({
+      url: '/static/swf/',
+      flashVersion: 9, // optional: shiny features (default = 8)
+      useFlashBlock: false, // optionally, 
+      onready: function() {
+        // Ready to use; soundManager.createSound() etc. can now be called.
+        soundManager.createSound({
+          id: 'mySound',
+          url: '/static/sound/sitcom.mp3',
+          autoLoad: true,
+          autoPlay: true,
+          onload: function() {
+            // alert('The sound '+this.id+' loaded!');
+          },
+          volume: 100
+        });
+        // soundManager.play('mySound');
+      }
+    });
+    $(document).ready( function() {
+        if ( $('ul.errorlist li:first-child').text().search(/LOL/i) >= 0 ) {
+            $('#lol-content').prepend('<img src="/static/images/jackie.jpg" />')
+                        $('#form-content').toggle('fast', function() {
+                // Animation complete.
+                setTimeout(function() {
+                    $('#lol-content').empty();
+                    $('#form-content').toggle();
+                } , 12000);
+            });
 
+        } 
+    } );
+{% endif %}
+</script>
+{% endblock %}
 {% block content %}
-
+<div id="lol-content">
+</div>
+<div id="form-content">
   {% if form.errors %}
   <p class="errors">Correggi i seguenti errori: {{ form.non_field_errors }}</p>
   {% endif %}
@@ -77,7 +117,7 @@
     <p class="submit"><input class="button green" type="submit" value="Iscriviti &rarr;"></p>
     </fieldset>
   </form>
-  
+</div>  
 {% endblock %}
 
 {% block sidebar %}
