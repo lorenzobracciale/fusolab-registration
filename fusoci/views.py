@@ -13,8 +13,8 @@ from fusoci.regbackend import FusolabBackend
 def home(request):
     return render_to_response('fusoci/index.html', {} , context_instance=RequestContext(request))
 
-def manifesto(request):
-    return render_to_response('fusoci/manifesto.html', {} , context_instance=RequestContext(request))
+def statuto(request):
+    return render_to_response('fusoci/statuto.html', {} , context_instance=RequestContext(request))
 
 def edit(request, activation_key=None):
     if request.user.is_authenticated() or activation_key:

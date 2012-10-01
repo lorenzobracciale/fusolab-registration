@@ -4,5 +4,5 @@ fusolab
 fusolab projects
 
 
-Need: django, python image library
+Need: django, python image library, unidecode
 

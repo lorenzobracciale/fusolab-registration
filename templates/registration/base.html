@@ -5,7 +5,7 @@
 
 {% url home as home %}
 {% url edit as edit %}
-{% url manifesto as manifesto %}
+{% url statuto as statuto %}
 {% url registration_register as register %}
 {% url auth_login as login %}
 {% url auth_logout  as logout %}
@@ -33,7 +33,7 @@
       <div id="logo">
         <div id="logo_text">
           <!-- class="logo_colour", allows you to change the colour of the text -->
-          <h1><a href="/index.html">Fusolab<span class="logo_colour">2.0</span></a></h1>
+          <h1><a href="/">Fusolab<span class="logo_colour">2.0</span></a></h1>
           <h2>Laboratorio Creativo</h2>
         </div>
       </div>
@@ -41,7 +41,7 @@
         <ul id="menu">
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
           <li class="{% active request home %}"><a href="/">Home</a></li>
-          <li class="{% active request manifesto %}"><a href="/manifesto/">Manifesto</a></li>
+          <li class="{% active request statuto %}"><a href="/statuto/">Statuto</a></li>
             
         {% if user.is_authenticated %}
             <li class="{% active request edit %}"><a href="/accounts/edit">Modifica Profilo</a></li>

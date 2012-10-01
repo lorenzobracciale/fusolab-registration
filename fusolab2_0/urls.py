@@ -13,7 +13,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'fusoci.views.home', name='home' ),
-    url(r'^manifesto/$', 'fusoci.views.manifesto', name='manifesto'),
+    url(r'^statuto/$', 'fusoci.views.statuto', name='statuto'),
 
     url(r'^accounts/edit/$', 'fusoci.views.edit', name='edit'),
 
