@@ -15,6 +15,7 @@ class UserProfile(models.Model):
     born_place = models.CharField(max_length=50, blank=True)
 
     photo = models.ImageField(upload_to='photo/', blank=True) #TODO fare check nel form per size ed eventualmente resizing
+    how_hear = models.CharField(max_length=500, blank=True)
     
     date_inserted = models.DateField(auto_now_add=True)
 

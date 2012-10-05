@@ -1,5 +1,7 @@
 {% extends "registration/base.html" %}
 
+{% load thumbnail %}
+
 {% block title %}Modifica {% endblock %}
 
 {% block content %}
@@ -10,7 +12,7 @@
   <p class="errors">Correggi gli errori qui sotto: {{ form.non_field_errors }}</p>
   {% endif %}
   
-  <form method="post" action="" class="wide">
+  <form enctype="multipart/form-data" method="post" action="" class="wide">
     <fieldset>  
     <legend>I tuoi dati</legend>  
 	{% csrf_token %}

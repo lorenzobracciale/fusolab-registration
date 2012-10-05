@@ -5,8 +5,10 @@ from django.utils.translation import ugettext_lazy as _
 from fusoci.models import UserProfile, DOCUMENT_TYPES
 from registration.models import RegistrationProfile
 from django.contrib.auth.models import User
+from form_utils.widgets import ImageWidget
 from models import UserProfile
 import datetime
+MAX_PHOTO_SIZE = 1500000 #bytes
 
 class RegistrationFormSocio(RegistrationForm):
     first_name = forms.CharField(max_length=50, required=True, label=_(u'Nome'))
@@ -62,7 +64,8 @@ class EditFormSocio(RegistrationForm):
     password2 = forms.CharField(widget=forms.PasswordInput(render_value=False),
                                 label=_("Password (di nuovo)"), required=False)
 
-    photo = forms.ImageField(required=False)
+    photo = forms.ImageField(required=False, widget=ImageWidget(width=50, height=50, template='%(input)s<br />%(image)s') )
+    how_hear = forms.CharField(max_length=500, widget=forms.Textarea, label=_(u'Come ci hai conosciuto?'), required=False)
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
@@ -72,6 +75,12 @@ class EditFormSocio(RegistrationForm):
 
 
     def clean(self):
+        data = self.cleaned_data
+        if 'photo' in data and data['photo']:
+            image = self.request.FILES['photo']
+            if image.size > MAX_PHOTO_SIZE:
+                raise forms.ValidationError(_("La foto che hai immesso e' troppo grande")) 
+
         if self.activation_key:
             try:
                 user = RegistrationProfile.objects.get(activation_key=self.activation_key).user
@@ -127,7 +136,11 @@ class EditFormSocio(RegistrationForm):
 
         profile.born_date, profile.born_place = data['born_date'], data['born_place']
         profile.doc_type, profile.doc_id = data['doc_type'], data['doc_id']
-        #TODO profile.photo = 
+        if 'how_hear' in data and len(data['how_hear']):
+            profile.how_hear = data['how_hear']
+        if 'photo' in data and data['photo']:
+            image = self.request.FILES['photo']
+            profile.photo.save(image.name, image) 
 
         profile.user = user
         profile.save()

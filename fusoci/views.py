@@ -31,7 +31,7 @@ def edit(request, activation_key=None):
 
         profile = user.get_profile()
         if request.method == 'POST':
-            form = EditFormSocio(request.POST, request=request, activation_key=activation_key, activating_user=user)  
+            form = EditFormSocio(request.POST, request.FILES, request=request, activation_key=activation_key, activating_user=user)  
             if form.is_valid():
                 if activation_key:
                     activate(request, backend='fusoci.regbackend.FusolabBackend', activation_key=activation_key)
@@ -53,6 +53,8 @@ def edit(request, activation_key=None):
                         'born_place': profile.born_place,
                         'doc_type': profile.doc_type,
                         'doc_id': profile.doc_id,
+                        'how_hear': profile.how_hear,
+                        'photo': profile.photo,
                         #TODO pic
                         }
             if activation_key:
