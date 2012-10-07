@@ -11,8 +11,8 @@ import datetime
 MAX_PHOTO_SIZE = 1500000 #bytes
 
 class RegistrationFormSocio(RegistrationForm):
-    first_name = forms.CharField(max_length=50, required=True, label=_(u'Nome'))
-    last_name = forms.CharField(max_length=50, required=True, label=_(u'Cognome'))
+    first_name = forms.CharField(max_length=30, required=True, label=_(u'Nome'))
+    last_name = forms.CharField(max_length=30, required=True, label=_(u'Cognome'))
 
     born_date = forms.DateField(input_formats=["%d/%m/%Y"] , label=_(u'Data di Nascita (gg/mm/aaaa)'))
     born_place = forms.CharField(max_length=50, label=_(u'Luogo di Nascita'))

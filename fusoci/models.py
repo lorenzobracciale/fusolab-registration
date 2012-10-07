@@ -24,6 +24,7 @@ class UserProfile(models.Model):
 class Card(models.Model):
     sn = models.CharField(unique=True, max_length=16 )
     user = models.ForeignKey('UserProfile')
+    created_on = models.DateField(auto_now_add=True)
     def __unicode__(self):
         return u'%s - %s %s' % (self.sn, self.user.user.first_name, self.user.user.last_name)
 

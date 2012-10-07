@@ -690,3 +690,7 @@ div#carddiv .hint {
   font-size: 0.8em;
   color: #888;
 }
+#output {
+  font-size: 2em;
+  color: red;
+}

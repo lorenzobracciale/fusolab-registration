@@ -9,6 +9,48 @@ $(document).ready(function() {
         q = $('#q').val();
         $('#results').html('&nbsp;').load('{% url user_search %}?q=' + q);
     });
+    /* read the card */
+    $("#read-card").live('click', function() {
+        $.ajax({
+            type: 'GET',
+            url: "{{ URL_CARD }}",
+            data: {},
+            dataType: "json",
+            success: function(card) {
+                if (card)
+                    $("#read-card-value").text("Tessera numero: " + card.sn);
+                else 
+                    alert("Non e' stata avvicinata nessuna tessera al lettore.");  
+            },
+            error: function(x,y,z) {
+                alert(x.responseText);
+            }
+        });
+    });
+
+    /* bind a card */
+    $(".make-card").live('click', function() {
+        var userid = this.id; 
+        if (userid) {
+            $.getJSON( '{{ URL_CARD }}', function(card) { //read the card
+                if (card) {
+                    $.ajax({    //write in the db
+                    url: "/makecard/",
+                    type: "GET",
+                    data: {'userid': userid, 'sn': card.sn},
+                    dataType: "html",
+                    success: function(resp) {
+                        $("#output").html(resp)
+                    }
+                    });
+                } else {
+                     alert("Non e' stata avvicinata nessuna tessera al lettore.");
+                }
+            }); 
+        } else {
+            alert("Errore: no user");
+        }
+    });
 });
 
 $(document).ajaxStart(function() {
@@ -19,6 +61,7 @@ $(document).ajaxStart(function() {
 </script>
 {% endblock %}
 <h1>Tessere</h1>
+<span id="output"></span>
 <div id="carddiv">
     <input id="q" type="text"/>
     <input id="searchSubmit" class="button green" type="submit" value="Cerca"/>
@@ -29,7 +72,13 @@ $(document).ajaxStart(function() {
         <div id="results"></div>
     </div>
 </div>
-<a class="button blue" href="/admin">Vai al pannello di amministrazione</a>
 
+<br/>
+<p>
+<a class="button pink" href="#" id='read-card'>Leggi tessera</a><span id="read-card-value"></span>
+<br/>
+<p>
+<a class="button blue" href="/admin">Vai al pannello di amministrazione</a>
+</p>
 {% endblock %}
 

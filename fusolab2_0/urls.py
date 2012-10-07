@@ -17,6 +17,11 @@ urlpatterns = patterns('',
 
     url(r'^accounts/edit/$', 'fusoci.views.edit', name='edit'),
 
+    url( r'^users/$', 'fusoci.views.ajax_user_search', name = 'user_search' ),
+    url(r'^card/$', 'fusoci.views.card', name='card'),
+    url(r'^makecard/$', 'fusoci.views.makecard', name='makecard'),
+
+
     url(r'^accounts/register/$', register, {'form_class': RegistrationFormSocio,
         'backend': 'fusoci.regbackend.FusolabBackend' },
          name='registration_register'),

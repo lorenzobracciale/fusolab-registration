@@ -9,7 +9,7 @@
     <tr class="{% cycle 'odd' 'even' %}">
         <td><strong>{{ forloop.counter }}.</strong></td>
         <td>
-        {{ user.first_name }} {{ user.last_name }}<br/>
+            {{ user.first_name }} {{ user.last_name }} - <a class="make-card" id="{{ user.id }}" href='#'>Fai la tessera</a><br/>
         <span class="hint">{{ user.email }} {% if user.is_active %} (verificata) {% else %} (non verificata) {% endif %}</span>
         </td>
         <td class="right">
@@ -23,6 +23,6 @@
     </table>
 {% else %}
     <div class="note">
-    Your search yielded no results
+    Non ho trovato un bel nulla. 
     </div>
 {% endif %}

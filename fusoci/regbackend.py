@@ -25,7 +25,7 @@ class FusolabBackend(DefaultBackend):
         first_name, last_name = kwargs['first_name'], kwargs['last_name']
         born_date, born_place = kwargs['born_date'], kwargs['born_place']
         proposed_username = first_name + last_name 
-        proposed_username = slugify(proposed_username) 
+        proposed_username = slugify(proposed_username)[:25] 
         #assure username is unique
         username = proposed_username
         unique_n = 0

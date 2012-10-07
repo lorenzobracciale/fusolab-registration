@@ -11,6 +11,7 @@ from registration.models import RegistrationProfile
 from django.contrib.auth.models import User
 from django.db.models import Q
 from fusoci.models import UserProfile, Card
+from django.conf import settings
 
 
 from fusoci.regbackend import FusolabBackend
@@ -23,7 +24,21 @@ def statuto(request):
 
 @staff_member_required
 def card(request):
-    return render_to_response('fusoci/card.html', {} , context_instance=RequestContext(request))
+    return render_to_response('fusoci/card.html', { 'URL_CARD': settings.URL_CARD } , context_instance=RequestContext(request))
+
+@staff_member_required
+def makecard(request):
+    userid = request.GET.get('userid') or None
+    user = UserProfile.objects.filter(user__id=userid)
+    sn = request.GET.get('sn') or None
+    if user and sn:
+        c = Card(sn=sn, user=user[0]) 
+        try:
+            c.save()
+        except:
+            return HttpResponse("Errore: non e' stato possibile inserire la carta nel database. Tessera gia' inserita? ")
+        return HttpResponse("Card registrata!")
+    return HttpResponse("Errore: non ho trovato il socio o il sn non e' valido.")
 
 
 @staff_member_required
