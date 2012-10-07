@@ -5,6 +5,7 @@
 
 {% url home as home %}
 {% url edit as edit %}
+{% url card as card %}
 {% url statuto as statuto %}
 {% url registration_register as register %}
 {% url auth_login as login %}
@@ -46,6 +47,9 @@
         {% if user.is_authenticated %}
             <li class="{% active request edit %}"><a href="/accounts/edit">Modifica Profilo</a></li>
             <li class="{% active request logout %}"><a href="/accounts/logout">Logout</a></li>
+            {% if user.is_staff %}
+                <li class="{% active request card %}"><a href="/card">Tessere</a></li>
+            {% endif %}
         {% else %}
             <li class="{% active request register %}"><a href="/accounts/register">Registrati</a></li>
             <li class="{% active request login %}"><a href="/accounts/login">Log-in</a></li>

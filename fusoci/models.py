@@ -16,8 +16,16 @@ class UserProfile(models.Model):
 
     photo = models.ImageField(upload_to='photo/', blank=True) #TODO fare check nel form per size ed eventualmente resizing
     how_hear = models.CharField(max_length=500, blank=True)
+
+    def __unicode__(self):
+        return u'%s %s' % (self.user.first_name, self.user.last_name)
     
-    date_inserted = models.DateField(auto_now_add=True)
+
+class Card(models.Model):
+    sn = models.CharField(unique=True, max_length=16 )
+    user = models.ForeignKey('UserProfile')
+    def __unicode__(self):
+        return u'%s - %s %s' % (self.sn, self.user.user.first_name, self.user.user.last_name)
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

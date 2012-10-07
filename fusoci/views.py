@@ -1,12 +1,17 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext, loader
 from forms import EditFormSocio
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 import datetime
 from registration.views import activate
 from registration.backends import get_backend
 from registration.models import RegistrationProfile
+from django.contrib.auth.models import User
+from django.db.models import Q
+from fusoci.models import UserProfile, Card
+
 
 from fusoci.regbackend import FusolabBackend
 
@@ -15,6 +20,31 @@ def home(request):
 
 def statuto(request):
     return render_to_response('fusoci/statuto.html', {} , context_instance=RequestContext(request))
+
+@staff_member_required
+def card(request):
+    return render_to_response('fusoci/card.html', {} , context_instance=RequestContext(request))
+
+
+@staff_member_required
+def ajax_user_search(request):
+    if request.is_ajax():
+        q = request.GET.get('q')
+        if q is not None:            
+            results = User.objects.filter( 
+                Q(email__contains = q) |
+                Q(last_name__contains = q)).order_by('username')
+            #results = [user.cards = list(Card.objects.filter(user=user.get_profile())) for user in results]
+            for user in results:
+                user.cards = Card.objects.filter(user=user.get_profile())
+            template = 'fusoci/results.html'
+            data = {
+                'results': results,
+            }
+            return render_to_response(template, data, 
+                context_instance = RequestContext(request))
+    else:
+       return HttpResponseNotFound('<h1>Brutta richiesta!</h1>')
 
 def edit(request, activation_key=None):
     if request.user.is_authenticated() or activation_key:

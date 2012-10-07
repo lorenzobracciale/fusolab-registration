@@ -621,3 +621,72 @@ label {
     border:1px solid #ccc;
     overflow:auto;
 }
+
+/* fai la tessera */
+div#carddiv table {
+  width: 100%;
+  border: 1px solid #DDDDB2;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+div#carddiv tr {
+  padding-bottom: 5px;
+  border-bottom: 1px solid #CCC;
+}
+
+div#carddiv tr.odd {
+  background: #FFF;
+}
+
+div#carddiv tr.even {
+  background: #FFFFD4;
+}
+
+div#carddiv td {
+  margin: 0;
+  padding: 5px 5px 5px 3px;
+  vertical-align: top;
+}
+
+div#carddiv td.right {
+  text-align: right;
+}
+
+div#carddiv #centered {     
+  text-align: left;
+  vertical-align: middle;   
+  margin: 0px auto;
+  padding: 20px;
+  width: 550px;
+  background-color: #FFF;
+  border: 1px solid #CCC;
+}
+
+#spinner {
+  display: none;
+  position: relative;
+}
+
+div#carddiv div.padded {
+  padding-top: 10px;
+}
+
+div#carddiv div.margin {
+  margin-top: 20px;
+}
+
+div#carddiv div.clear {
+  clear: both;
+}
+
+div#carddiv div.note {
+  padding: 15px;
+  background: #FFFFD4;
+  border: 1px solid #DDDDB2;
+}
+
+div#carddiv .hint {
+  font-size: 0.8em;
+  color: #888;
+}

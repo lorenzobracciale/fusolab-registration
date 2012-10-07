@@ -1,0 +1,35 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Fai la tessera{% endblock %}
+{% block content %}
+{% block js %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#searchSubmit').click(function() {
+        q = $('#q').val();
+        $('#results').html('&nbsp;').load('{% url user_search %}?q=' + q);
+    });
+});
+
+$(document).ajaxStart(function() {
+    $('#spinner').show();
+}).ajaxStop(function() {
+    $('#spinner').hide();
+});
+</script>
+{% endblock %}
+<h1>Tessere</h1>
+<div id="carddiv">
+    <input id="q" type="text"/>
+    <input id="searchSubmit" class="button green" type="submit" value="Cerca"/>
+    <br/>
+    <span class="hint">Inserisci l'e-mail o il cognome:</span>
+    <div class="margin">
+        <span id="spinner"><img src="{{ STATIC_URL }}images/spinner.gif"/></span>
+        <div id="results"></div>
+    </div>
+</div>
+<a class="button blue" href="/admin">Vai al pannello di amministrazione</a>
+
+{% endblock %}
+
