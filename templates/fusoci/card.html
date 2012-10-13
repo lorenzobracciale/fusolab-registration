@@ -1,7 +1,6 @@
 {% extends "registration/base.html" %}
 
 {% block title %}Fai la tessera{% endblock %}
-{% block content %}
 {% block js %}
 <script type="text/javascript">
 $(document).ready(function() {
@@ -17,7 +16,7 @@ $(document).ready(function() {
             data: {},
             dataType: "json",
             success: function(card) {
-                if (card)
+            if (card && card.sn.length !==  0)
                     $("#read-card-value").text("Tessera numero: " + card.sn);
                 else 
                     alert("Non e' stata avvicinata nessuna tessera al lettore.");  
@@ -33,7 +32,7 @@ $(document).ready(function() {
         var userid = this.id; 
         if (userid) {
             $.getJSON( '{{ URL_CARD }}', function(card) { //read the card
-                if (card) {
+                if (card && card.sn.length !== 0) {
                     $.ajax({    //write in the db
                     url: "/makecard/",
                     type: "GET",
@@ -60,6 +59,7 @@ $(document).ajaxStart(function() {
 });
 </script>
 {% endblock %}
+{% block content %}
 <h1>Tessere</h1>
 <span id="output"></span>
 <div id="carddiv">

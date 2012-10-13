@@ -7,15 +7,21 @@
     </tr>
     {% for user in results %}
     <tr class="{% cycle 'odd' 'even' %}">
-        <td><strong>{{ forloop.counter }}.</strong></td>
+
+        <td><strong><a id="{{ user.id }}" href='#' class="make-card button {% if user.cards|length > 0 %} orange {% else %} green {% endif %}">Tesseralo</a></strong></td>
         <td>
-            {{ user.first_name }} {{ user.last_name }} - <a class="make-card" id="{{ user.id }}" href='#'>Fai la tessera</a><br/>
+            <a href="/admin/auth/user/{{ user.id }}/">{{ user.first_name }} {{ user.last_name }}</a><br/>
         <span class="hint">{{ user.email }} {% if user.is_active %} (verificata) {% else %} (non verificata) {% endif %}</span>
         </td>
         <td class="right">
         <span class="hint">
         Registrato {{ user.date_joined|timesince }} fa<br/>
-        Ha {{ user.cards|length }} tessere registrate 
+        {% if user.cards|length == 0 %}
+            Non ha tessere registrate
+        {% else %}
+            Ha {{ user.cards|length }} tessere registrate: 
+            {% for card in user.cards %}<a href="/admin/fusoci/card/{{ card.id }}">{{ forloop.counter }}</a>{% if not forloop.last %}-{% endif %}{% endfor %}
+        {% endif %}
         </span>
         </td>
     </tr>

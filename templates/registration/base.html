@@ -49,6 +49,7 @@
             <li class="{% active request logout %}"><a href="/accounts/logout">Logout</a></li>
             {% if user.is_staff %}
                 <li class="{% active request card %}"><a href="/card">Tessere</a></li>
+                <li><a href="/admin">Admin</a></li>
             {% endif %}
         {% else %}
             <li class="{% active request register %}"><a href="/accounts/register">Registrati</a></li>
