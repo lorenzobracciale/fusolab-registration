@@ -27,6 +27,18 @@ def card(request):
     return render_to_response('fusoci/card.html', { 'URL_CARD': settings.URL_CARD } , context_instance=RequestContext(request))
 
 @staff_member_required
+def viewcard(request):
+    sn = request.GET.get('sn') or None
+    if sn and len(sn) > 0 :
+        try:
+            c = Card.objects.get(sn=sn) 
+            return HttpResponse("Tessera <a href='/admin/fusoci/card/" + str(c.id) +  "'>" + sn + "</a> appartenente a <a href='/admin/auth/user/" + str(c.user.id) + "'>" + c.user.user.first_name + " " + c.user.user.last_name + "</a>" )
+        except Card.DoesNotExist:
+            
+            return HttpResponse(sn + ". La tessera non e' di nessun socio.")
+
+
+@staff_member_required
 def makecard(request):
     userid = request.GET.get('userid') or None
     user = UserProfile.objects.filter(user__id=userid)
