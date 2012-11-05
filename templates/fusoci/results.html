@@ -20,7 +20,7 @@
             Non ha tessere registrate
         {% else %}
             Ha {{ user.cards|length }} tessere registrate: 
-            {% for card in user.cards %}<a href="/admin/fusoci/card/{{ card.id }}">{{ forloop.counter }}</a>{% if not forloop.last %}-{% endif %}{% endfor %}
+            {% for card in user.cards %}<a href="/admin/fusoci/card/{{ card.id }}">{{ card.id }}</a>{% if not forloop.last %}-{% endif %}{% endfor %}
         {% endif %}
         </span>
         </td>

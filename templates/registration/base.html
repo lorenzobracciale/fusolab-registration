@@ -6,6 +6,7 @@
 {% url home as home %}
 {% url edit as edit %}
 {% url card as card %}
+{% url cash as cash %}
 {% url viewcard as viewcard %}
 {% url statuto as statuto %}
 {% url registration_register as register %}
@@ -31,6 +32,7 @@
 
 <body id="">
   <div id="main">
+    {% block header %}
     <div id="header">
       <div id="logo">
         <div id="logo_text">
@@ -50,6 +52,7 @@
             <li class="{% active request logout %}"><a href="/accounts/logout">Logout</a></li>
             {% if user.is_staff %}
                 <li class="{% active request card %}"><a href="/card">Tessere</a></li>
+                <li class="{% active request cash %}"><a href="/cash">Cassa</a></li>
                 <li><a href="/admin">Admin</a></li>
             {% endif %}
         {% else %}
@@ -60,6 +63,7 @@
         </ul>
       </div>
     </div>
+    {% endblock %}
     <div id="content_header"></div>
     <div id="site_content">
      
@@ -94,10 +98,12 @@
       </div>
     </div>
      
+    {% block footer %}
     <div id="content_footer"></div>
     <div id="footer">
         Fusolab 2.0 -  Viale della Bella Villa, 94 00172 Roma 
     </div>
+    {% endblock %}
   </div>
 </body>
 </html>

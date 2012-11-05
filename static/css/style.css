@@ -694,3 +694,7 @@ div#carddiv .hint {
   font-size: 2em;
   color: red;
 }
+
+#cashdiv a {
+  font-size: 3em;
+}

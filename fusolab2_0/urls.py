@@ -19,6 +19,7 @@ urlpatterns = patterns('',
 
     url( r'^users/$', 'fusoci.views.ajax_user_search', name = 'user_search' ),
     url(r'^card/$', 'fusoci.views.card', name='card'),
+    url(r'^cash/$', 'fusoci.views.cash', name='cash'),
     url(r'^makecard/$', 'fusoci.views.makecard', name='makecard'),
     url(r'^viewcard/$', 'fusoci.views.viewcard', name='viewcard'),
 

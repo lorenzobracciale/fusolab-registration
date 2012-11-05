@@ -27,6 +27,10 @@ def card(request):
     return render_to_response('fusoci/card.html', { 'URL_CARD': settings.URL_CARD } , context_instance=RequestContext(request))
 
 @staff_member_required
+def cash(request):
+    return render_to_response('fusoci/cash.html', { } , context_instance=RequestContext(request))
+
+@staff_member_required
 def viewcard(request):
     sn = request.GET.get('sn') or None
     if sn and len(sn) > 0 :
@@ -49,7 +53,7 @@ def makecard(request):
             c.save()
         except:
             return HttpResponse("Errore: non e' stato possibile inserire la carta nel database. Tessera gia' inserita? ")
-        return HttpResponse("Card registrata!")
+        return HttpResponse("Card registrata con id " + str(c.id) )
     return HttpResponse("Errore: non ho trovato il socio o il sn non e' valido.")
 
 
@@ -112,7 +116,6 @@ def edit(request, activation_key=None):
                         'doc_id': profile.doc_id,
                         'how_hear': profile.how_hear,
                         'photo': profile.photo,
-                        #TODO pic
                         }
             if activation_key:
                 init_dict.pop('username') #force users to choose a username
