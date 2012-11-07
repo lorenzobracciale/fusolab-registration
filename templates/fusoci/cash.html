@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<head>
+	<title>Cassa Fusolab 2.0</title>
+	<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="/static/css/cash.css" />
+    <script type="text/javascript" src="/static/js/jquery-1.8.0.min.js"></script>  
+    <script type="text/javascript" src="/static/js/jquery-ui-1.8.23.custom.min.js"></script>  
+    <script type="text/javascript" src="/static/js/jquery.printElement.min.js"></script>
+  <script type="text/javascript"> 
+     var  total = 0.0;
+
+      function refresh_total () {
+        $('.total').each(function(index) {
+            $(this).html( total.toString().replace(".", ",") );
+        });
+      };
+
+      function additem( p_id ) {
+          var cost = 0.0;
+          {% for p in products %} 
+          if (p_id == {{ p.id }}) {
+              $('#product-receipt ul').append("<li><span class='product-name'>{{ p.name }}</span><span class='product-cost'>{{ p.cost }}</span></li>");
+              cost = parseFloat("{{ p.cost }}".replace(",", "."));
+              total += cost; 
+          }
+          {% endfor  %}
+          refresh_total();
+      };
+      function removelastitem() {
+          var last_cost_element = $('#product-receipt li .product-cost').last();
+          var last_cost = 0.0;
+          if ( last_cost_element.length  ) {
+              last_cost = parseFloat(last_cost_element.text().replace(",", "."));
+              total -= last_cost
+              $('#product-receipt li').last().remove();
+              refresh_total();
+          }
+      };
+
+      function clearitems() {
+          $('#product-receipt').empty();
+          $('#product-receipt').html('<ul></ul>');
+          total = 0.0;
+          refresh_total();
+      };
+      function printreceipt(){
+           /* push in db and print */
+          var json_list = { 'purchased_products' : [] };
+
+          if (total == 0.0)
+              return;
+
+          $('#product-receipt ul .product-name').each(function(index) {
+              json_list.purchased_products.push( $(this).text() )
+          } );
+          $.post("/barcash/addpurchasedproduct/", json_list , function(data) { }
+          )
+          .success(function() { $('#receipt').printElement(); })
+          .error(function() { alert("Errore, non posso connettermi al server FusoHeart, contattare un nerd!"); })
+          .complete(function() {  });
+              
+              ;
+          clearitems()
+          refresh_total();
+      };
+
+
+      $(document).ready(function() {
+             $(document).keypress(function(e) {
+                 /* bind products from 1 to 9*/
+                switch (e.which) {
+                    {% for p in products %}
+                        case 48 + {{ p.id }} :
+                            additem({{ p.id}});
+                        break;
+                    {% endfor %}
+                    case 13:
+                        // enter
+                        printreceipt();
+                    case 8:
+                        // backspace
+                        clearitems();
+                    case 9:
+                        //tab
+                        removelastitem();
+                    default:
+                        ;
+                    } 
+              });
+      });
+  </script>
+
+</head>
+<body id="body">
+<h1>Cassa 2.0</h1>
+<div class="colmask leftmenu">
+	<div class="colleft">
+		<div class="col1"> <!-- right col --!>
+            <div id="products">
+                <ul>
+                {% for p in products %}
+                    <li><a href="javascript:additem({{ p.id }})"><span class="product-n">{{ p.id }}</span><span class="product-name">{{ p.name }}</span><span class="product-cost">{{ p.cost }}</span></a></li>
+                {% endfor %}
+                </ul>
+                <div id='printcancel'>
+                    <ul>
+                        <li id="cancel-last"><a href="javascript:removelastitem()">Annulla Ultimo</a></li>
+                        <li id="cancel-all"><a href="javascript:clearitems()">Annulla Tutto</a></li>
+                        <li id="print-receipt"><a href="javascript:printreceipt()">Stampa</a></li>
+                    </ul>
+                </div>
+            </div>
+		</div>
+        <div class="col2"> <!-- left col --!>
+			<h2>Scontrino</h2>
+			<h2>Totale: <span class="total"></span></h2>
+            <div id="receipt">
+                <img src="/static/images/fusolab_logo.png" height="42" width="62"/>
+                <span id="rdate">
+                    Fusolab 2.0 <br/>
+                    {% now "j-m-Y" %}
+                    <br />
+                    {% now "H:i" %}
+                </span>
+                <div id="product-receipt">
+                    <ul></ul>
+                </div>
+                <li id="litotal"><span class='product-name'>TOTALE</span><span class='product-cost total'>0</span></li>
+            </div>
+        </div>
+	</div>
+</div>
+<div id="footer">
+    <p><a href="#">Gestione Cassa</a></p>
+</div>
+
+</body>
+</html>

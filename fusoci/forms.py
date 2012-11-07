@@ -42,7 +42,7 @@ class RegistrationFormSocio(RegistrationForm):
                         if firstlastname.find(part.lower()) < 0:
                             found = False 
                     if found:
-                        raise forms.ValidationError(_("LOL!"))
+                        raise forms.ValidationError(_("LOL! ") )
 
         return cdata
 

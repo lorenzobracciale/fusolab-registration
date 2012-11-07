@@ -10,8 +10,9 @@ from registration.backends import get_backend
 from registration.models import RegistrationProfile
 from django.contrib.auth.models import User
 from django.db.models import Q
-from fusoci.models import UserProfile, Card
+from fusoci.models import * 
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 
 
 from fusoci.regbackend import FusolabBackend
@@ -27,8 +28,26 @@ def card(request):
     return render_to_response('fusoci/card.html', { 'URL_CARD': settings.URL_CARD } , context_instance=RequestContext(request))
 
 @staff_member_required
-def cash(request):
-    return render_to_response('fusoci/cash.html', { } , context_instance=RequestContext(request))
+def barcash(request):
+    p = Product.objects.all()
+    return render_to_response('fusoci/cash.html', { 'products': p } , context_instance=RequestContext(request))
+
+@csrf_exempt
+@staff_member_required
+def addpurchasedproduct(request):
+    data = request.POST
+    if (data):
+        for e in data.getlist('purchased_products[]') :
+           p = Product.objects.get(name = e) 
+           pp = PurchasedProduct()
+           pp.name = p.name
+           pp.cost = p.cost
+           pp.cashier = request.user.get_profile()
+           pp.save()
+        return HttpResponse('OK')
+    else:
+        return HttpResponseNotFound
+
 
 @staff_member_required
 def viewcard(request):

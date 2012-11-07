@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from fusoci.models import UserProfile, Card
+from fusoci.models import * 
 
 # Define an inline admin descriptor for UserProfile model
 # which acts a bit like a singleton
@@ -20,3 +20,6 @@ class UserAdmin(UserAdmin):
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Card)
+admin.site.register(PurchasedProduct)
+admin.site.register(Product)
+admin.site.register(BarCashBalance)

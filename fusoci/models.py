@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
 DOCUMENT_TYPES = ( ('ci', 'Carta d\'identita\''), ('pp', 'Passaporto'), ('pa', 'Patente')   )
+DATE_FORMAT = "%d-%m-%Y" 
+TIME_FORMAT = "%H:%M:%S"
 
 class UserProfile(models.Model):
     # This field is required.
@@ -27,6 +29,32 @@ class Card(models.Model):
     created_on = models.DateField(auto_now_add=True)
     def __unicode__(self):
         return u'%s - %s %s' % (self.sn, self.user.user.first_name, self.user.user.last_name)
+
+#bar
+class Product(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=30)
+    cost = models.DecimalField(max_digits=5, decimal_places=2)
+    def __unicode__(self):
+        return u'%s' % (self.name)
+
+class PurchasedProduct(models.Model):
+    purchased_at = models.DateTimeField(auto_now_add = True)
+    name = models.CharField(max_length=30)
+    cost = models.DecimalField(max_digits=5, decimal_places=2)
+    cashier = models.ForeignKey('UserProfile') 
+    def __unicode__(self):
+        return self.purchased_at.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
+
+class BarCashBalance(models.Model):
+    date = models.DateTimeField(auto_now_add = True)
+    initial_cash = models.DecimalField(max_digits=6, decimal_places=2)
+    final_cash = models.DecimalField(max_digits=6, decimal_places=2)
+    withdraw = models.DecimalField(max_digits=6, decimal_places=2)
+    deposit = models.DecimalField(max_digits=6, decimal_places=2)
+    def __unicode__(self):
+        return self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
+###
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

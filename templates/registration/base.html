@@ -6,7 +6,7 @@
 {% url home as home %}
 {% url edit as edit %}
 {% url card as card %}
-{% url cash as cash %}
+{% url barcash as barcash %}
 {% url viewcard as viewcard %}
 {% url statuto as statuto %}
 {% url registration_register as register %}
@@ -52,7 +52,7 @@
             <li class="{% active request logout %}"><a href="/accounts/logout">Logout</a></li>
             {% if user.is_staff %}
                 <li class="{% active request card %}"><a href="/card">Tessere</a></li>
-                <li class="{% active request cash %}"><a href="/cash">Cassa</a></li>
+                <li class="{% active request barcash %}"><a href="/barcash">Cassa Bar</a></li>
                 <li><a href="/admin">Admin</a></li>
             {% endif %}
         {% else %}
