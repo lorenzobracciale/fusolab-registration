@@ -85,6 +85,9 @@ img {
     background: red;
 }
 
+.product-id {
+    display: none;
+}
 #products #print-receipt a {
     background: green;
 }
@@ -99,9 +102,11 @@ img {
 	background:#000;
 	font-weight:bold;
 }
+
 #products ul li a span {
 	display:block;
 }
+
 /* 'widths' sub menu */
 #layoutdims {
 	clear:both;
@@ -159,7 +164,14 @@ img {
     border-style: dashed;
     border-color:#000000;
     padding: 10px;
+    margin: 20px;
 }
+
+#receipt img{ margin: 0 0 10px; width: 80px }
+
+#receipt li{ padding: 4px 4px; margin: -1px 0; border-top: 1px solid gray; border-bottom: 1px solid gray }
+
+#receipt-sn{ font-weight: bold }
 
 #receipt .product-cost {
     float: right;
@@ -174,6 +186,7 @@ img {
 #litotal {
      border-top:1px solid #000;
 	 font-weight:bold;
+     list-style: outside none;
 }
 
 #rdate {

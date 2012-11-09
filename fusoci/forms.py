@@ -64,7 +64,7 @@ class EditFormSocio(RegistrationForm):
     password2 = forms.CharField(widget=forms.PasswordInput(render_value=False),
                                 label=_("Password (di nuovo)"), required=False)
 
-    photo = forms.ImageField(required=False, widget=ImageWidget(width=50, height=50, template='%(input)s<br />%(image)s') )
+    photo = forms.ImageField(required=False, label=_(u'Foto (opzionale)'), widget=ImageWidget(width=50, height=50, template='%(input)s<br />%(image)s') )
     how_hear = forms.CharField(max_length=500, widget=forms.Textarea, label=_(u'Come ci hai conosciuto?'), required=False)
 
     def __init__(self, *args, **kwargs):

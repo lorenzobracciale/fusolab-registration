@@ -13,6 +13,7 @@ from django.db.models import Q
 from fusoci.models import * 
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import simplejson
 
 
 from fusoci.regbackend import FusolabBackend
@@ -35,18 +36,32 @@ def barcash(request):
 @csrf_exempt
 @staff_member_required
 def addpurchasedproduct(request):
-    data = request.POST
+    data = request.POST.get('q')
+    total = 0.0
     if (data):
-        for e in data.getlist('purchased_products[]') :
-           p = Product.objects.get(name = e) 
-           pp = PurchasedProduct()
-           pp.name = p.name
-           pp.cost = p.cost
-           pp.cashier = request.user.get_profile()
-           pp.save()
-        return HttpResponse('OK')
+       r = Receipt()
+
+       r.cashier = request.user.get_profile()
+       r.total = total
+       r.save()
+       jdata = simplejson.loads(data)
+       for p in jdata: #data.getlist('purchased_products') :
+           p_type = Product.objects.get(id = int(p['type']) ) 
+           for i in range(0, int(p['quantity'] ) ):
+               pp = PurchasedProduct()
+
+               pp.name = p_type.name
+               pp.cost = p_type.cost
+               total = total + float(pp.cost) 
+               pp.receipt = r
+               pp.save()
+       r.total = total
+       r.save()
+       #return HttpResponse( "{'receipt_id' : " + str(r.id) + "}", mimetype="application/json")
+       response_data = { 'receipt_id' : r.id }
+       return HttpResponse( simplejson.dumps(response_data), mimetype="application/json" )
     else:
-        return HttpResponseNotFound
+       return HttpResponseNotFound
 
 
 @staff_member_required
@@ -82,8 +97,8 @@ def ajax_user_search(request):
         q = request.GET.get('q')
         if q is not None:            
             results = User.objects.filter( 
-                Q(email__contains = q) |
-                Q(last_name__contains = q)).order_by('username')
+                Q(email__icontains = q) |
+                Q(last_name__icontains = q)).order_by('username')
             #results = [user.cards = list(Card.objects.filter(user=user.get_profile())) for user in results]
             for user in results:
                 user.cards = Card.objects.filter(user=user.get_profile())

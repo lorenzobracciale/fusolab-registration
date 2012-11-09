@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+from django.utils.safestring import mark_safe
 
 DOCUMENT_TYPES = ( ('ci', 'Carta d\'identita\''), ('pp', 'Passaporto'), ('pa', 'Patente')   )
 DATE_FORMAT = "%d-%m-%Y" 
@@ -32,26 +33,34 @@ class Card(models.Model):
 
 #bar
 class Product(models.Model):
-    id = models.IntegerField(primary_key=True)
+    keycode = models.IntegerField() #rapid keycode for cash 
     name = models.CharField(max_length=30)
     cost = models.DecimalField(max_digits=5, decimal_places=2)
     def __unicode__(self):
-        return u'%s' % (self.name)
+        return u'%d %s %s%s' % (self.keycode, self.name, self.cost, 'e' )
 
 class PurchasedProduct(models.Model):
-    purchased_at = models.DateTimeField(auto_now_add = True)
     name = models.CharField(max_length=30)
     cost = models.DecimalField(max_digits=5, decimal_places=2)
-    cashier = models.ForeignKey('UserProfile') 
+    receipt = models.ForeignKey('Receipt')
     def __unicode__(self):
-        return self.purchased_at.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
+        return self.receipt.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
+
+class Receipt(models.Model):
+    cashier = models.ForeignKey('UserProfile') 
+    date = models.DateTimeField(auto_now_add = True)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    def __unicode__(self):
+        return "#%d - %.2f EUR %s" % (self.id, self.total, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
 
 class BarCashBalance(models.Model):
     date = models.DateTimeField(auto_now_add = True)
+    cashier = models.ForeignKey('UserProfile') 
     initial_cash = models.DecimalField(max_digits=6, decimal_places=2)
     final_cash = models.DecimalField(max_digits=6, decimal_places=2)
     withdraw = models.DecimalField(max_digits=6, decimal_places=2)
     deposit = models.DecimalField(max_digits=6, decimal_places=2)
+    note = models.TextField()
     def __unicode__(self):
         return self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
 ###

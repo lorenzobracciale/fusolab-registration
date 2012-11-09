@@ -20,13 +20,14 @@
           var cost = 0.0;
           {% for p in products %} 
           if (p_id == {{ p.id }}) {
-              $('#product-receipt ul').append("<li><span class='product-name'>{{ p.name }}</span><span class='product-cost'>{{ p.cost }}</span></li>");
+              $('#product-receipt ul').append("<li><span class='product-name'>{{ p.name }}</span><span class='product-id'>{{p.id }}</span><span class='product-cost'>{{ p.cost }}</span></li>");
               cost = parseFloat("{{ p.cost }}".replace(",", "."));
               total += cost; 
           }
           {% endfor  %}
           refresh_total();
       };
+
       function removelastitem() {
           var last_cost_element = $('#product-receipt li .product-cost').last();
           var last_cost = 0.0;
@@ -40,31 +41,55 @@
 
       function clearitems() {
           $('#product-receipt').empty();
+          $('#receipt-sn').empty();
           $('#product-receipt').html('<ul></ul>');
           total = 0.0;
           refresh_total();
       };
+
       function printreceipt(){
            /* push in db and print */
           var json_list = { 'purchased_products' : [] };
-
+          var products = {};
+        
           if (total == 0.0)
               return;
 
-          $('#product-receipt ul .product-name').each(function(index) {
-              json_list.purchased_products.push( $(this).text() )
-          } );
-          $.post("/barcash/addpurchasedproduct/", json_list , function(data) { }
-          )
-          .success(function() { $('#receipt').printElement(); })
-          .error(function() { alert("Errore, non posso connettermi al server FusoHeart, contattare un nerd!"); })
-          .complete(function() {  });
-              
-              ;
-          clearitems()
-          refresh_total();
-      };
+          $('#product-receipt ul .product-id').each(function(index) {
+              var tid = $(this).text() ;
 
+              if ( !( tid in products) ) 
+                products[tid] = 0;
+
+              products[tid] += 1;
+          } );
+
+          $.each(products, function(key, value) {
+                  json_list.purchased_products.push( { "type" : key.toString() , "quantity" : value.toString()  } );
+          });
+
+          $.ajax({
+            url: "/barcash/addpurchasedproduct/", 
+            type: "POST",
+            data: { 'q' : JSON.stringify(json_list.purchased_products) } ,
+            dataType: 'json',
+            success: function(data) { 
+                $('#receipt-sn').text('#' + data.receipt_id );
+                $('#receipt').printElement({
+                    overrideElementCSS:[ 
+                        '/static/css/cash.css'
+                    ]
+                }); 
+            },
+            error: function(e) { 
+                alert("Errore, non posso connettermi al server FusoHeart, contattare un nerd!"); 
+            },
+            complete: function() { 
+              clearitems();
+              refresh_total();
+            }
+          });
+        };
 
       $(document).ready(function() {
              $(document).keypress(function(e) {
@@ -78,10 +103,10 @@
                     case 13:
                         // enter
                         printreceipt();
-                    case 8:
+                    case 9:
                         // backspace
                         clearitems();
-                    case 9:
+                    case 17:
                         //tab
                         removelastitem();
                     default:
@@ -100,7 +125,7 @@
             <div id="products">
                 <ul>
                 {% for p in products %}
-                    <li><a href="javascript:additem({{ p.id }})"><span class="product-n">{{ p.id }}</span><span class="product-name">{{ p.name }}</span><span class="product-cost">{{ p.cost }}</span></a></li>
+                    <li><a href="javascript:additem({{ p.id }})"><span class="product-n">{{ p.keycode }}</span><span class="product-name">{{ p.name }}</span><span class="product-cost">{{ p.cost }}</span></a></li>
                 {% endfor %}
                 </ul>
                 <div id='printcancel'>
@@ -120,8 +145,9 @@
                 <span id="rdate">
                     Fusolab 2.0 <br/>
                     {% now "j-m-Y" %}
-                    <br />
                     {% now "H:i" %}
+                    <br />
+                    <span id="receipt-sn"></span>
                 </span>
                 <div id="product-receipt">
                     <ul></ul>
@@ -132,7 +158,7 @@
 	</div>
 </div>
 <div id="footer">
-    <p><a href="#">Gestione Cassa</a></p>
+    <p><a href="/admin/fusoci/barcashbalance/">Gestione Cassa</a></p>
 </div>
 
 </body>
