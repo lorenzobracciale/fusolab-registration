@@ -77,7 +77,7 @@
                 $('#receipt-sn').text('#' + data.receipt_id );
                 $('#receipt').printElement({
                     overrideElementCSS:[ 
-                        '/static/css/cash.css'
+                        '/static/css/cash2.css'
                     ]
                 }); 
             },
@@ -141,13 +141,14 @@
 			<h2>Scontrino</h2>
 			<h2>Totale: <span class="total"></span></h2>
             <div id="receipt">
-                <img src="/static/images/fusolab_logo.png" height="42" width="62"/>
+                <img id="receipt-fusolab-logo" src="/static/images/fusolab_logo_receipt.png" height="42" width="62"/>
                 <span id="rdate">
                     Fusolab 2.0 <br/>
                     {% now "j-m-Y" %}
                     {% now "H:i" %}
                     <br />
                     <span id="receipt-sn"></span>
+                    <br />
                 </span>
                 <div id="product-receipt">
                     <ul></ul>

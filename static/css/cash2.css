@@ -1,3 +1,5 @@
+/* this is only for receipt */
+
 body {
 	margin:0;
 	padding:0;
@@ -163,12 +165,14 @@ img {
 #receipt {
     border-style: dashed;
     border-color:#000000;
-    padding: 10px;
+    padding: 20px;
     margin: 20px;
-    font-size:1.2em;
+    font-size:3em;
 }
 
-#receipt img{ margin: 0 0 10px; width: 65px }
+
+
+#receipt img{ margin: 0 0 10px; width: 230px; height: auto; }
 
 #receipt li{ padding: 4px 4px; margin: -1px 0; border-top: 1px solid gray; border-bottom: 1px solid gray }
 
@@ -182,6 +186,7 @@ img {
     list-style: none;
     padding: 0;
     margin: 0;
+    margin-top: 60px;
 }
 
 #litotal {
@@ -192,6 +197,8 @@ img {
 
 #rdate {
     float: right;
+    text-align: right;
+    clear: left;
     padding: 0;
     margin: 0;
 }

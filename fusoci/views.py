@@ -4,7 +4,6 @@ from django.template import RequestContext, loader
 from forms import EditFormSocio
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
-import datetime
 from registration.views import activate
 from registration.backends import get_backend
 from registration.models import RegistrationProfile
@@ -14,6 +13,8 @@ from fusoci.models import *
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import simplejson
+from decimal import Decimal
+from datetime import datetime, timedelta
 
 
 from fusoci.regbackend import FusolabBackend
@@ -27,6 +28,35 @@ def statuto(request):
 @staff_member_required
 def card(request):
     return render_to_response('fusoci/card.html', { 'URL_CARD': settings.URL_CARD } , context_instance=RequestContext(request))
+
+@staff_member_required
+
+def entrance(request, cardid=None, cost=None):
+    if cardid and cost:
+        e = Entrance()
+        # set the cost
+        try:
+            e.cost = Decimal(cost) 
+        except:
+            return HttpResponseNotFound("Il costo non e' valido.")
+        # set the user
+        try:
+            c = Card.objects.get(sn = cardid)
+            e.user = c.user 
+        except:
+            return HttpResponseNotFound("La carta non e' valida.")
+        #get last entrance for that user or none
+        try:
+            last_entrance = Entrance.objects.filter(user = c.user).order_by('-date')[0]
+        except:
+            last_entrance = None
+        #if last_entrance: 
+        #    if (datetime.datetime.now() - last_entrance.date).seconds/3600 < 12 h:
+        #    return HttpResponseNotFound("Oggi e' gia stata registrata un'entrata per questo utente")
+        e.save()
+        return HttpResponse("E' entrato %s - %s" % (c.user.user.first_name , e.user.user.last_name ) )
+    else:
+        return HttpResponseNotFound("No card id or cost")
 
 @staff_member_required
 def barcash(request):

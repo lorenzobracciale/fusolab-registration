@@ -1,0 +1,126 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Stats{% endblock %}
+{% block js %}
+<script type="text/javascript" src="/static/js/jqplot/jquery.jqplot.js"></script> 
+<script type="text/javascript" src="/static/js/jqplot/jqplot.dateAxisRenderer.min.js"></script>
+<script type="text/javascript" src="/static/js/jqplot/jqplot.canvasTextRenderer.min.js"></script>
+<script type="text/javascript" src="/static/js/jqplot/jqplot.canvasAxisTickRenderer.min.js"></script>
+<script type="text/javascript" src="/static/js/jqplot/jqplot.categoryAxisRenderer.min.js"></script>
+<script type="text/javascript" src="/static/js/jqplot/jqplot.barRenderer.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/js/jqplot/jquery.jqplot.min.css" />
+<script type="text/javascript">
+
+var jsonurl = "";
+var xformat = "";
+var yformat = "";
+
+var ajaxDataRenderer = function(url, plot, options) {
+    var ret = null;
+    $.ajax({
+      // have to use synchronous here, else the function 
+      // will return before the data is fetched
+      async: false,
+      url: url,
+      dataType:"json",
+      success: function(data) {
+        plot.legend.labels = data.labels;
+        ret = data.data;
+      }
+    });
+    return ret;
+};
+
+
+function plot_stat(xformat, yformat, jsonurl)  {
+  var plot = $.jqplot('chart', jsonurl, {
+    dataRenderer: ajaxDataRenderer,
+    dataRendererOptions: {
+      unusedOptionalUrl: jsonurl
+    },
+    axes:{
+      xaxis:{
+        renderer:$.jqplot.DateAxisRenderer,
+          tickOptions:{
+            formatString: xformat
+          }
+      },
+      yaxis:{
+        min: 0,
+        tickOptions:{
+          formatString: yformat
+        }
+      }
+    },
+    seriesDefaults:{
+        showMarker: false,
+        shadow: false,
+        rendererOptions: {
+          smooth: true
+        }
+    },
+    highlighter: {
+      show: false
+    },
+    cursor: {
+      show: true,
+      tooltipLocation:'sw'
+    },
+    legend: {
+        location: 'nw',
+        show: true
+    }
+  }); 
+
+}
+
+$(document).ready(function(){
+    $.jqplot.config.enablePlugins = true
+    $("a.button").live("click", function(){ 
+        if($(this).is('#bar-daily')) {
+            $("#chart-title").text("Consumazioni giornaliere bar");
+            yformat = "%d";
+            xformat = "%#H:%M";
+            jsonurl="/stats/bar/daily/"
+        } else if ($(this).is('#bar-monthly'))  {
+            $("#chart-title").text("Consumazioni mensili bar");
+            yformat = "%d";
+            xformat = "%b&nbsp;%#d %#H:%M";
+            jsonurl="/stats/bar/monthly/";
+        } else if ($(this).is('#money-bar-daily'))  {
+            $("#chart-title").text("Incasso bar giornaliero");
+            yformat = "EUR %.2f";
+            xformat = "%#H:%M";
+            jsonurl="/stats/money-bar/daily/";
+        } else if ($(this).is('#money-bar-monthly'))  {
+            $("#chart-title").text("Incasso bar mensile");
+            yformat = "EUR %.2f";
+            xformat = "%b&nbsp;%#d %#H:%M";
+            jsonurl="/stats/money-bar/monthly/";
+        } 
+        $("#chart").empty();
+        plot_stat(xformat, yformat, jsonurl);  
+    });
+});
+</script>
+{% endblock %}
+{% block content %}
+<h1>Stats</h1>
+<table>
+    <tr>
+        <td><a href="#" id="bar-daily" class="button blue">Consumazioni Bar Giornaliero</a></td>
+        <td><a href="#" id="bar-monthly" class="button blue">Consumazioni Bar Mensile</a></td>
+        <td><a href="#" id="money-bar-daily" class="button orange">Incasso Bar Giornaliero</a></td>
+        <td><a href="#" id="money-bar-monthly" class="button orange">Incasso Bar Mensile</a></td>
+    </tr><tr>
+        <td><a href="#" id="entrance-daily" class="button green">Ingressi Giornaliero</a></td>
+        <td><a href="#" id="entrance-monthly" class="button green">Ingressi Mensile</a></td>
+        <td><a href="#" id="money-entrance-daily" class="button orange">Incasso Ingressi Giornaliero</a></td>
+        <td><a href="#" id="money-entrance-monthly" class="button orange">Incasso Ingressi Mensile</a></td>
+    </tr><tr>
+        <td><a href="#" id="money-total-daily" class="button orange">Incasso Totale Giornaliero</a></td>
+        <td><a href="#" id="money-total-monthly" class="button orange">Incasso Totale Mensile</a></td>
+    </table>
+       <h2 id="chart-title"></h2>
+        <div id="chart" style="height:400px;width:600px;></div>
+{% endblock %}

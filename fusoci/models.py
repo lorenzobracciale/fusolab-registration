@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.utils.safestring import mark_safe
+from datetime import datetime 
 
 DOCUMENT_TYPES = ( ('ci', 'Carta d\'identita\''), ('pp', 'Passaporto'), ('pa', 'Patente')   )
 DATE_FORMAT = "%d-%m-%Y" 
@@ -54,15 +55,35 @@ class Receipt(models.Model):
         return "#%d - %.2f EUR %s" % (self.id, self.total, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
 
 class BarCashBalance(models.Model):
-    date = models.DateTimeField(auto_now_add = True)
+    date = models.DateTimeField()
     cashier = models.ForeignKey('UserProfile') 
-    initial_cash = models.DecimalField(max_digits=6, decimal_places=2)
-    final_cash = models.DecimalField(max_digits=6, decimal_places=2)
-    withdraw = models.DecimalField(max_digits=6, decimal_places=2)
-    deposit = models.DecimalField(max_digits=6, decimal_places=2)
-    note = models.TextField()
+    initial_cash = models.DecimalField(default=0, max_digits=6, decimal_places=2)
+    final_cash = models.DecimalField(default=0, max_digits=6, decimal_places=2)
+    withdraw = models.DecimalField(default=0, max_digits=6, decimal_places=2)
+    deposit = models.DecimalField(default=0, max_digits=6, decimal_places=2)
+    note = models.TextField(blank=True)
     def __unicode__(self):
         return self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
+
+class EntranceCashBalance(models.Model):
+    date = models.DateTimeField()
+    cashier = models.ForeignKey('UserProfile') 
+    initial_cash = models.DecimalField(default=0, max_digits=6, decimal_places=2)
+    final_cash = models.DecimalField(default=0, max_digits=6, decimal_places=2)
+    withdraw = models.DecimalField(default=0, max_digits=6, decimal_places=2)
+    deposit = models.DecimalField(default=0, max_digits=6, decimal_places=2)
+    note = models.TextField(blank=True)
+    def __unicode__(self):
+        return self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
+
+
+class Entrance(models.Model):
+    date = models.DateTimeField(auto_now_add = True)
+    user = models.ForeignKey('UserProfile')
+    cost = models.DecimalField(max_digits=6, decimal_places=2)
+    def __unicode__(self):
+        return u"%s - %s" % (self.user, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
+
 ###
 
 def create_user_profile(sender, instance, created, **kwargs):

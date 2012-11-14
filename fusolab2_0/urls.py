@@ -23,7 +23,10 @@ urlpatterns = patterns('',
     url(r'^barcash/$', 'fusoci.views.barcash', name='barcash'),
     url(r'^makecard/$', 'fusoci.views.makecard', name='makecard'),
     url(r'^viewcard/$', 'fusoci.views.viewcard', name='viewcard'),
+    url(r'^entrance/(?P<cardid>\w{8})/(?P<cost>\S+)/$', 'fusoci.views.entrance', name='entrance'),
 
+    url(r'^stats/(?P<what>\S+)/(?P<interval>\S+)/$', 'fusoci.stats.ajax_stats', name='ajax_stats'),
+    url(r'^stats/$', 'fusoci.stats.stats', name='stats'),
 
     url(r'^accounts/register/$', register, {'form_class': RegistrationFormSocio,
         'backend': 'fusoci.regbackend.FusolabBackend' },
