@@ -21,6 +21,41 @@ def stats(request):
     return render_to_response('fusoci/stats.html', {'products' : products} , context_instance=RequestContext(request))
 
 @staff_member_required
+def ajax_stats2(request, what=None, interval=None, dd=None, mm=None, yyyy=None):
+    data = {"labels" : [], "data" : [] }
+    day, month, year = int(dd), int(mm), int(yyyy)
+    pp = None
+    qss = None
+    any_result = True
+    if what == "bar":
+        if interval == "daily":
+            delta = timedelta(minutes=15)
+            starttime = datetime(year,month,day,12,00,00)
+            endtime = starttime + timedelta(hours=20)
+            try:
+                p = PurchasedProduct.objects.filter(receipt__date__range=[starttime, endtime])
+                starttime = p.order_by('receipt__date')[0].receipt.date
+                endtime = p.latest('receipt__date').receipt.date
+            except (IndexError, PurchasedProduct.DoesNotExist):
+                any_result = False
+
+
+            for product_type in Product.objects.all():
+                data["labels"].append(product_type.name)
+
+                current_step = starttime
+                buf = []
+                cumulative = 0
+                while (current_step < endtime) and any_result == True:
+                    pp = PurchasedProduct.objects.filter(receipt__date__range=[current_step, current_step + delta]).filter(name=product_type.name)
+                    current_step = current_step + delta
+                    cumulative = cumulative +  pp.count() 
+                    if pp.count() > 0:
+                        buf.append([current_step.strftime("%Y-%m-%d %I:%M%p") , cumulative])
+                data["data"].append(buf) 
+    return HttpResponse( simplejson.dumps(data), mimetype="application/json" )
+
+@staff_member_required
 def ajax_stats(request, what=None, interval=None):
     data = {"labels" : [], "data" : [] } 
     pp = None

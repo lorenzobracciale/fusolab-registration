@@ -9,6 +9,7 @@
 <script type="text/javascript" src="/static/js/jqplot/jqplot.categoryAxisRenderer.min.js"></script>
 <script type="text/javascript" src="/static/js/jqplot/jqplot.barRenderer.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/static/js/jqplot/jquery.jqplot.min.css" />
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
 <script type="text/javascript">
 
 var jsonurl = "";
@@ -17,6 +18,7 @@ var yformat = "";
 
 var ajaxDataRenderer = function(url, plot, options) {
     var ret = null;
+    var there_are_values = false;
     $.ajax({
       // have to use synchronous here, else the function 
       // will return before the data is fetched
@@ -26,6 +28,14 @@ var ajaxDataRenderer = function(url, plot, options) {
       success: function(data) {
         plot.legend.labels = data.labels;
         ret = data.data;
+        $.each(ret, function(index, value) {
+            if (value.length > 0)
+                there_are_values = true;
+        });
+        if (! there_are_values ) {
+            $('#chart-title').text('Non ci sono dati disponibili.');
+            return null;
+        }
       }
     });
     return ret;
@@ -75,13 +85,25 @@ function plot_stat(xformat, yformat, jsonurl)  {
 }
 
 $(document).ready(function(){
-    $.jqplot.config.enablePlugins = true
+    $.jqplot.config.enablePlugins = true;
+    $.jqplot.config.catchErrors = true;
+    $('#change-day').live("click", function() {
+        $("#bar-daily").trigger("click"); 
+    });
     $("a.button").live("click", function(){ 
         if($(this).is('#bar-daily')) {
             $("#chart-title").text("Consumazioni giornaliere bar");
             yformat = "%d";
             xformat = "%#H:%M";
-            jsonurl="/stats/bar/daily/"
+            if ($("#datepicker").length > 0 && $("#datepicker").datepicker( "getDate" ) != null) {
+                jsonurl="/stats/bar/daily/" + $("#datepicker").val() +"/"; 
+            } else {
+                jsonurl="/stats/bar/daily/{% now "d/m/Y" %}/"
+            }
+            $("#extra").html("<p>Cambia giorno: <input type='text' id='datepicker' /> <a id='change-day' href='#'>Vai</a></p>");
+            $( "#datepicker" ).datepicker({
+                dateFormat: "dd/mm/yy"
+            });
         } else if ($(this).is('#bar-monthly'))  {
             $("#chart-title").text("Consumazioni mensili bar");
             yformat = "%d";
@@ -120,7 +142,8 @@ $(document).ready(function(){
     </tr><tr>
         <td><a href="#" id="money-total-daily" class="button orange">Incasso Totale Giornaliero</a></td>
         <td><a href="#" id="money-total-monthly" class="button orange">Incasso Totale Mensile</a></td>
-    </table>
+</table>
        <h2 id="chart-title"></h2>
-        <div id="chart" style="height:400px;width:600px;></div>
+       <div id="extra"></div>
+       <div id="chart" style="height:400px;width:600px;"></div>
 {% endblock %}
