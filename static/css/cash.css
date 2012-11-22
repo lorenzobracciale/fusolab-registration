@@ -81,6 +81,10 @@ img {
     background: yellow;
 }
 
+#products #members-cost a {
+    background: blue;
+}
+
 #products #cancel-all a {
     background: red;
 }
@@ -168,7 +172,7 @@ img {
     font-size:1.2em;
 }
 
-#receipt img{ margin: 0 0 10px; width: 65px }
+#receipt img{ margin: 0 0 10px; width: 55px }
 
 #receipt li{ padding: 4px 4px; margin: -1px 0; border-top: 1px solid gray; border-bottom: 1px solid gray }
 

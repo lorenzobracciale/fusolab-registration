@@ -16,17 +16,28 @@
         });
       };
 
-      function additem( p_id ) {
+      function additem(p_id, internal) {
           var cost = 0.0;
           {% for p in products %} 
           if (p_id == {{ p.id }}) {
-              $('#product-receipt ul').append("<li><span class='product-name'>{{ p.name }}</span><span class='product-id'>{{p.id }}</span><span class='product-cost'>{{ p.cost }}</span></li>");
-              cost = parseFloat("{{ p.cost }}".replace(",", "."));
+              if (internal == null) {
+                  $('#product-receipt ul').append("<li><span class='product-name'>{{ p.name }}</span><span class='product-id'>{{p.id }}</span><span class='product-cost'>{{ p.cost }}</span></li>");
+                  cost = parseFloat("{{ p.cost }}".replace(",", "."));
+              } else {
+                // price for internal
+                  $('#product-receipt ul').append("<li><span class='product-name'>{{ p.name }}</span><span class='product-id'>{{p.id }}</span><span class='product-cost'>{{ p.internal_cost }}</span></li>");
+                  cost = parseFloat("{{ p.internal_cost }}".replace(",", "."));
+              }
               total += cost; 
           }
           {% endfor  %}
           refresh_total();
       };
+
+      function membercost() {
+          $("#internal-cost-buttons").toggle();
+          $("#external-cost-buttons").toggle();
+      }
 
       function removelastitem() {
           var last_cost_element = $('#product-receipt li .product-cost').last();
@@ -124,14 +135,22 @@
 		<div class="col1"> <!-- right col --!>
             <div id="products">
                 <ul>
+                <div id="external-cost-buttons">
                 {% for p in products %}
                     <li><a href="javascript:additem({{ p.id }})"><span class="product-n">{{ p.keycode }}</span><span class="product-name">{{ p.name }}</span><span class="product-cost">{{ p.cost }}</span></a></li>
                 {% endfor %}
+                </div>
+                <div id="internal-cost-buttons" style="display:none">
+                {% for p in products %}
+                    <li><a href="javascript:additem({{ p.id }}, 'internal')"><span class="product-n">{{ p.keycode }}</span><span class="product-name">{{ p.name }}</span><span class="product-cost">{{ p.internal_cost }}</span></a></li>
+                {% endfor %}
+                </div>
                 </ul>
                 <div id='printcancel'>
                     <ul>
                         <li id="cancel-last"><a href="javascript:removelastitem()">Annulla Ultimo</a></li>
                         <li id="cancel-all"><a href="javascript:clearitems()">Annulla Tutto</a></li>
+                        <li id="members-cost"><a href="javascript:membercost()">Prezzo di Costo</a></li>
                         <li id="print-receipt"><a href="javascript:printreceipt()">Stampa</a></li>
                     </ul>
                 </div>
