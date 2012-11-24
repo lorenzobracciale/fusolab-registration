@@ -16,9 +16,12 @@ import qsstats
 @staff_member_required
 def stats(request):
     products = [] 
+    mnow = datetime.now()
+    if mnow.hour < 12:
+        mnow = mnow - timedelta(days=1)
     for p in Product.objects.all():
         products.append( {'name': p.name, 'quantity': PurchasedProduct.objects.filter(name=p.name).count()} )
-    return render_to_response('fusoci/stats.html', {'products' : products} , context_instance=RequestContext(request))
+    return render_to_response('fusoci/stats.html', {'products' : products, 'mnow': mnow} , context_instance=RequestContext(request))
 
 @staff_member_required
 def ajax_stats2(request, what=None, interval=None, dd=None, mm=None, yyyy=None):

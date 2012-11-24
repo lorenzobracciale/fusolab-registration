@@ -48,7 +48,7 @@
               $('#product-receipt li').last().remove();
               refresh_total();
           }
-      };
+      }
 
       function clearitems() {
           $('#product-receipt').empty();
@@ -56,15 +56,25 @@
           $('#product-receipt').html('<ul></ul>');
           total = 0.0;
           refresh_total();
-      };
+      }
 
-      function printreceipt(){
+      function deletereceipt(receiptid) {
+        if (receiptid == null)
+            return;
+        $.get('/barcash/deletereceipt/' + receiptid +'/', function(data) {
+                $('#footer').html("<img src='/static/images/tick_green.png' />" + data);
+        }).error(function() {
+                alert('Errore: Non ho potuto cancellare lo scontrino.'); 
+        });
+      }
+      function printreceipt() {
            /* push in db and print */
           var json_list = { 'purchased_products' : [] };
           var products = {};
         
           if (total == 0.0)
               return;
+
 
           $('#product-receipt ul .product-id').each(function(index) {
               var tid = $(this).text() ;
@@ -86,6 +96,8 @@
             dataType: 'json',
             success: function(data) { 
                 $('#receipt-sn').text('#' + data.receipt_id );
+                $('footer').empty();
+                $('#footer').html("<a href='javascript:deletereceipt("+data.receipt_id+");'><img src='/static/images/delete.gif' /></a> Ultimo scontrino di " + total + " euro (id: " + data.receipt_id + ")" );
                 $('#receipt').printElement({
                     overrideElementCSS:[ 
                         '/static/css/cash2.css'
@@ -100,7 +112,7 @@
               refresh_total();
             }
           });
-        };
+       }
 
       $(document).ready(function() {
              $(document).keypress(function(e) {
@@ -129,7 +141,11 @@
 
 </head>
 <body id="body">
-<h1>Cassa 2.0</h1>
+<div id="header">
+    <h1>Cassa 2.0 - Cassiere: {{  request.user.username }}</h1>
+    Non sei  {{  request.user.username }} ? <a href="/accounts/logout">Esci</a> e rientra con il tuo username!
+</div>
+<div id="cash-manager"><a href="/admin/fusoci/barcashbalance/">Gestione Cassa</a></div>
 <div class="colmask leftmenu">
 	<div class="colleft">
 		<div class="col1"> <!-- right col --!>
@@ -157,7 +173,6 @@
             </div>
 		</div>
         <div class="col2"> <!-- left col --!>
-			<h2>Scontrino</h2>
 			<h2>Totale: <span class="total"></span></h2>
             <div id="receipt">
                 <img id="receipt-fusolab-logo" src="/static/images/fusolab_logo_receipt.png" height="42" width="62"/>
@@ -178,7 +193,6 @@
 	</div>
 </div>
 <div id="footer">
-    <p><a href="/admin/fusoci/barcashbalance/">Gestione Cassa</a></p>
 </div>
 
 </body>

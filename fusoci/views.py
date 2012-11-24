@@ -63,6 +63,20 @@ def barcash(request):
     p = Product.objects.all()
     return render_to_response('fusoci/cash.html', { 'products': p } , context_instance=RequestContext(request))
 
+
+@staff_member_required
+def deletereceipt(request, receiptid):
+    total = 0.0
+    try:
+        r = Receipt.objects.get(id=receiptid)
+        total = r.total
+        r.delete()
+    except Receipt.DoesNotExist:
+        return HttpResponseNotFound("Non e' stato trovato nessuno scontrino con id %s. Come hai fatto a finire qua? Contattare un nerd."  % (receiptid) )
+
+    return HttpResponse("Lo scontrino da %.2f euro con id %s e' stato cancellato con successo" % (total, receiptid) )
+
+
 @csrf_exempt
 @staff_member_required
 def addpurchasedproduct(request):
@@ -102,7 +116,6 @@ def viewcard(request):
             c = Card.objects.get(sn=sn) 
             return HttpResponse("Tessera <a href='/admin/fusoci/card/" + str(c.id) +  "'>" + sn + "</a> appartenente a <a href='/admin/auth/user/" + str(c.user.id) + "'>" + c.user.user.first_name + " " + c.user.user.last_name + "</a>" )
         except Card.DoesNotExist:
-            
             return HttpResponse(sn + ". La tessera non e' di nessun socio.")
 
 

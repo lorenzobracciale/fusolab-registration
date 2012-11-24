@@ -20,11 +20,13 @@ urlpatterns = patterns('',
     url( r'^users/$', 'fusoci.views.ajax_user_search', name = 'user_search' ),
     url(r'^card/$', 'fusoci.views.card', name='card'),
     url(r'^barcash/addpurchasedproduct/$', 'fusoci.views.addpurchasedproduct', name='addpurchasedproduct'),
+    url(r'^barcash/deletereceipt/(?P<receiptid>\d+)/$', 'fusoci.views.deletereceipt'),
     url(r'^barcash/$', 'fusoci.views.barcash', name='barcash'),
     url(r'^makecard/$', 'fusoci.views.makecard', name='makecard'),
     url(r'^viewcard/$', 'fusoci.views.viewcard', name='viewcard'),
     url(r'^entrance/(?P<cardid>\w{8})/(?P<cost>\S+)/$', 'fusoci.views.entrance', name='entrance'),
 
+    url(r'^stats/(?P<what>\S+)/(?P<interval>\S+)/(?P<dd>\d{2})/(?P<mm>\d{2})/(?P<yyyy>\d{4})/$', 'fusoci.stats.ajax_stats2', name='ajax_stats2'),
     url(r'^stats/(?P<what>\S+)/(?P<interval>\S+)/$', 'fusoci.stats.ajax_stats', name='ajax_stats'),
     url(r'^stats/$', 'fusoci.stats.stats', name='stats'),
 

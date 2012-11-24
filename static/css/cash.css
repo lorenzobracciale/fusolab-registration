@@ -13,7 +13,7 @@ a {
 }
 a:hover {
 	color:#fff;
-	background:#369;
+	background:#369; 
 	text-decoration:none;
 }
 h1, h2, h3 {
@@ -31,6 +31,26 @@ img {
 	display:block;
 	padding-top:10px;
 }
+#header {
+	background:#404040;
+	color:#fff;
+}
+
+#header a {
+    color:#9EDD48;
+}
+
+#cash-manager {
+    position: absolute;
+    right: 20px;
+    top: 30px;
+}
+
+#cash-manager a {
+    color:#9EDD48;
+    font-size: 2.5em;
+}
+
 
 /* products styles */
 #products {
@@ -82,7 +102,7 @@ img {
 }
 
 #products #members-cost a {
-    background: blue;
+    background: #808080;
 }
 
 #products #cancel-all a {
@@ -93,12 +113,13 @@ img {
     display: none;
 }
 #products #print-receipt a {
-    background: green;
+    background: #9EDD48;
 }
 
 #products ul li a:hover {
-	background:#369;
-	color:#fff;
+	/* background:#369; */
+	background:#9EDD48;
+	color:#404040;
 }
 #products ul li a.active,
 #products ul li a.active:hover {
@@ -206,6 +227,7 @@ img {
 	float:left;
 	width:100%;
 	border-top:1px solid #000;
+    font-size: 1.5em;
 }
 
 #footer p {
