@@ -98,7 +98,7 @@ $(document).ready(function(){
             if ($("#datepicker").length > 0 && $("#datepicker").datepicker( "getDate" ) != null) {
                 jsonurl="/stats/bar/daily/" + $("#datepicker").val() +"/"; 
             } else {
-                jsonurl="/stats/bar/daily/{% now "d/m/Y" %}/"
+                jsonurl="/stats/bar/daily/{{ mnow|date:"d/m/Y" }}/"
             }
             $("#extra").html("<p>Cambia giorno: <input type='text' id='datepicker' /> <a id='change-day' href='#'>Vai</a></p>");
             $( "#datepicker" ).datepicker({
