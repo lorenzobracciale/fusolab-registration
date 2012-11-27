@@ -67,7 +67,12 @@
                 alert('Errore: Non ho potuto cancellare lo scontrino.'); 
         });
       }
-      function printreceipt() {
+
+      function dontprintreceipt() {
+        printreceipt(true);
+      }
+
+      function printreceipt(dontprint) {
            /* push in db and print */
           var json_list = { 'purchased_products' : [] };
           var products = {};
@@ -98,11 +103,13 @@
                 $('#receipt-sn').text('#' + data.receipt_id );
                 $('footer').empty();
                 $('#footer').html("<a href='javascript:deletereceipt("+data.receipt_id+");'><img src='/static/images/delete.gif' /></a> Ultimo scontrino di " + total + " euro (id: " + data.receipt_id + ")" );
-                $('#receipt').printElement({
-                    overrideElementCSS:[ 
-                        '/static/css/cash2.css'
-                    ]
-                }); 
+                if (!dontprint) {
+                    $('#receipt').printElement({
+                        overrideElementCSS:[ 
+                            '/static/css/cash2.css'
+                        ]
+                    }); 
+                }
             },
             error: function(e) { 
                 alert("Errore, non posso connettermi al server FusoHeart, contattare un nerd!"); 
@@ -166,8 +173,9 @@
                     <ul>
                         <li id="cancel-last"><a href="javascript:removelastitem()">Annulla Ultimo</a></li>
                         <li id="cancel-all"><a href="javascript:clearitems()">Annulla Tutto</a></li>
-                        <li id="members-cost"><a href="javascript:membercost()">Prezzo di Costo</a></li>
+                        <!-- li id="members-cost"><a href="javascript:membercost()">Prezzo di Costo</a></li -->
                         <li id="print-receipt"><a href="javascript:printreceipt()">Stampa</a></li>
+                        <li id="dont-print-receipt"><a href="javascript:dontprintreceipt()">Stampa Peffinta</a></li>
                     </ul>
                 </div>
             </div>

@@ -116,6 +116,10 @@ img {
     background: #9EDD48;
 }
 
+#products #dont-print-receipt a {
+    background: #0E0E83;
+    color: #FFFFFF;
+}
 #products ul li a:hover {
 	/* background:#369; */
 	background:#9EDD48;
