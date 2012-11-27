@@ -26,8 +26,8 @@ urlpatterns = patterns('',
     url(r'^viewcard/$', 'fusoci.views.viewcard', name='viewcard'),
     url(r'^entrance/(?P<cardid>\w{8})/(?P<cost>\S+)/$', 'fusoci.views.entrance', name='entrance'),
 
-    url(r'^stats/(?P<what>\S+)/(?P<interval>\S+)/(?P<dd>\d{2})/(?P<mm>\d{2})/(?P<yyyy>\d{4})/$', 'fusoci.stats.ajax_stats2', name='ajax_stats2'),
-    url(r'^stats/(?P<what>\S+)/(?P<interval>\S+)/$', 'fusoci.stats.ajax_stats', name='ajax_stats'),
+    url(r'^stats/(?P<what>\S+)/(?P<interval>\S+)/(?P<dd>\d{2})/(?P<mm>\d{2})/(?P<yyyy>\d{4})/$', 'fusoci.stats.ajax_stats', name='ajax_stats'),
+    #url(r'^stats/(?P<what>\S+)/(?P<interval>\S+)/$', 'fusoci.stats.ajax_stats', name='ajax_stats'),
     url(r'^stats/$', 'fusoci.stats.stats', name='stats'),
 
     url(r'^accounts/register/$', register, {'form_class': RegistrationFormSocio,

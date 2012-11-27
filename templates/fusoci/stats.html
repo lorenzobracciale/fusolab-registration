@@ -90,6 +90,9 @@ $(document).ready(function(){
     $('#change-day').live("click", function() {
         $("#bar-daily").trigger("click"); 
     });
+    $('#change-day-mo').live("click", function() {
+        $("#money-bar-daily").trigger("click"); 
+    });
     $("a.button").live("click", function(){ 
         if($(this).is('#bar-daily')) {
             $("#chart-title").text("Consumazioni giornaliere bar");
@@ -108,17 +111,27 @@ $(document).ready(function(){
             $("#chart-title").text("Consumazioni mensili bar");
             yformat = "%d";
             xformat = "%b&nbsp;%#d %#H:%M";
-            jsonurl="/stats/bar/monthly/";
+            jsonurl="/stats/bar/monthly/{{ mnow|date:"d/m/Y" }}/"
+            $("#extra").html("");
         } else if ($(this).is('#money-bar-daily'))  {
             $("#chart-title").text("Incasso bar giornaliero");
             yformat = "EUR %.2f";
             xformat = "%#H:%M";
-            jsonurl="/stats/money-bar/daily/";
+            if ($("#datepickermo").length > 0 && $("#datepickermo").datepicker( "getDate" ) != null) {
+                jsonurl="/stats/money-bar/daily/" + $("#datepickermo").val() +"/"; 
+            } else {
+                jsonurl="/stats/money-bar/daily/{{ mnow|date:"d/m/Y" }}/"
+            }
+            $("#extra").html("<p>Cambia giorno: <input type='text' id='datepickermo' /> <a id='change-day-mo' href='#'>Vai</a></p>");
+            $( "#datepickermo" ).datepicker({
+                dateFormat: "dd/mm/yy"
+            });
         } else if ($(this).is('#money-bar-monthly'))  {
             $("#chart-title").text("Incasso bar mensile");
             yformat = "EUR %.2f";
             xformat = "%b&nbsp;%#d %#H:%M";
-            jsonurl="/stats/money-bar/monthly/";
+            jsonurl="/stats/money-bar/monthly/{{ mnow|date:"d/m/Y" }}/"
+            $("#extra").html("");
         } 
         $("#chart").empty();
         plot_stat(xformat, yformat, jsonurl);  

@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.db.models import Sum
 from fusoci.models import * 
 from django.conf import settings
 from django.utils import simplejson
@@ -24,52 +25,89 @@ def stats(request):
     return render_to_response('fusoci/stats.html', {'products' : products, 'mnow': mnow} , context_instance=RequestContext(request))
 
 @staff_member_required
-def ajax_stats2(request, what=None, interval=None, dd=None, mm=None, yyyy=None):
+def ajax_stats(request, what=None, interval=None, dd=None, mm=None, yyyy=None):
     data = {"labels" : [], "data" : [] }
     day, month, year = int(dd), int(mm), int(yyyy)
     pp = None
     qss = None
     any_result = True
+
+    if interval == "daily":
+        delta = timedelta(minutes=15)
+        starttime = datetime(year,month,day,12,00,00)
+        endtime = starttime + timedelta(hours=20)
+    elif interval == "monthly":
+        delta = timedelta(days=1)
+        endtime = datetime(year,month,day,12,00,00)
+        starttime = endtime - timedelta(days=30)
+
     if what == "bar":
-        if interval == "daily":
-            delta = timedelta(minutes=15)
-            starttime = datetime(year,month,day,12,00,00)
-            endtime = starttime + timedelta(hours=20)
-            try:
-                p = PurchasedProduct.objects.filter(receipt__date__range=[starttime, endtime])
-                starttime = p.order_by('receipt__date')[0].receipt.date
-                endtime = p.latest('receipt__date').receipt.date
-            except (IndexError, PurchasedProduct.DoesNotExist):
-                any_result = False
+        try:
+            p = PurchasedProduct.objects.filter(receipt__date__range=[starttime, endtime])
+            starttime = p.order_by('receipt__date')[0].receipt.date
+            endtime = p.latest('receipt__date').receipt.date
+        except (IndexError, PurchasedProduct.DoesNotExist):
+            any_result = False
 
+        for product_type in Product.objects.all():
+            data["labels"].append(product_type.name)
 
-            for product_type in Product.objects.all():
-                data["labels"].append(product_type.name)
+            current_step = starttime
+            buf = []
+            cumulative = 0
+            while (current_step < endtime) and any_result == True:
+                pp = PurchasedProduct.objects.filter(receipt__date__range=[current_step, current_step + delta]).filter(name=product_type.name)
+                current_step = current_step + delta
+                cumulative = cumulative +  pp.count() 
+                if pp.count() > 0:
+                    buf.append([current_step.strftime("%Y-%m-%d %I:%M%p") , cumulative])
+            data["data"].append(buf) 
+    elif what == "money-bar":
+        try:
+            p = PurchasedProduct.objects.filter(receipt__date__range=[starttime, endtime])
+            starttime = p.order_by('receipt__date')[0].receipt.date
+            endtime = p.latest('receipt__date').receipt.date
+        except (IndexError, PurchasedProduct.DoesNotExist):
+            any_result = False
 
-                current_step = starttime
-                buf = []
-                cumulative = 0
-                while (current_step < endtime) and any_result == True:
-                    pp = PurchasedProduct.objects.filter(receipt__date__range=[current_step, current_step + delta]).filter(name=product_type.name)
-                    current_step = current_step + delta
-                    cumulative = cumulative +  pp.count() 
-                    if pp.count() > 0:
-                        buf.append([current_step.strftime("%Y-%m-%d %I:%M%p") , cumulative])
-                data["data"].append(buf) 
+        for product_type in Product.objects.all():
+            data["labels"].append(product_type.name)
+            current_step = starttime
+            buf = []
+            money = 0.0
+            while (current_step < endtime) and any_result == True:
+                pp = PurchasedProduct.objects.filter(receipt__date__range=[current_step, current_step + delta]).filter(name=product_type.name)
+                current_step = current_step + delta
+                tmptot = pp.aggregate(tmptot=Sum('receipt__total'))['tmptot']
+                if not tmptot:
+                    tmptot = 0.0
+                money = money + float(tmptot)
+                buf.append([current_step.strftime("%Y-%m-%d %I:%M%p") , money])
+            data["data"].append(buf) 
+
     return HttpResponse( simplejson.dumps(data), mimetype="application/json" )
 
 @staff_member_required
-def ajax_stats(request, what=None, interval=None):
+def ajax_stats1(request, what=None, interval=None):
+    dnow = datetime.now()
+    return ajax_stats2(request, what, interval, dnow.day, dnow.month, dnow.year)
+
+@staff_member_required
+def ajax_stats_old(request, what=None, interval=None):
     data = {"labels" : [], "data" : [] } 
     pp = None
     qss = None
     if what == "bar":
+        dnow = datetime.now()
+        dnow = dnow.replace(dnow.year, dnow.month, dnow.day, dnow.hour, 0, 0, 0)
         if interval == "daily":
-            pp = PurchasedProduct.objects.filter(receipt__date__gte=datetime.now()-timedelta(hours=12))
+            #pp = PurchasedProduct.objects.filter(receipt__date__gte=datetime.now()-timedelta(hours=12))
+            pp = PurchasedProduct.objects.filter(receipt__date__gte=dnow-timedelta(hours=12))
             #qs = PurchasedProduct.objects.all()
             #qss = qsstats.QuerySetStats(qs, 'receipt')
         elif interval == "monthly":
-            pp = PurchasedProduct.objects.filter(receipt__date__gte=datetime.now()-timedelta(days=30))
+            #pp = PurchasedProduct.objects.filter(receipt__date__gte=datetime.now()-timedelta(days=30))
+            pp = PurchasedProduct.objects.filter(receipt__date__gte=dnow-timedelta(days=30))
         else:
             return HttpResponseNotFound("Interval is not valid")
 
@@ -87,10 +125,14 @@ def ajax_stats(request, what=None, interval=None):
             data["data"].append(buf)
 
     elif what == "money-bar":
+        dnow = datetime.now()
+        dnow = dnow.replace(dnow.year, dnow.month, dnow.day, dnow.hour, 0, 0, 0)
         if interval == "daily":
-            rr = Receipt.objects.filter(date__gte=datetime.now()-timedelta(hours=12))
+            #rr = Receipt.objects.filter(date__gte=datetime.now()-timedelta(hours=12))
+            rr = Receipt.objects.filter(date__gte=dnow-timedelta(hours=12))
         elif interval == "monthly":
-            rr = Receipt.objects.filter(date__gte=datetime.now()-timedelta(days=30))
+            #rr = Receipt.objects.filter(date__gte=datetime.now()-timedelta(days=30))
+            rr = Receipt.objects.filter(date__gte=dnow-timedelta(days=30))
         else:
             return HttpResponseNotFound("Interval is not valid")
         data["labels"].append("Incasso")
