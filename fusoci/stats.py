@@ -61,6 +61,12 @@ def ajax_stats(request, what=None, interval=None, dd=None, mm=None, yyyy=None):
                 cumulative = cumulative +  pp.count() 
                 if pp.count() > 0:
                     buf.append([current_step.strftime("%Y-%m-%d %I:%M%p") , cumulative])
+            # to improve display
+            et = endtime + timedelta(seconds=30)
+            st = starttime - timedelta(seconds=30)
+            buf.append([et.strftime("%Y-%m-%d %I:%M%p") , cumulative ])
+            buf.append([st.strftime("%Y-%m-%d %I:%M%p") , 0 ])
+
             data["data"].append(buf) 
     elif what == "money-bar":
         try:
