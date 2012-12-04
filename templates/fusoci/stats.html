@@ -99,9 +99,9 @@ $(document).ready(function(){
             yformat = "%d";
             xformat = "%#H:%M";
             if ($("#datepicker").length > 0 && $("#datepicker").datepicker( "getDate" ) != null) {
-                jsonurl="/stats/bar/daily/" + $("#datepicker").val() +"/"; 
+                jsonurl="/devstats/bar/daily/" + $("#datepicker").val() +"/"; 
             } else {
-                jsonurl="/stats/bar/daily/{{ mnow|date:"d/m/Y" }}/"
+                jsonurl="/devstats/bar/daily/{{ mnow|date:"d/m/Y" }}/"
             }
             $("#extra").html("<p>Cambia giorno: <input type='text' id='datepicker' /> <a id='change-day' href='#'>Vai</a></p>");
             $( "#datepicker" ).datepicker({
@@ -111,16 +111,16 @@ $(document).ready(function(){
             $("#chart-title").text("Consumazioni mensili bar");
             yformat = "%d";
             xformat = "%b&nbsp;%#d %#H:%M";
-            jsonurl="/stats/bar/monthly/{{ mnow|date:"d/m/Y" }}/"
+            jsonurl="/devstats/bar/monthly/{{ mnow|date:"d/m/Y" }}/"
             $("#extra").html("");
         } else if ($(this).is('#money-bar-daily'))  {
             $("#chart-title").text("Incasso bar giornaliero");
             yformat = "EUR %.2f";
             xformat = "%#H:%M";
             if ($("#datepickermo").length > 0 && $("#datepickermo").datepicker( "getDate" ) != null) {
-                jsonurl="/stats/money-bar/daily/" + $("#datepickermo").val() +"/"; 
+                jsonurl="/devstats/money-bar/daily/" + $("#datepickermo").val() +"/"; 
             } else {
-                jsonurl="/stats/money-bar/daily/{{ mnow|date:"d/m/Y" }}/"
+                jsonurl="/devstats/money-bar/daily/{{ mnow|date:"d/m/Y" }}/"
             }
             $("#extra").html("<p>Cambia giorno: <input type='text' id='datepickermo' /> <a id='change-day-mo' href='#'>Vai</a></p>");
             $( "#datepickermo" ).datepicker({
@@ -130,7 +130,7 @@ $(document).ready(function(){
             $("#chart-title").text("Incasso bar mensile");
             yformat = "EUR %.2f";
             xformat = "%b&nbsp;%#d %#H:%M";
-            jsonurl="/stats/money-bar/monthly/{{ mnow|date:"d/m/Y" }}/"
+            jsonurl="/devstats/money-bar/monthly/{{ mnow|date:"d/m/Y" }}/"
             $("#extra").html("");
         } 
         $("#chart").empty();
