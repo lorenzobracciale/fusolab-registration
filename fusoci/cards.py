@@ -24,32 +24,28 @@ def card(request):
     return render_to_response('fusoci/card.html', { 'URL_CARD': settings.URL_CARD } , context_instance=RequestContext(request))
 
 @staff_member_required
-def entrance(request, cardid=None, cost=None):
-    if cardid and cost:
+def delete_entrance(request, entranceid=None):
+    try:
+        e = Entrance.objects.get(id=entranceid)
+        e.delete()
+        return HttpResponse("Ingresso eliminato<br /><a href='/card/'>Torna alla pagina precedente</a>")
+    except Entrance.DoesNotExist:
+        return HttpResponseNotFound("Ingresso non trovato<br /><a href='/card/'>Torna alla pagina precedente</a>")
+
+
+@staff_member_required
+def entrance(request, cost=None):
+    if cost:
         e = Entrance()
         # set the cost
         try:
             e.cost = Decimal(cost) 
         except:
-            return HttpResponseNotFound("Il costo non e' valido.")
-        # set the user
-        try:
-            c = Card.objects.get(sn = cardid)
-            e.user = c.user 
-        except:
-            return HttpResponseNotFound("La carta non e' valida.")
-        #get last entrance for that user or none
-        try:
-            last_entrance = Entrance.objects.filter(user = c.user).order_by('-date')[0]
-        except:
-            last_entrance = None
-        #if last_entrance: 
-        #    if (datetime.datetime.now() - last_entrance.date).seconds/3600 < 12 h:
-        #    return HttpResponseNotFound("Oggi e' gia stata registrata un'entrata per questo utente")
+            return HttpResponse("Il costo non e' valido.")
         e.save()
-        return HttpResponse("E' entrato %s - %s" % (c.user.user.first_name , e.user.user.last_name ) )
+        return HttpResponse("Aggiunto ingresso di %.1f euro (id %d). <a href='/entrance/delete/%d/'>Cancella Ingresso</a>" % (e.cost , e.id, e.id ) )
     else:
-        return HttpResponseNotFound("No card id or cost")
+        return HttpResponse("Non e' stato inserito nessun costo (mettere 0 se entra aggratis)")
 
 
 @staff_member_required
@@ -77,7 +73,6 @@ def makecard(request):
         return HttpResponse("Card registrata con id " + str(c.id) )
     return HttpResponse("Errore: non ho trovato il socio o il sn non e' valido.")
 
-@csrf_exempt
 @staff_member_required
 def ajax_user_search(request, q=None):
     if q:            

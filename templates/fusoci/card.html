@@ -41,36 +41,25 @@ $(document).ready(function() {
         });
     });
     /* register entrance */
-    
     $("#record-entrance").live('click', function() {
-        $.ajax({
-            type: 'GET',
-            url: "{{ URL_CARD }}",
-            data: {},
-            dataType: "json", 
-            success: function(card) {
-                if (card && card.sn.length !==  0) {
-                    var cost = $('#entrance-cost').val();
-                    if (isNaN(parseFloat(cost))) {
-                        alert("Il costo dell'entrata non e' valido");
-                        return;
-                    }
-                    $.get('/entrance/' + card.sn + '/' + cost +'/', function(data) {
-                        $('#record-entrance-value').text("Ingresso registrato")
-                     })
-                    .success(function() { })
-                    .error(function() { alert("Errore, la tessera non appartiene a nessun socio oppure il costo non e' valido "); })
-                    .complete(function() {  });
-                } else  {
-                     alert("Non e' stata avvicinata nessuna tessera al lettore oppure il lettore non e' collegato correttamente.");
-                }
-            },
-            error: function(x,y,z) {
-                alert(x.responseText);
-            }
-        });
+        var init_data = $('#entrance-cost').val();
+        var cost_str = init_data.replace(",","."); //accept 3.2 and 3,2
+        var cost_float = parseFloat(cost_str);
+
+        if (isNaN(cost_float) || cost_str != cost_float.toString()) {
+            alert("Il costo dell'entrata non e' valido, se entra gratis mettere 0");
+            return;
+        }
+
+        $('#record-entrance-value').html('&nbsp;').load('/entrance/' + encodeURIComponent(cost_float.toString()) +'/')
     });
-    
+    /* bind cost input to register entrance button*/
+    $('#entrance-cost').keypress(function (e) {
+      if (e.which == 13) {
+        $('#record-entrance').trigger('click');
+      }
+    });
+
     /* bind a card */
     $(".make-card").live('click', function() {
         var userid = this.id; 
@@ -123,13 +112,14 @@ $(document).ajaxStart(function() {
 </p>
 <br/>
 <p>
-<span>Costo ingresso: <input type="text" id="entrance-cost"></span> <br>
-<a class="button orange" href="#" id='record-entrance'>Registra Ingresso</a><span id="record-entrance-value"></span>
+<span>Costo ingresso: <input type="text" size=4 id="entrance-cost">Euro</span><br>
+<a class="button orange" href="#" id='record-entrance'>Registra Ingresso</a>
 </p>
+<span id="record-entrance-value"></span>
+<br/>
 <br/>
 <p>
-<a class="button blue" href="/admin">Vai al pannello di amministrazione</a>
+<a class="button blue" href="/admin/fusoci/entrancecashbalance/">Contanti iniziali e finali</a>
 </p>
-<a href="/admin/fusoci/entrancecashbalance/">Contanti iniziali e finali</a> 
 {% endblock %}
 

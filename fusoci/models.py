@@ -98,10 +98,9 @@ class EntranceCashBalance(models.Model):
 
 class Entrance(models.Model):
     date = models.DateTimeField(auto_now_add = True)
-    user = models.ForeignKey('UserProfile')
     cost = models.DecimalField(max_digits=6, decimal_places=2)
     def __unicode__(self):
-        return u"%s - %s" % (self.user, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
+        return u"%.1f EURO - %s" % (self.cost, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
     class Meta:
         verbose_name = "Ingresso"
         verbose_name_plural = "Ingressi"
