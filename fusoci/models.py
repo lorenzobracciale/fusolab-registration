@@ -52,7 +52,7 @@ class PurchasedProduct(models.Model):
     cost = models.DecimalField("prezzo", max_digits=5, decimal_places=2)
     receipt = models.ForeignKey('Receipt')
     def __unicode__(self):
-        return self.receipt.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
+        return self.name + " " + self.receipt.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
     class Meta:
         verbose_name = "Consumazione"
         verbose_name_plural = "Consumazioni"
@@ -106,6 +106,11 @@ class Entrance(models.Model):
         verbose_name = "Ingresso"
         verbose_name_plural = "Ingressi"
 
+class Greeting(models.Model):
+    user = models.ForeignKey('UserProfile')
+    date = models.DateTimeField(auto_now_add = True)
+    def __unicode__(self):
+        return u"%s - %s" % (self.user, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
 ###
 
 def create_user_profile(sender, instance, created, **kwargs):

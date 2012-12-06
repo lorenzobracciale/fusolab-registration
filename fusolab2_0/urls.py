@@ -17,14 +17,17 @@ urlpatterns = patterns('',
 
     url(r'^accounts/edit/$', 'fusoci.views.edit', name='edit'),
 
-    url( r'^users/$', 'fusoci.views.ajax_user_search', name = 'user_search' ),
-    url(r'^card/$', 'fusoci.views.card', name='card'),
     url(r'^barcash/addpurchasedproduct/$', 'fusoci.views.addpurchasedproduct', name='addpurchasedproduct'),
     url(r'^barcash/deletereceipt/(?P<receiptid>\d+)/$', 'fusoci.views.deletereceipt'),
     url(r'^barcash/$', 'fusoci.views.barcash', name='barcash'),
-    url(r'^makecard/$', 'fusoci.views.makecard', name='makecard'),
-    url(r'^viewcard/$', 'fusoci.views.viewcard', name='viewcard'),
-    url(r'^entrance/(?P<cardid>\w{8})/(?P<cost>\S+)/$', 'fusoci.views.entrance', name='entrance'),
+
+    url(r'^card/$', 'fusoci.cards.card', name='card'),
+    url(r'^makecard/$', 'fusoci.cards.makecard', name='makecard'),
+    url(r'^viewcard/$', 'fusoci.cards.viewcard', name='viewcard'),
+    url(r'^entrance/(?P<cardid>\w{8})/(?P<cost>\S+)/$', 'fusoci.cards.entrance', name='entrance'),
+    url( r'^users/(?P<q>.+)/', 'fusoci.cards.ajax_user_search', name='user_search' ),
+
+    url(r'^salutatore/(?P<cardid>\w{8})/$', 'fusoci.salutatore.salutatore', name='salutatore'),
 
     url(r'^stats/(?P<what>\S+)/(?P<interval>\S+)/(?P<dd>\d{2})/(?P<mm>\d{2})/(?P<yyyy>\d{4})/$', 'fusoci.stats.ajax_stats', name='ajax_stats'),
     #url(r'^stats/(?P<what>\S+)/(?P<interval>\S+)/$', 'fusoci.stats.ajax_stats', name='ajax_stats'),
@@ -39,7 +42,6 @@ urlpatterns = patterns('',
         'fusoci.views.edit', name='edit'),
     url(r'^index.html$', 'fusoci.views.home'),
     url(r'^accounts/', include('registration.backends.default.urls')),
-    # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     url(r'^admin/', include(admin.site.urls)),

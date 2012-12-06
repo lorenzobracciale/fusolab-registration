@@ -4,9 +4,22 @@
 {% block js %}
 <script type="text/javascript">
 $(document).ready(function() {
+    /* on click on search button, call ajax */
     $('#searchSubmit').click(function() {
         q = $('#q').val();
-        $('#results').html('&nbsp;').load('{% url user_search %}?q=' + q);
+        // $('#results').html('&nbsp;').load('{ url user_search }?q=' + q, 
+        $('#results').html('&nbsp;').load('/users/' + encodeURIComponent(q) + '/', 
+            function (responseText, textStatus, req) {
+                if (textStatus == "error") {
+                    return "oh noes!!!!";
+                }
+            });
+    });
+    /* bind enter to textinput card */
+    $('#q').keypress(function (e) {
+      if (e.which == 13) {
+        $('#searchSubmit').trigger('click');
+      }
     });
     /* read the card */
     $("#read-card").live('click', function() {
