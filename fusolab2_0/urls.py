@@ -35,6 +35,9 @@ urlpatterns = patterns('',
     url(r'^stats/$', 'fusoci.stats.stats', name='stats'),
     url(r'^devstats/(?P<what>\S+)/(?P<interval>\S+)/(?P<dd>\d{2})/(?P<mm>\d{2})/(?P<yyyy>\d{4})/$', 'fusoci.stats.ajax_stats_dev', name='ajax_stats_dev'),
 
+    url(r'^trends/(?P<what>\S+)/(?P<interval>\S+)/(?P<dd>\d{2})/(?P<mm>\d{2})/(?P<yyyy>\d{4})/$', 'fusoci.trends.ajax_stats', name='ajax_stats'),
+    url(r'^trends/$', 'fusoci.trends.trends', name='trends'),
+
     url(r'^accounts/register/$', register, {'form_class': RegistrationFormSocio,
         'backend': 'fusoci.regbackend.FusolabBackend' },
          name='registration_register'),
