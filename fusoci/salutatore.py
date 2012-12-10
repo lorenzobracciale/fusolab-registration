@@ -8,12 +8,13 @@ def salutatore(request, cardid=None):
     name = ""
     last_greeting = None
     current_greeting = None
+    c = None
     try:
         c = Card.objects.get(sn = cardid)
         name = c.user.user.first_name
-        last_greeting = Greeting.objects.filter(user = c.user).latest('date')
         current_greeting = Greeting(user = c.user)
         current_greeting.save()
+        last_greeting = Greeting.objects.filter(user = c.user).order_by('-date')[1]
     except Card.DoesNotExist:
         name = "signor nessuno"
     except Greeting.DoesNotExist:
