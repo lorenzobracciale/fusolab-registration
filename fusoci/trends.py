@@ -27,7 +27,7 @@ def trends(request):
 
 @staff_member_required
 def ajax_stats(request, what=None, interval=None, dd=None, mm=None, yyyy=None):
-    data = {"labels" : [], "data" : [] }
+    data = {"labels" : [], "trend" : [], "total" : [] }
     day, month, year = int(dd), int(mm), int(yyyy)
     pp = None
     qss = None
@@ -43,7 +43,7 @@ def ajax_stats(request, what=None, interval=None, dd=None, mm=None, yyyy=None):
 
     if what == "bar":
         current_step = starttime
-        cumulative = {}
+        total = {}
         buf = {}
         while (current_step < endtime):
             pp = PurchasedProduct.objects.filter(receipt__date__range=[current_step, current_step + delta]).values('name').annotate(pcount=Count('receipt'))
@@ -51,24 +51,20 @@ def ajax_stats(request, what=None, interval=None, dd=None, mm=None, yyyy=None):
                 pname = p['name']
                 if not buf.has_key(pname):
                     buf[pname] = []
-                if not cumulative.has_key(pname):
-                    cumulative[pname] = 0
+                if not total.has_key(pname):
+                    total[pname] = 0
                 try:
                     tmpcount = int(p['pcount'])
                 except ValueError:
                     tmpcount = 0
-                cumulative[pname] += tmpcount
-                buf[pname].append([current_step.strftime("%Y-%m-%d %I:%M%p") , cumulative[pname]])
+                total[pname] += tmpcount
+                buf[pname].append([current_step.strftime("%Y-%m-%d %I:%M%p") , tmpcount] )
             current_step = current_step + delta
 
         for p in buf.keys():
-            data["labels"].append(p)
-            # to improve display
-            st = starttime - timedelta(seconds=30)
-            buf[p].insert(0, [st.strftime("%Y-%m-%d %I:%M%p") , 0 ])
-            et = endtime + timedelta(seconds=30)
-            buf[p].append([et.strftime("%Y-%m-%d %I:%M%p") , cumulative[p]])
-            data["data"].append(buf[p]) 
+			data["labels"].append(p)
+			data["trend"].append(buf[p])
+			data["total"].append([total[p]])
 
     elif what == "money-bar":
         current_step = starttime
