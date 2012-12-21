@@ -3,6 +3,23 @@ from django.core.servers.basehttp import FileWrapper
 import os, mimetypes, urllib
 from models import *
 
+def custom_greeting(cardid):
+    to_say = None
+    if cardid == "1d74a629": #lorena
+        to_say = "In informatica, il kernel costituisce il nucleo di un sistema operativo. Si tratta di un software avente il compito di fornire ai processi in esecuzione sull'elaboratore un accesso sicuro e controllato all'hardware. Dato che possono esserne eseguiti simultaneamente piu' di uno, il kernel ha anche la responsabilia' di assegnare una porzione di tempo-macchina (scheduling) e di accesso all'hardware a ciascun programma (multitasking)."
+    elif cardid == "faf70430": #fish
+        to_say = "Ciao Fish, hai fatto lo sburratone?"
+    elif cardid == "7aa23d30": #silvio
+        to_say = "Ciao Silvio, grazie di essere tornato, sei l'unico che prende le doppio malto, lo sai? Vuole mica un caffettini? Arrivederci, Arrivederci, Arrivederci"
+    elif cardid == "0a2d3d30": #michele
+        to_say == "E' arrivato il sindaco mics. Alleluaiiaaaaaaaaaa suonate campane vicine e lontane"
+    elif cardid == "ba6f4630": #matteo
+        to_say == "Ciao Matteo, lo sai che ho imparato a dire le cose con i rutti. UUUUAAAAAAAAIIIIIIIIOOOOOOOOMMMMMMMIIIINNNNNNGGGGGGGG . Bravo vero? "
+
+
+    return to_say
+
+
 def salutatore(request, cardid=None):
     to_say, name = "", ""
     last_greeting, first_time, current_greeting = None, None, None
@@ -24,9 +41,14 @@ def salutatore(request, cardid=None):
     to_say = "ciao %s tessera numero %s" % (name, cardid)
 
     if last_greeting and current_greeting:
-        to_say += ", sono %d secondi che non ci vediamo, mi sei mancato tanto" % (current_greeting.date - last_greeting.date).seconds
+        td = (current_greeting.date - last_greeting.date)
+        seconds = td.seconds + td.days * (3600*24) 
+        to_say += ", sono %d secondi che non ci vediamo, mi sei mancato tanto" % seconds
     elif first_time:
         to_say += first_time
+
+    if custom_greeting(cardid):
+        to_say = custom_greeting(cardid)
 
     os.system("cd /var/www/fusolab/media/salutatore; echo \"" + to_say + "\"|/usr/bin/text2wave -eval \"(voice_pc_diphone)\" -o saluto.wav -; lame -b 80 saluto.wav saluto.mp3")
     wrapper = FileWrapper(file( '/var/www/fusolab/media/salutatore/saluto.mp3' ))
