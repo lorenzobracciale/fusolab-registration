@@ -94,6 +94,7 @@ $(document).ajaxStart(function() {
 {% endblock %}
 {% block content %}
 <h1>Tessere</h1>
+<p>Ciao {{ request.user.username }}. Non sei {{ request.user.username }} ? <a href="/accounts/logout">Esci</a> e rientra con il tuo username!</p>
 <span id="output"></span>
 <div id="carddiv">
     <input id="q" type="text"/>

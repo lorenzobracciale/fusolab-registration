@@ -14,23 +14,38 @@ from decimal import Decimal
 from datetime import datetime, timedelta
 import csv
 
+DATETIME_FORMAT = "%d/%m/%Y %H:%M"
+DATE_FORMAT = "%d/%m/%Y"
 
 @staff_member_required
 def csv_statistics(request, what=None):
-	response = HttpResponse(mimetype='text')
+	response = HttpResponse(mimetype='text/csv')
+	response['Content-Disposition'] = 'attachment; filename="'+what+'.csv"'
 	writer = csv.writer(response,delimiter=';')
 
 	if what == 'bar':
 		writer.writerow(['data','apertura','prelevati','depositati','chiusura','cassiere'])
 		b = BarCashBalance.objects.all()
 		for bb in b:
-			writer.writerow(  [bb.date.strftime("%Y-%m-%d %H:%M"),bb.initial_cash,bb.withdraw,bb.deposit,bb.final_cash,bb.cashier]   )
+			writer.writerow([	bb.date.strftime(DATETIME_FORMAT),
+								str(bb.initial_cash).replace('.',','),
+								str(bb.withdraw).replace('.',','),
+								str(bb.deposit).replace('.',','),
+								str(bb.final_cash).replace('.',','),
+								bb.cashier
+			])
 		
 	elif what == 'entrance':
 		writer.writerow(['data','apertura','prelevati','depositati','chiusura','cassiere'])
 		e = EntranceCashBalance.objects.all()
 		for ee in e:
-			writer.writerow(  [ee.date.strftime("%Y-%m-%d %H:%M"),ee.initial_cash,ee.withdraw,ee.deposit,ee.final_cash,ee.cashier]   )
+			writer.writerow([	ee.date.strftime(DATETIME_FORMAT),
+								str(ee.initial_cash).replace('.',','),
+								str(ee.withdraw).replace('.',','),
+								str(ee.deposit).replace('.',','),
+								str(ee.final_cash).replace('.',','),
+								ee.cashier
+			])
 
 	elif what == 'receipts':
 		writer.writerow(['data','totale ricevute'])
@@ -38,7 +53,10 @@ def csv_statistics(request, what=None):
 		current_step = datetime(2012,11,10,12,00,00)
 		while (current_step < datetime.now()):
 			r = Receipt.objects.filter(  date__range=[ current_step,current_step+timedelta(hours=24)  ]  ).aggregate(tot=Sum('total'))
-			writer.writerow( [current_step.strftime("%Y-%m-%d"),r['tot']])
+			if r['tot']>0:
+				writer.writerow([	current_step.strftime(DATE_FORMAT),
+									str(r['tot']).replace('.',',')
+								])
 			current_step = current_step + timedelta(hours=24)
 		
 	else:

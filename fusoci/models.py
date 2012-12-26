@@ -64,6 +64,7 @@ class Receipt(models.Model):
     def __unicode__(self):
         return "#%d - %.2f EUR %s" % (self.id, self.total, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
     class Meta:
+    	ordering = ["date"]
         verbose_name = "Scontrino"
         verbose_name_plural = "Scontrini"
 
@@ -78,6 +79,7 @@ class BarCashBalance(models.Model):
     def __unicode__(self):
         return self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
     class Meta:
+    	ordering = ["date"]
         verbose_name = "Bilancio Entrate da Bar"
         verbose_name_plural = "Bilanci Entrate da Bar"
 
@@ -92,6 +94,7 @@ class EntranceCashBalance(models.Model):
     def __unicode__(self):
         return self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
     class Meta:
+    	ordering = ["date"]
         verbose_name = "Bilancio Entrate da Ingresso"
         verbose_name_plural = "Bilanci Entrate da Ingresso"
 
@@ -102,6 +105,7 @@ class Entrance(models.Model):
     def __unicode__(self):
         return u"%.1f EURO - %s" % (self.cost, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
     class Meta:
+    	ordering = ["date"]
         verbose_name = "Ingresso"
         verbose_name_plural = "Ingressi"
 
