@@ -23,6 +23,9 @@ class UserProfile(models.Model):
 
     def __unicode__(self):
         return u'%s %s' % (self.user.first_name, self.user.last_name)
+	class Meta:
+		verbose_name = "Utente"
+		verbose_name_plural = "Utenti"		
     
 
 class Card(models.Model):
@@ -117,3 +120,157 @@ def create_user_profile(sender, instance, created, **kwargs):
         UserProfile.objects.create(user=instance)
 
 post_save.connect(create_user_profile, sender=User)
+
+
+
+### dario
+class ReceiptManager(models.Manager):
+	def total_between(self, opening_date, closing_date):
+		return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).aggregate(Sum('total'))['total__sum']
+	def receipts_between(self, opening_date, closing_date):
+		return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date])
+
+class Receipt(models.Model):
+	cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere")
+	date = models.DateTimeField(auto_now_add = True)
+	total = models.DecimalField("totale", max_digits=10, decimal_places=2)
+	
+	objects = ReceiptManager()
+	
+	def __unicode__(self):
+		return "#%d - %.2f EUR %s" % (self.id, self.total, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
+	
+	class Meta:
+		ordering = ['-date']
+		verbose_name = "Scontrino"
+		verbose_name_plural = "Scontrini"
+
+	#
+	#	ABSTRACT BALANCE MANAGER
+	#
+	
+class BalanceManager(models.Manager):
+
+	def is_open(self,time=datetime.now):
+		return super(BalanceManager, self).get_query_set().filter(Q(date__lt=time) & Q(operation__in=[Balance.OPENING,Balance.CLOSING])).latest('date').operation == Balance.OPENING
+
+	def get_parent(self, time):
+		return super(BalanceManager, self).get_query_set().filter(Q(operation=Balance.OPENING) & Q(date__lt=time)).latest('date')
+	
+	def get_closing_amount_before(self,current_opening):
+		return super(BalanceManager, self).get_query_set().get(id=current_opening.id).get_previous_by_date(operation=Balance.CLOSING).amount
+
+	def get_transactions_for(self, current_opening):
+		return super(BalanceManager, self).get_query_set().filter(parent=current_opening)
+	
+	def get_opening_times(self,start_date,end_date):
+		list = super(BalanceManager, self).get_query_set().filter(Q(date__range=[start_date,end_date]) & Q(parent__isnull=True)).select_related()
+		ret = []
+		for l in list:
+			ret.append([l.date,BarBalance.objects.filter(Q(parent=l.id) & Q(operation=BarBalance.CLOSING)).get().date])
+		return ret	
+
+	def get_checkpoint_before(self,saved_balance):
+		return super(BalanceManager, self).get_query_set().get(id=saved_balance.id).get_previous_by_date(operation=Balance.CASHPOINT)
+
+	#
+	#	ABSTRACT BALANCE 
+	#
+
+class Balance(models.Model):
+	OPENING = 'op'
+	CLOSING = 'cl'
+	PAYMENT = 'pa'
+	DEPOSIT = 'de'
+	WITHDRAW = 'wi'	
+	CASHPOINT = 'pt'
+	OPERATION_TYPES = ( 
+		(OPENING, 'apertura'),
+		(CLOSING, 'chiusura'),
+		(PAYMENT, 'pagamento'),
+		(DEPOSIT, 'deposito'),
+		(WITHDRAW, 'prelievo tesoriere'),
+		(CASHPOINT, 'punto di cassa')
+	)
+	operation = models.CharField(max_length=2, choices=OPERATION_TYPES)	
+	parent = models.ForeignKey('self', blank=True, null=True, editable=False)
+	amount = models.DecimalField("Somma", max_digits=10, decimal_places=2)
+	date = models.DateTimeField("Data", default=datetime.now)
+	cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere")
+	note = models.TextField(blank=True)
+	
+	objects = BalanceManager()		
+
+	class Meta:
+		ordering = ['-date']
+		abstract = True	
+
+
+	#
+	#	BAR BALANCE
+	#
+
+class BarBalance(Balance):
+
+	def __unicode__(self):
+		if self.operation == self.OPENING:
+			return "%d - -  %s %.2f %s" % (self.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
+		else:
+			return "%d - %d %s %.2f %s" % (self.id, self.parent.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
+		
+	class Meta:
+		verbose_name = "Voce di bilancio del Bar"
+		verbose_name_plural = "Voci di bilancio del Bar"		
+
+	#assegna l'id automaticamente durante il salvataggio per raggruppare gli eventi
+	def save(self, *args, **kwargs):
+		if self.operation != self.OPENING:
+			self.parent = BarBalance.objects.get_parent(self.date)
+		super(BarBalance, self).save(*args, **kwargs)
+
+	
+	#
+	#	ENTRANCE BALANCE
+	#
+
+class EntranceBalance(Balance):
+
+	def __unicode__(self):
+		if self.operation == self.OPENING:
+			return "%d - -  %s %.2f %s" % (self.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
+		else:
+			return "%d - %d %s %.2f %s" % (self.id, self.parent.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))	
+
+	class Meta:
+		verbose_name = "Voce di bilancio dell'entrata"
+		verbose_name_plural = "Voci di bilancio dell'entrata"		
+
+	#assegna l'id automaticamente durante il salvataggio per raggruppare gli eventi
+	def save(self, *args, **kwargs):
+		if self.operation != self.OPENING:
+			self.parent = EntranceBalance.objects.get_parent(self.date)
+		super(EntranceBalance, self).save(*args, **kwargs)
+
+		
+	#
+	#	SMALL BALANCE
+	#
+
+class SmallBalance(Balance):
+
+	def __unicode__(self):
+		return "%d - %s %.2f %s" % (self.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
+		
+	class Meta:
+		ordering = ['-date']
+		verbose_name = "Voce di bilancio dell'Interregno"
+		verbose_name_plural = "Voci di bilancio dell'Interregno"		
+
+	#assegna l'id automaticamente durante il salvataggio per raggruppare gli eventi
+	def save(self, *args, **kwargs):
+		if self.operation != self.CASHPOINT:
+			self.parent = SmallBalance.objects.get_parent(self.date)
+		super(SmallBalance, self).save(*args, **kwargs)
+
+
+#import signals
