@@ -4,6 +4,14 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.utils.safestring import mark_safe
 from datetime import datetime 
+from django.db.models import Sum, Q, F
+import math
+
+DATE_FORMAT = "%d-%m-%Y"
+TIME_FORMAT = "%H:%M:%S"
+MONEY_DELTA = 0.0
+NOTIFICATION_ADDRESS_LIST = ['dario.luzzi@gmail.com','arnardospippoli@gmail.com']
+
 
 DOCUMENT_TYPES = ( ('ci', 'Carta d\'identita\''), ('pp', 'Passaporto'), ('pa', 'Patente')   )
 DATE_FORMAT = "%d-%m-%Y" 
@@ -60,43 +68,43 @@ class PurchasedProduct(models.Model):
         verbose_name = "Consumazione"
         verbose_name_plural = "Consumazioni"
 
-class Receipt(models.Model):
-    cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere") 
-    date = models.DateTimeField(auto_now_add = True)
-    total = models.DecimalField("totale", max_digits=10, decimal_places=2)
-    def __unicode__(self):
-        return "#%d - %.2f EUR %s" % (self.id, self.total, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
-    class Meta:
-        verbose_name = "Scontrino"
-        verbose_name_plural = "Scontrini"
-
-class BarCashBalance(models.Model):
-    date = models.DateTimeField("Data")
-    cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere") 
-    initial_cash = models.DecimalField("Contanti iniziali", default=0, max_digits=6, decimal_places=2)
-    final_cash = models.DecimalField("Contanti finali", default=0, max_digits=6, decimal_places=2)
-    withdraw = models.DecimalField("Prelevati", default=0, max_digits=6, decimal_places=2)
-    deposit = models.DecimalField("Depositati", default=0, max_digits=6, decimal_places=2)
-    note = models.TextField(blank=True)
-    def __unicode__(self):
-        return self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
-    class Meta:
-        verbose_name = "Bilancio Entrate da Bar"
-        verbose_name_plural = "Bilanci Entrate da Bar"
-
-class EntranceCashBalance(models.Model):
-    date = models.DateTimeField("Data")
-    cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere") 
-    initial_cash = models.DecimalField("Contanti iniziali", default=0, max_digits=6, decimal_places=2)
-    final_cash = models.DecimalField("Contanti finali", default=0, max_digits=6, decimal_places=2)
-    withdraw = models.DecimalField("Prelevati", default=0, max_digits=6, decimal_places=2)
-    deposit = models.DecimalField("Depositati", default=0, max_digits=6, decimal_places=2)
-    note = models.TextField(blank=True)
-    def __unicode__(self):
-        return self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
-    class Meta:
-        verbose_name = "Bilancio Entrate da Ingresso"
-        verbose_name_plural = "Bilanci Entrate da Ingresso"
+#class Receipt(models.Model):
+#    cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere") 
+#    date = models.DateTimeField(auto_now_add = True)
+#    total = models.DecimalField("totale", max_digits=10, decimal_places=2)
+#    def __unicode__(self):
+#        return "#%d - %.2f EUR %s" % (self.id, self.total, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
+#    class Meta:
+#        verbose_name = "Scontrino"
+#        verbose_name_plural = "Scontrini"
+#
+#class BarCashBalance(models.Model):
+#    date = models.DateTimeField("Data")
+#    cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere") 
+#    initial_cash = models.DecimalField("Contanti iniziali", default=0, max_digits=6, decimal_places=2)
+#    final_cash = models.DecimalField("Contanti finali", default=0, max_digits=6, decimal_places=2)
+#    withdraw = models.DecimalField("Prelevati", default=0, max_digits=6, decimal_places=2)
+#    deposit = models.DecimalField("Depositati", default=0, max_digits=6, decimal_places=2)
+#    note = models.TextField(blank=True)
+#    def __unicode__(self):
+#        return self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
+#    class Meta:
+#        verbose_name = "Bilancio Entrate da Bar"
+#        verbose_name_plural = "Bilanci Entrate da Bar"
+#
+#class EntranceCashBalance(models.Model):
+#    date = models.DateTimeField("Data")
+#    cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere") 
+#    initial_cash = models.DecimalField("Contanti iniziali", default=0, max_digits=6, decimal_places=2)
+#    final_cash = models.DecimalField("Contanti finali", default=0, max_digits=6, decimal_places=2)
+#    withdraw = models.DecimalField("Prelevati", default=0, max_digits=6, decimal_places=2)
+#    deposit = models.DecimalField("Depositati", default=0, max_digits=6, decimal_places=2)
+#    note = models.TextField(blank=True)
+#    def __unicode__(self):
+#        return self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
+#    class Meta:
+#        verbose_name = "Bilancio Entrate da Ingresso"
+#        verbose_name_plural = "Bilanci Entrate da Ingresso"
 
 
 class Entrance(models.Model):
@@ -145,9 +153,9 @@ class Receipt(models.Model):
 		verbose_name = "Scontrino"
 		verbose_name_plural = "Scontrini"
 
-	#
-	#	ABSTRACT BALANCE MANAGER
-	#
+#
+#	ABSTRACT BALANCE MANAGER
+#
 	
 class BalanceManager(models.Manager):
 
@@ -173,9 +181,9 @@ class BalanceManager(models.Manager):
 	def get_checkpoint_before(self,saved_balance):
 		return super(BalanceManager, self).get_query_set().get(id=saved_balance.id).get_previous_by_date(operation=Balance.CASHPOINT)
 
-	#
-	#	ABSTRACT BALANCE 
-	#
+#
+#	ABSTRACT BALANCE 
+#
 
 class Balance(models.Model):
 	OPENING = 'op'
@@ -206,9 +214,9 @@ class Balance(models.Model):
 		abstract = True	
 
 
-	#
-	#	BAR BALANCE
-	#
+#
+#	BAR BALANCE
+#
 
 class BarBalance(Balance):
 
@@ -229,9 +237,9 @@ class BarBalance(Balance):
 		super(BarBalance, self).save(*args, **kwargs)
 
 	
-	#
-	#	ENTRANCE BALANCE
-	#
+#
+#	ENTRANCE BALANCE
+#
 
 class EntranceBalance(Balance):
 
@@ -252,9 +260,9 @@ class EntranceBalance(Balance):
 		super(EntranceBalance, self).save(*args, **kwargs)
 
 		
-	#
-	#	SMALL BALANCE
-	#
+#
+#	SMALL BALANCE
+#
 
 class SmallBalance(Balance):
 
