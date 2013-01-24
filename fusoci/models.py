@@ -1,8 +1,10 @@
 # -*- coding: iso-8859-15 -*-
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator
 from django.db.models.signals import post_save
 from django.utils.safestring import mark_safe
+from decimal import Decimal 
 from datetime import datetime 
 
 DOCUMENT_TYPES = ( ('ci', 'Carta d\'identita\''), ('pp', 'Passaporto'), ('pa', 'Patente')   )
@@ -126,7 +128,10 @@ post_save.connect(create_user_profile, sender=User)
 ### dario
 class ReceiptManager(models.Manager):
 	def total_between(self, opening_date, closing_date):
-		return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).aggregate(Sum('total'))['total__sum']
+		if super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).exists():
+			return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).aggregate(Sum('total'))['total__sum']
+		else:
+			return Decimal('0.00')
 	def receipts_between(self, opening_date, closing_date):
 		return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date])
 
@@ -172,6 +177,46 @@ class BalanceManager(models.Manager):
 
 	def get_checkpoint_before(self,saved_balance):
 		return super(BalanceManager, self).get_query_set().get(id=saved_balance.id).get_previous_by_date(operation=Balance.CASHPOINT)
+		
+	def check_opening_balance(self,opening_id):
+		opening_date = super(BalanceManager, self).get_query_set().get(id=opening_id).date
+		opening_amount = super(BalanceManager, self).get_query_set().get(id=opening_id).amount
+		if super(BalanceManager, self).get_query_set().filter(id__lt=opening_id).exists():
+			closing_amount_before = super(BalanceManager, self).get_query_set().get(id=opening_id).get_previous_by_date(operation=Balance.CLOSING).amount
+		else:
+			closing_amount_before = Decimal('0.00')
+		closing_date = super(BalanceManager, self).get_query_set().get(Q(operation=Balance.CLOSING) & Q(parent=opening_id)).date
+		closing_amount = super(BalanceManager, self).get_query_set().get(Q(operation=Balance.CLOSING) & Q(parent=opening_id)).amount
+		if super(BalanceManager, self).get_query_set().filter(Q(parent=opening_id) & Q(operation=Balance.PAYMENT)).exists():
+			total_payments = super(BalanceManager, self).get_query_set().filter(Q(parent=opening_id) & Q(operation=Balance.PAYMENT)).aggregate(Sum('amount'))['amount__sum']
+		else:
+			total_payments = Decimal('0.00')
+		if super(BalanceManager, self).get_query_set().filter(Q(parent=opening_id) & Q(operation=Balance.WITHDRAW)).exists():
+			total_withdraws = super(BalanceManager, self).get_query_set().filter(Q(parent=opening_id) & Q(operation=Balance.WITHDRAW)).aggregate(Sum('amount'))['amount__sum']
+		else:
+			total_withdraws = Decimal('0.00')
+		if super(BalanceManager, self).get_query_set().filter(Q(parent=opening_id) & Q(operation=Balance.DEPOSIT)).exists():
+			total_deposits = super(BalanceManager, self).get_query_set().filter(Q(parent=opening_id) & Q(operation=Balance.DEPOSIT)).aggregate(Sum('amount'))['amount__sum']
+		else:
+			total_deposits = Decimal('0.00')
+		balance_income = closing_amount - opening_amount - total_deposits + total_withdraws + total_payments
+		receipts_income = Receipt.objects.total_between(opening_date,closing_date)
+		income_check = balance_income - receipts_income
+		opening_check = opening_amount - closing_amount_before
+		
+		return dict([
+			('data',opening_date),
+			('contanti iniziali',opening_amount),
+			('contanti finali',closing_amount),
+			('pagamenti',total_payments),
+			('prelievi tesoriere',total_withdraws),
+			('depositati in cassa',total_deposits),
+			('ricavi reali',balance_income),
+			('ricavi teorici',receipts_income),
+			('check ricavi',income_check),
+			('check apertura',opening_check)
+		])
+		
 
 	#
 	#	ABSTRACT BALANCE 
@@ -192,9 +237,20 @@ class Balance(models.Model):
 		(WITHDRAW, 'prelievo tesoriere'),
 		(CASHPOINT, 'punto di cassa')
 	)
+	PAYMENT_SUBTYPES = (
+		('ar','artisti'),
+		('ba','barman'),
+		('pu','pulizie'),
+		('va','varie')
+	)	
+	DEPOSIT_SUBTYPES = (
+		('co','contante'),
+		('do','donazione')
+	)
 	operation = models.CharField(max_length=2, choices=OPERATION_TYPES)	
+	subtype = models.CharField(max_length=2, blank=True, null=True)
 	parent = models.ForeignKey('self', blank=True, null=True, editable=False)
-	amount = models.DecimalField("Somma", max_digits=10, decimal_places=2)
+	amount = models.DecimalField("Somma", max_digits=10, decimal_places=2,  validators=[MinValueValidator(Decimal('0.00'))])
 	date = models.DateTimeField("Data", default=datetime.now)
 	cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere")
 	note = models.TextField(blank=True)
@@ -272,5 +328,3 @@ class SmallBalance(Balance):
 			self.parent = SmallBalance.objects.get_parent(self.date)
 		super(SmallBalance, self).save(*args, **kwargs)
 
-
-#import signals
