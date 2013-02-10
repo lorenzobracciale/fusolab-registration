@@ -58,7 +58,18 @@ def csv_statistics(request, what=None):
 									str(r['tot']).replace('.',',')
 								])
 			current_step = current_step + timedelta(hours=24)
-		
+
+	elif what == 'users':
+		writer.writerow(['nome','cognome','data di nascita','luogo di nascita'])
+		u = UserProfile.objects.all()
+		for uu in u:
+			writer.writerow([
+				uu.user.first_name.encode('utf-8'),
+				uu.user.last_name.encode('utf-8'),
+				uu.born_date,
+				uu.born_place.encode('utf-8')
+			])
+			
 	else:
 		return HttpResponseNotFound('bad request')
 	return response
