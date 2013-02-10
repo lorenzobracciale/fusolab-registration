@@ -2,6 +2,16 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.core.servers.basehttp import FileWrapper
 import os, mimetypes, urllib
 from models import *
+import random
+
+jokes = ["Bill Gates sta' facendo l'amore quando la compagna gli dice: Caro non godo per niente! E lui: Annullo, Riprovo, Ignoro o Tralascio? ",
+        "Quanti programmatori ci vogliono per cambiare una lampadina?  Nessuno. E' un problema aaarduer. ",
+        "Un IBM Pentium sta facendo la corte ad un Motorola Macintosh. Che programma hai per stasera?. Mi dispiace, devo uscire con un' Amiga. ",
+        "Due topi si incontrano dopo tanto tempo, uno chiede all'altro. Come sta tuo figlio? Sta bene grazie, si e' laureato in America e ora lavora nel campo dell'informatica. E di che cosa si occupa precisamente? Fa il maaauuuuuss. ",
+        "Un bambino chiede al padre cosa fossero le icone, il padre risponde. Sono immagini sacre. E il figlio. E perche' windows ne ha tante? Il padre. Perche' per farlo funzionare ci vuole un miracolo. ",
+        "Fonzie con un pugno riusciva a far partire il giu box. Fusolab due punto zero con un pugno fa partire i concerti a San Siro. ",
+        "Maradona palleggia con le arance, Fusolab Due Punto Zero palleggia con Maradona che palleggia con le arance. ",
+        ]
 
 def custom_greeting(cardid):
     to_say = None
@@ -15,8 +25,6 @@ def custom_greeting(cardid):
         to_say == "E' arrivato il sindaco mics. Alleluaiiaaaaaaaaaa suonate campane vicine e lontane"
     elif cardid == "ba6f4630": #matteo
         to_say == "Ciao Matteo, lo sai che ho imparato a dire le cose con i rutti. UUUUAAAAAAAAIIIIIIIIOOOOOOOOMMMMMMMIIIINNNNNNGGGGGGGG . Bravo vero? "
-
-
     return to_say
 
 
@@ -46,6 +54,13 @@ def salutatore(request, cardid=None):
         to_say += ", sono %d secondi che non ci vediamo, mi sei mancato tanto" % seconds
     elif first_time:
         to_say += first_time
+
+    if random.randrange(0,1) == 0: #0.5 prob
+        to_say += ", senti questa, e' fortissima. "
+        to_say += random.choice(jokes)
+        #to_say += jokes[-1]
+        to_say += "aaaah ahhh  ahhh ahhh ahhhr."
+
 
     if custom_greeting(cardid):
         to_say = custom_greeting(cardid)
