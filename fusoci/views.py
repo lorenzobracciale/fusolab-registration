@@ -30,6 +30,10 @@ def barcash(request):
     p = Product.objects.all()
     return render_to_response('fusoci/cash.html', { 'products': p } , context_instance=RequestContext(request))
 
+@staff_member_required
+def bar_balance(request):
+    return render_to_response('fusoci/bar_balance.html', { } , context_instance=RequestContext(request))
+
 
 @staff_member_required
 def deletereceipt(request, receiptid):
