@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext, loader
-from forms import EditFormSocio
+#from forms import EditFormSocio
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from registration.views import activate
@@ -9,28 +9,29 @@ from registration.backends import get_backend
 from registration.models import RegistrationProfile
 from django.contrib.auth.models import User
 from django.db.models import Q
-from fusoci.models import * 
+from ingresso.models import * 
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import simplejson
 from decimal import Decimal
 from datetime import datetime, timedelta
+from ingresso.models import *
 
 
-from fusoci.regbackend import FusolabBackend
+from base.regbackend import FusolabBackend
 
 @staff_member_required
 def card(request):
-    return render_to_response('fusoci/card.html', { 'URL_CARD': settings.URL_CARD } , context_instance=RequestContext(request))
+    return render_to_response('base/card.html', { 'URL_CARD': settings.URL_CARD } , context_instance=RequestContext(request))
 
 @staff_member_required
 def delete_entrance(request, entranceid=None):
     try:
         e = Entrance.objects.get(id=entranceid)
         e.delete()
-        return HttpResponse("Ingresso eliminato<br /><a href='/card/'>Torna alla pagina precedente</a>")
+        return HttpResponse("Ingresso eliminato<br /><a href='/ingresso/card'>Torna alla pagina precedente</a>")
     except Entrance.DoesNotExist:
-        return HttpResponseNotFound("Ingresso non trovato<br /><a href='/card/'>Torna alla pagina precedente</a>")
+        return HttpResponseNotFound("Ingresso non trovato<br /><a href='/ingresso/card'>Torna alla pagina precedente</a>")
 
 
 @staff_member_required
@@ -43,7 +44,7 @@ def entrance(request, cost=None):
         except:
             return HttpResponse("Il costo non e' valido.")
         e.save()
-        return HttpResponse("Aggiunto ingresso di %.1f euro (id %d). <a href='/entrance/delete/%d/'>Cancella Ingresso</a>" % (e.cost , e.id, e.id ) )
+        return HttpResponse("Aggiunto ingresso di %.1f euro (id %d). <a href='/ingresso/delete/%d/'>Cancella Ingresso</a>" % (e.cost , e.id, e.id ) )
     else:
         return HttpResponse("Non e' stato inserito nessun costo (mettere 0 se entra aggratis)")
 
@@ -54,7 +55,7 @@ def viewcard(request):
     if sn and len(sn) > 0 :
         try:
             c = Card.objects.get(sn=sn) 
-            return HttpResponse("Tessera <a href='/admin/fusoci/card/" + str(c.id) +  "'>" + sn + "</a> appartenente a <a href='/admin/auth/user/" + str(c.user.id) + "'>" + c.user.user.first_name + " " + c.user.user.last_name + "</a>" )
+            return HttpResponse("Tessera <a href='/admin/base/card/" + str(c.id) +  "'>" + sn + "</a> appartenente a <a href='/admin/auth/user/" + str(c.user.id) + "'>" + c.user.user.first_name + " " + c.user.user.last_name + "</a>" )
         except Card.DoesNotExist:
             return HttpResponse(sn + ". La tessera non e' di nessun socio.")
 
@@ -81,7 +82,7 @@ def ajax_user_search(request, q=None):
             Q(last_name__icontains = q)).order_by('username')
         for user in results:
             user.cards = Card.objects.filter(user=user.get_profile())
-        template = 'fusoci/results.html'
+        template = 'base/results.html'
         data = {
             'results': results,
         }

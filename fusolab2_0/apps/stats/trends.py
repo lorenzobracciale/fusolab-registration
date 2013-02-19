@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import Count
-from fusoci.models import * 
+from bar.models import * 
 from django.conf import settings
 from django.utils import simplejson
 from decimal import Decimal
@@ -23,7 +23,7 @@ def trends(request):
         mnow = mnow - timedelta(days=1)
     for p in Product.objects.all():
         products.append( {'name': p.name, 'quantity': PurchasedProduct.objects.filter(name=p.name).count()} )
-    return render_to_response('fusoci/trends.html', {'products' : products, 'mnow': mnow} , context_instance=RequestContext(request))
+    return render_to_response('base/trends.html', {'products' : products, 'mnow': mnow} , context_instance=RequestContext(request))
 
 @staff_member_required
 def ajax_stats(request, what=None, interval=None, dd=None, mm=None, yyyy=None):

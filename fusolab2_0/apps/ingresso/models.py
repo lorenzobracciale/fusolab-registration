@@ -8,13 +8,14 @@ from decimal import Decimal
 from datetime import datetime 
 from bar.models import SmallBalance, Balance	
 from ingresso.managers import *
+from base.models import *
 
 DATE_FORMAT = "%d-%m-%Y" 
 TIME_FORMAT = "%H:%M:%S"
 
 class Card(models.Model):
     sn = models.CharField("Seriale", unique=True, max_length=16)
-    user = models.ForeignKey('UserProfile', verbose_name="Utente")
+    user = models.ForeignKey('base.UserProfile', verbose_name="Utente")
     created_on = models.DateField(auto_now_add=True)
     def __unicode__(self):
         return u'%s - %s %s' % (self.sn, self.user.user.first_name, self.user.user.last_name)

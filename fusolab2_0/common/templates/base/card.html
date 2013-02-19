@@ -7,8 +7,12 @@ $(document).ready(function() {
     /* on click on search button, call ajax */
     $('#searchSubmit').click(function() {
         q = $('#q').val();
+        if (q == "") {
+            $('#results').html('Inserisci una email o un cognome');
+            return; 
+        } 
         // $('#results').html('&nbsp;').load('{ url user_search }?q=' + q, 
-        $('#results').html('&nbsp;').load('/users/' + encodeURIComponent(q) + '/', 
+        $('#results').html('&nbsp;').load('/ingresso/users/' + encodeURIComponent(q) + '/', 
             function (responseText, textStatus, req) {
                 if (textStatus == "error") {
                     return "oh noes!!!!";
@@ -31,7 +35,7 @@ $(document).ready(function() {
             success: function(card) {
             if (card && card.sn.length !==  0)
                     // $("#read-card-value").text("Tessera numero: " + card.sn);
-                    $("#read-card-value").html('&nbsp;').load('/viewcard/?sn=' + card.sn);
+                    $("#read-card-value").html('&nbsp;').load('/ingresso/viewcard/?sn=' + card.sn);
                 else 
                      alert("Non e' stata avvicinata nessuna tessera al lettore oppure il lettore non e' collegato correttamente.");
             },
@@ -51,7 +55,7 @@ $(document).ready(function() {
             return;
         }
 
-        $('#record-entrance-value').html('&nbsp;').load('/entrance/' + encodeURIComponent(cost_float.toString()) +'/')
+        $('#record-entrance-value').html('&nbsp;').load('/ingresso/insert/' + encodeURIComponent(cost_float.toString()) +'/')
     });
     /* bind cost input to register entrance button*/
     $('#entrance-cost').keypress(function (e) {
@@ -67,7 +71,7 @@ $(document).ready(function() {
             $.getJSON( '{{ URL_CARD }}', function(card) { //read the card
                 if (card && card.sn.length !== 0) {
                     $.ajax({    //write in the db
-                    url: "/makecard/",
+                    url: "/ingresso/makecard/",
                     type: "GET",
                     data: {'userid': userid, 'sn': card.sn},
                     dataType: "html",
@@ -119,7 +123,7 @@ $(document).ajaxStart(function() {
 <br/>
 <br/>
 <p>
-<a class="button blue" href="/admin/fusoci/entrancecashbalance/">Contanti iniziali e finali</a>
+<a class="button blue" href="/admin/ingresso/entrancebalance/">Contanti iniziali e finali</a>
 </p>
 {% endblock %}
 

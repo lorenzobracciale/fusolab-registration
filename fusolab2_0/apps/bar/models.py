@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 from decimal import Decimal 
 from datetime import datetime 
 from bar.managers import *
+from base.models import UserProfile
 
 DATE_FORMAT = "%d-%m-%Y" 
 TIME_FORMAT = "%H:%M:%S"
@@ -33,27 +34,26 @@ class PurchasedProduct(models.Model):
         verbose_name = "Consumazione"
         verbose_name_plural = "Consumazioni"
 
-class Receipt(models.Model):
-    cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere") 
-    date = models.DateTimeField(auto_now_add = True)
-    total = models.DecimalField("totale", max_digits=10, decimal_places=2)
-    def __unicode__(self):
-        return "#%d - %.2f EUR %s" % (self.id, self.total, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
-    class Meta:
-        verbose_name = "Scontrino"
-        verbose_name_plural = "Scontrini"
+class ReceiptManager(models.Manager):
+	def total_between(self, opening_date, closing_date):
+		if super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).exists():
+			return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).aggregate(Sum('total'))['total__sum']
+		else:
+			return Decimal('0.00')
 
+	def receipts_between(self, opening_date, closing_date):
+		return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date])
 
 class Receipt(models.Model):
-	cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere")
+	cashier = models.ForeignKey('base.UserProfile', verbose_name="Cassiere")
 	date = models.DateTimeField(auto_now_add = True)
 	total = models.DecimalField("totale", max_digits=10, decimal_places=2)
-	
+
 	objects = ReceiptManager()
-	
+
 	def __unicode__(self):
 		return "#%d - %.2f EUR %s" % (self.id, self.total, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
-	
+
 	class Meta:
 		ordering = ['-date']
 		verbose_name = "Scontrino"
@@ -93,7 +93,7 @@ class Balance(models.Model):
 	parent = models.ForeignKey('self', blank=True, null=True, editable=False)
 	amount = models.DecimalField("Somma", max_digits=10, decimal_places=2,  validators=[MinValueValidator(Decimal('0.00'))])
 	date = models.DateTimeField("Data", default=datetime.now)
-	cashier = models.ForeignKey('UserProfile', verbose_name="Cassiere")
+	cashier = models.ForeignKey('base.UserProfile', verbose_name="Cassiere")
 	note = models.TextField(blank=True)
 	
 	objects = BalanceManager()		

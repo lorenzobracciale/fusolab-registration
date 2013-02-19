@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext, loader
-from forms import EditFormSocio
+#from forms import EditFormSocio
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from registration.views import activate
@@ -15,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import simplejson
 from decimal import Decimal
 from datetime import datetime, timedelta
+from bar.models import *
 
 
 @staff_member_required

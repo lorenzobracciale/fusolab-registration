@@ -18,7 +18,7 @@ urlpatterns = patterns('',
 
 
     url(r'^accounts/register/$', register, {'form_class': RegistrationFormSocio,
-        'backend': 'fusoci.regbackend.FusolabBackend' },
+        'backend': 'base.regbackend.FusolabBackend' },
          name='registration_register'),
     url(r'^accounts/', include('registration.backends.default.urls')),
 
