@@ -1,6 +1,5 @@
 # regbackend.py
 import profile, re, unidecode
-from fusoci.forms import RegistrationFormSocio
 from registration.backends.default import DefaultBackend
 
 from django.contrib.sites.models import Site
@@ -12,7 +11,7 @@ from registration import signals
 
 from models import UserProfile
 
-from fusoci.forms import EditFormSocio
+from base.forms import EditFormSocio, RegistrationFormSocio
 
 def slugify(str):
     str = unidecode.unidecode(str).lower()
