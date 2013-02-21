@@ -17,7 +17,7 @@ class Product(models.Model):
     keycode = models.IntegerField("tasto rapido per cassiere") #rapid keycode for cash 
     name = models.CharField("nome", max_length=30)
     cost = models.DecimalField("prezzo", max_digits=5, decimal_places=2)
-    internal_cost = models.DecimalField("prezzo per interni", max_digits=5, decimal_places=2, blank=True)
+    #internal_cost = models.DecimalField("prezzo per interni", max_digits=5, decimal_places=2, blank=True)
     def __unicode__(self):
         return u'%d %s %s%s' % (self.keycode, self.name, self.cost, 'e' )
     class Meta:
