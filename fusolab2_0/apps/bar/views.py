@@ -16,15 +16,17 @@ from django.utils import simplejson
 from decimal import Decimal
 from datetime import datetime, timedelta
 from bar.models import *
+from base.tests import in_turnisti
+from django.contrib.auth.decorators import user_passes_test
 
 
-@staff_member_required
+@user_passes_test(in_turnisti)
 def barcash(request):
     p = Product.objects.all()
     return render_to_response('base/cash.html', { 'products': p } , context_instance=RequestContext(request))
 
 
-@staff_member_required
+@user_passes_test(in_turnisti)
 def deletereceipt(request, receiptid):
     total = 0.0
     try:
@@ -38,7 +40,7 @@ def deletereceipt(request, receiptid):
 
 
 @csrf_exempt
-@staff_member_required
+@user_passes_test(in_turnisti)
 def addpurchasedproduct(request):
     data = request.POST.get('q')
     total = 0.0
@@ -66,6 +68,3 @@ def addpurchasedproduct(request):
        return HttpResponse( simplejson.dumps(response_data), mimetype="application/json" )
     else:
        return HttpResponseNotFound
-
-
-

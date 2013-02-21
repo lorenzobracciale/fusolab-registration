@@ -9,22 +9,47 @@ from registration.backends import get_backend
 from registration.models import RegistrationProfile
 from django.contrib.auth.models import User
 from django.db.models import Q
-from ingresso.models import * 
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import simplejson
 from decimal import Decimal
 from datetime import datetime, timedelta
+from django.http import Http404
 from ingresso.models import *
-
+from django.contrib.auth.decorators import user_passes_test
+from base.tests import in_turnisti
+from ingresso.forms import *
 
 from base.regbackend import FusolabBackend
 
-@staff_member_required
+@user_passes_test(in_turnisti)
 def card(request):
     return render_to_response('base/card.html', { 'URL_CARD': settings.URL_CARD } , context_instance=RequestContext(request))
 
-@staff_member_required
+@user_passes_test(in_turnisti)
+def entrance_balance_form(request, balance_type):
+    forms = {
+                'open': { 'name': 'Apri Cassa Ingresso', 'form': EntranceOpeningModelForm }, 
+                'close': { 'name': 'Chiudi Cassa Ingresso', 'form': EntranceClosingModelForm },
+                'withdraw': { 'name': 'Inserisci Prelievo', 'form': EntranceWithdrawModelForm },
+                'payment': { 'name': 'Inserisci Pagamento', 'form': EntrancePaymentModelForm },
+                'deposit': { 'name': 'Inserisci Deposito', 'form': EntrancePaymentModelForm },
+            }
+    if balance_type in forms.keys():
+        formname = forms[balance_type]['name']
+        if request.method == 'POST':
+            form = forms[balance_type]['form'](request.POST)  
+            if form.is_valid:
+                form.save()
+                return HttpResponseRedirect('/ingresso/')
+        else:
+            form = forms[balance_type]['form']()  
+    else:
+        raise Http404
+    return render_to_response('base/entrance_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
+
+
+@user_passes_test(in_turnisti)
 def delete_entrance(request, entranceid=None):
     try:
         e = Entrance.objects.get(id=entranceid)
@@ -34,7 +59,7 @@ def delete_entrance(request, entranceid=None):
         return HttpResponseNotFound("Ingresso non trovato<br /><a href='/ingresso/card'>Torna alla pagina precedente</a>")
 
 
-@staff_member_required
+@user_passes_test(in_turnisti)
 def entrance(request, cost=None):
     if cost:
         e = Entrance()
@@ -49,7 +74,7 @@ def entrance(request, cost=None):
         return HttpResponse("Non e' stato inserito nessun costo (mettere 0 se entra aggratis)")
 
 
-@staff_member_required
+@user_passes_test(in_turnisti)
 def viewcard(request):
     sn = request.GET.get('sn') or None
     if sn and len(sn) > 0 :
@@ -60,7 +85,7 @@ def viewcard(request):
             return HttpResponse(sn + ". La tessera non e' di nessun socio.")
 
 
-@staff_member_required
+@user_passes_test(in_turnisti)
 def makecard(request):
     userid = request.GET.get('userid') or None
     user = UserProfile.objects.filter(user__id=userid)
@@ -74,7 +99,7 @@ def makecard(request):
         return HttpResponse("Card registrata con id " + str(c.id) )
     return HttpResponse("Errore: non ho trovato il socio o il sn non e' valido.")
 
-@staff_member_required
+@user_passes_test(in_turnisti)
 def ajax_user_search(request, q=None):
     if q:            
         results = User.objects.filter( 

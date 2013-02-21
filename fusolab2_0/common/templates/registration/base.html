@@ -2,6 +2,7 @@
 
 
 {% load tags %}
+{% load ifusergroup %}
 {% url home as home %}
 {% url edit as edit %}
 {% url card as card %}
@@ -46,21 +47,22 @@
           <li class="{% active request home %}"><a href="/">Home</a></li>
             
         {% if user.is_authenticated %}
-            <li class="{% active request edit %}"><a href="/accounts/edit">Modifica Profilo</a></li>
-            <li class="{% active request logout %}"><a href="/accounts/logout">Logout</a></li>
-            {% if user.is_staff %}
-                <li class="{% active request card %}"><a href="/ingresso/card">Tessere</a></li>
-                <li class="{% active request barcash %}"><a href="/bar/cash">Cassa Bar</a></li>
-                <li><a href="/admin">Admin</a></li>
+            {% ifusergroup turnisti %}
+                <li class="{% active request card %}"><a href="/ingresso/">Tessere</a></li>
+                <li class="{% active request barcash %}"><a href="/bar/">Cassa Bar</a></li>
             {% else %}
                 <li class="{% active request statuto %}"><a href="/statuto/">Statuto</a></li>
-            {% endif %}
+            {% endifusergroup %}
+            <li class="{% active request edit %}"><a href="/accounts/edit">Modifica Profilo</a></li>
+            <li class="{% active request logout %}"><a href="/accounts/logout">Logout</a></li>
         {% else %}
             <li class="{% active request statuto %}"><a href="/statuto/">Statuto</a></li>
             <li class="{% active request register %}"><a href="/accounts/register">Registrati</a></li>
             <li class="{% active request login %}"><a href="/accounts/login">Log-in</a></li>
         {% endif %}
-          
+        {% if user.is_staff %}
+            <li><a href="/admin">Admin</a></li>
+        {% endif %}
         </ul>
       </div>
     </div>
