@@ -24,30 +24,30 @@ class BarBalanceModelForm(ModelForm):
 class BarOpeningModelForm(BarBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(BarOpeningModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.OPENING)	
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=OPENING)	
 
 class BarClosingModelForm(BarBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(BarClosingModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.CLOSING)	
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=CLOSING)	
 
 class BarPaymentModelForm(BarBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(BarPaymentModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.PAYMENT)
-		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=Balance.PAYMENT_SUBTYPES))
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=PAYMENT)
+		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=PAYMENT_SUBTYPES))
 
 		
 class BarDepositModelForm(BarBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(BarDepositModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.DEPOSIT)	
-		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=Balance.DEPOSIT_SUBTYPES))
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=DEPOSIT)	
+		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=DEPOSIT_SUBTYPES))
 		
 class BarWithdrawModelForm(BarBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(BarWithdrawModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.WITHDRAW)	
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=WITHDRAW)	
 
 #
 #	SMALL FORMS
@@ -66,21 +66,21 @@ class SmallBalanceModelForm(ModelForm):
 class SmallCashpointModelForm(SmallBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(SmallCashpointModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.CASHPOINT)	
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=CASHPOINT)	
 
 class SmallPaymentModelForm(SmallBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(SmallPaymentModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.PAYMENT)
-		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=Balance.PAYMENT_SUBTYPES))
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=PAYMENT)
+		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=PAYMENT_SUBTYPES))
 				
 class SmallDepositModelForm(SmallBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(SmallDepositModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.DEPOSIT)	
-		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=Balance.DEPOSIT_SUBTYPES))
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=DEPOSIT)	
+		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=DEPOSIT_SUBTYPES))
 		
 class SmallWithdrawModelForm(SmallBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(SmallWithdrawModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.WITHDRAW)	
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=WITHDRAW)	

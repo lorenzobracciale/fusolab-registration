@@ -6,4 +6,5 @@ urlpatterns = patterns('',
     url(r'activate/(?P<activation_key>\w+)/$', 'base.views.edit', name='edit'),
     url(r'^$', 'base.views.home', name='home' ),
     url(r'^index.html$', 'base.views.home'),
+    url(r'^tuttoapposto/(?P<next_page>\S+)$', 'base.views.tuttoapposto', name='tuttoapposto'),
 )

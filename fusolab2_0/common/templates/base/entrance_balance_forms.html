@@ -9,6 +9,7 @@
 <form action="" method="post">{% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Ok" class="button blue" />
+    <a href="/ingresso/" class="button red" />Annulla e Torna alla pagina di prima</a>
 </form>
 {% endblock %}
 

@@ -24,6 +24,8 @@ def home(request):
 def statuto(request):
     return render_to_response('base/statuto.html', {} , context_instance=RequestContext(request))
 
+def tuttoapposto(request, next_page):
+    return render_to_response('base/tuttoapposto.html', {'next_page': next_page} , context_instance=RequestContext(request))
 
 def edit(request, activation_key=None):
     if request.user.is_authenticated() or activation_key:

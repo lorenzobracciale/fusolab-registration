@@ -9,6 +9,7 @@ from datetime import datetime
 from bar.models import SmallBalance, Balance	
 from ingresso.managers import *
 from base.models import *
+from bar.managers import *
 
 DATE_FORMAT = "%d-%m-%Y" 
 TIME_FORMAT = "%H:%M:%S"
@@ -37,7 +38,7 @@ class Entrance(models.Model):
 class EntranceBalance(Balance):
 
 	def __unicode__(self):
-		if self.operation == self.OPENING:
+		if self.operation == OPENING:
 			return "%d - -  %s %.2f %s" % (self.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
 		else:
 			return "%d - %d %s %.2f %s" % (self.id, self.parent.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))	
@@ -48,7 +49,7 @@ class EntranceBalance(Balance):
 
 	#assegna l'id automaticamente durante il salvataggio per raggruppare gli eventi
 	def save(self, *args, **kwargs):
-		if self.operation != self.OPENING:
+		if self.operation != OPENING:
 			self.parent = EntranceBalance.objects.get_parent(self.date)
 		super(EntranceBalance, self).save(*args, **kwargs)
 

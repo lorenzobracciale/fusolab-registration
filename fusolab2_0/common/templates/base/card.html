@@ -1,5 +1,5 @@
 {% extends "registration/base.html" %}
-
+{% load ifbalanceopen %}
 {% block title %}Fai la tessera{% endblock %}
 {% block js %}
 <script type="text/javascript">
@@ -115,15 +115,17 @@ $(document).ajaxStart(function() {
 <a class="button pink" href="#" id='read-card'>Leggi tessera</a><span id="read-card-value"></span>
 </p>
 <br/>
+{% ifbalanceopen ingresso %}
 <p>
 <span>Costo ingresso: <input type="text" size=4 id="entrance-cost">Euro</span><br>
 <a class="button orange" href="#" id='record-entrance'>Registra Ingresso</a>
 </p>
 <span id="record-entrance-value"></span>
+{% endifbalanceopen %}
 <br/>
 <br/>
+{% ifbalanceopen ingresso %}
 <p>
-<a class="button blue" href="/ingresso/balance/open/">Apri Cassa</a>
 <a class="button red" href="/ingresso/balance/close/">Chiudi Cassa</a>
 </p>
 <p>
@@ -131,5 +133,10 @@ $(document).ajaxStart(function() {
 <a class="button pink" href="/ingresso/balance/deposit/">Deposito</a>
 <a class="button orange" href="/ingresso/balance/payment/">Pagamento</a>
 </p>
+{% else %}
+<p>
+<a class="button blue" href="/ingresso/balance/open/">Apri Cassa</a>
+</p>
+{% endifbalanceopen %}
 {% endblock %}
 

@@ -1,5 +1,6 @@
 from base.models import *
 from ingresso.models import *
+from bar.managers import *
 from django import forms
 from django.forms import ModelForm
 from registration.forms import RegistrationForm
@@ -23,27 +24,27 @@ class EntranceBalanceModelForm(ModelForm):
 class EntranceOpeningModelForm(EntranceBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(EntranceOpeningModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.OPENING)	
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=OPENING)	
 
 class EntranceClosingModelForm(EntranceBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(EntranceClosingModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.CLOSING)	
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=CLOSING)	
 
 class EntrancePaymentModelForm(EntranceBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(EntrancePaymentModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.PAYMENT)
-		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=Balance.PAYMENT_SUBTYPES))
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=PAYMENT)
+		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=PAYMENT_SUBTYPES))
 				
 class EntranceDepositModelForm(EntranceBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(EntranceDepositModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.DEPOSIT)	
-		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=Balance.DEPOSIT_SUBTYPES))
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=DEPOSIT)	
+		self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=DEPOSIT_SUBTYPES))
 
 class EntranceWithdrawModelForm(EntranceBalanceModelForm):
 	def __init__(self, *args, **kwargs):
 		super(EntranceWithdrawModelForm, self).__init__(*args, **kwargs)
-		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=Balance.WITHDRAW)	
+		self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=WITHDRAW)	
 

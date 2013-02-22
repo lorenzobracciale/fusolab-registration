@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django.utils.safestring import mark_safe
 from decimal import Decimal 
 from datetime import datetime 
-from bar.managers import *
+from bar.managers import * 
 from base.models import UserProfile
 
 DATE_FORMAT = "%d-%m-%Y" 
@@ -34,16 +34,6 @@ class PurchasedProduct(models.Model):
         verbose_name = "Consumazione"
         verbose_name_plural = "Consumazioni"
 
-class ReceiptManager(models.Manager):
-	def total_between(self, opening_date, closing_date):
-		if super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).exists():
-			return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).aggregate(Sum('total'))['total__sum']
-		else:
-			return Decimal('0.00')
-
-	def receipts_between(self, opening_date, closing_date):
-		return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date])
-
 class Receipt(models.Model):
 	cashier = models.ForeignKey('base.UserProfile', verbose_name="Cassiere")
 	date = models.DateTimeField(auto_now_add = True)
@@ -64,43 +54,19 @@ class Receipt(models.Model):
 #
 
 class Balance(models.Model):
-	OPENING = 'op'
-	CLOSING = 'cl'
-	PAYMENT = 'pa'
-	DEPOSIT = 'de'
-	WITHDRAW = 'wi'	
-	CASHPOINT = 'pt'
-	OPERATION_TYPES = ( 
-		(OPENING, 'apertura'),
-		(CLOSING, 'chiusura'),
-		(PAYMENT, 'pagamento'),
-		(DEPOSIT, 'deposito'),
-		(WITHDRAW, 'prelievo tesoriere'),
-		(CASHPOINT, 'punto di cassa')
-	)
-	PAYMENT_SUBTYPES = (
-		('ar','artisti'),
-		('ba','barman'),
-		('pu','pulizie'),
-		('va','varie')
-	)	
-	DEPOSIT_SUBTYPES = (
-		('co','contante'),
-		('do','donazione')
-	)
-	operation = models.CharField(max_length=2, choices=OPERATION_TYPES)	
-	subtype = models.CharField(max_length=2, blank=True, null=True)
-	parent = models.ForeignKey('self', blank=True, null=True, editable=False)
-	amount = models.DecimalField("Somma", max_digits=10, decimal_places=2,  validators=[MinValueValidator(Decimal('0.00'))])
-	date = models.DateTimeField("Data", default=datetime.now)
-	cashier = models.ForeignKey('base.UserProfile', verbose_name="Cassiere")
-	note = models.TextField(blank=True)
+    operation = models.CharField(max_length=2, choices=OPERATION_TYPES)	
+    subtype = models.CharField(max_length=2, blank=True, null=True)
+    parent = models.ForeignKey('self', blank=True, null=True, editable=False)
+    amount = models.DecimalField("Somma", max_digits=10, decimal_places=2,  validators=[MinValueValidator(Decimal('0.00'))])
+    date = models.DateTimeField("Data", default=datetime.now)
+    cashier = models.ForeignKey('base.UserProfile', verbose_name="Cassiere")
+    note = models.TextField(blank=True)
 	
-	objects = BalanceManager()		
+    objects = BalanceManager()		
 
-	class Meta:
-		ordering = ['-date']
-		abstract = True	
+    class Meta:
+        ordering = ['-date']
+        abstract = True	
 
 
 #
@@ -110,7 +76,7 @@ class Balance(models.Model):
 class BarBalance(Balance):
 
 	def __unicode__(self):
-		if self.operation == self.OPENING:
+		if self.operation == OPENING:
 			return "%d - -  %s %.2f %s" % (self.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
 		else:
 			return "%d - %d %s %.2f %s" % (self.id, self.parent.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
@@ -121,7 +87,7 @@ class BarBalance(Balance):
 
 	#assegna l'id automaticamente durante il salvataggio per raggruppare gli eventi
 	def save(self, *args, **kwargs):
-		if self.operation != self.OPENING:
+		if self.operation != OPENING:
 			self.parent = BarBalance.objects.get_parent(self.date)
 		super(BarBalance, self).save(*args, **kwargs)
 
@@ -143,7 +109,7 @@ class SmallBalance(Balance):
 
 	#assegna l'id automaticamente durante il salvataggio per raggruppare gli eventi
 	def save(self, *args, **kwargs):
-		if self.operation != self.CASHPOINT:
+		if self.operation != CASHPOINT:
 			self.parent = SmallBalance.objects.get_parent(self.date)
 		super(SmallBalance, self).save(*args, **kwargs)
 

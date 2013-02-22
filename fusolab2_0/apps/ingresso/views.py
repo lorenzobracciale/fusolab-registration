@@ -39,9 +39,9 @@ def entrance_balance_form(request, balance_type):
         formname = forms[balance_type]['name']
         if request.method == 'POST':
             form = forms[balance_type]['form'](request.POST)  
-            if form.is_valid:
+            if form.is_valid():
                 form.save()
-                return HttpResponseRedirect('/ingresso/')
+                return HttpResponseRedirect('/ingresso/tuttoapposto')
         else:
             form = forms[balance_type]['form']()  
     else:

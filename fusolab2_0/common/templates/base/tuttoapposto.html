@@ -1,0 +1,19 @@
+{% extends "registration/base.html" %}
+
+{% block title %} Tutto Ok {% endblock %}
+{% block js %}
+<script>
+var delay = 3000; //Your delay in milliseconds
+setTimeout(function(){ window.location = "/{{ next_page }}"; }, delay);
+</script>
+{% endblock %}
+{% block content %}
+<h1>Dati inseriti con successo!</h1>
+<h3>La sua soddisfazione è il nostro miglior premo</h3>
+{{ next_page }}
+<br />
+<img src="/static/images/linobanfi.jpg" />
+<br />
+Attendi 3 secondi...
+{% endblock %}
+
