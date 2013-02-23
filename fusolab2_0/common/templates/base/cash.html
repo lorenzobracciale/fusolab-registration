@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+{% load ifbalanceopen %}
 <head>
 	<title>Cassa Fusolab 2.0</title>
 	<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
@@ -64,7 +65,7 @@
       function deletereceipt(receiptid) {
         if (receiptid == null)
             return;
-        $.get('/barcash/deletereceipt/' + receiptid +'/', function(data) {
+        $.get('/bar/deletereceipt/' + receiptid +'/', function(data) {
                 $('#footer').html("<img src='/static/images/tick_green.png' />" + data);
         }).error(function() {
                 alert('Errore: Non ho potuto cancellare lo scontrino.'); 
@@ -98,7 +99,7 @@
           });
 
           $.ajax({
-            url: "/barcash/addpurchasedproduct/", 
+            url: "/bar/addpurchasedproduct/", 
             type: "POST",
             data: { 'q' : JSON.stringify(json_list.purchased_products) } ,
             dataType: 'json',
@@ -150,12 +151,27 @@
   </script>
 
 </head>
-<body id="body">
+<body id="body" {% ifbalanceopen bar %} style="background: green;" %} {% else %} style="background: red;" {% endifbalanceopen %}>
 <div id="header">
-    <h1>Cassa 2.0 - Cassiere: {{  request.user.username }}</h1>
-    Non sei  {{  request.user.username }} ? <a href="/accounts/logout">Esci</a> e rientra con il tuo username!
+    <h1>Cassa {% ifbalanceopen bar %} Aperta {% else %} Chiusa/Interregno {% endifbalanceopen %}- Cassiere: {{ request.user.username }}</h1>
+    Non sei  {{  request.user.username }} ? <a href="/accounts/logout">Esci</a> e rientra con il tuo username! - Torna alla <a href="/">homepage</a>
 </div>
-<div id="cash-manager"><a href="/admin/fusoci/barcashbalance/">Gestione Cassa</a></div>
+{% ifbalanceopen bar %}
+<div id="cash-manager">
+    <a href="/bar/balance/withdraw/">Prelievo</a>
+    <a href="/bar/balance/deposit/">Deposito</a>
+    <a href="/bar/balance/payment/">Pagamento</a>
+    <a href="/bar/balance/close/">Chiudi Cassa</a>
+</div>
+{% else %}
+<div id="cash-manager">
+    <a href="/bar/smallbalance/point/">Punto di Cassa</a>
+    <a href="/bar/smallbalance/withdraw/">Prelievo</a>
+    <a href="/bar/smallbalance/deposit/">Deposito</a>
+    <a href="/bar/smallbalance/payment/">Pagamento</a>
+    <a href="/bar/balance/open/">Apri Cassa</a>
+</div>
+{% endifbalanceopen %}
 <div class="colmask leftmenu">
 	<div class="colleft">
 		<div class="col1"> <!-- right col --!>

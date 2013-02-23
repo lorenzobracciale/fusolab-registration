@@ -2,6 +2,7 @@
 from django.db import models
 from datetime import datetime
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 #from bar.models import Balance
 
 OPENING = 'op'
@@ -33,7 +34,10 @@ DEPOSIT_SUBTYPES = (
 class BalanceManager(models.Manager):
 
     def is_open(self,time=datetime.now):
-        return super(BalanceManager, self).get_query_set().filter(Q(date__lt=time) & Q(operation__in=[OPENING,CLOSING])).latest('date').operation == OPENING
+        try:
+            return super(BalanceManager, self).get_query_set().filter(Q(date__lt=time) & Q(operation__in=[OPENING,CLOSING])).latest('date').operation == OPENING
+        except ObjectDoesNotExist:
+            return False
 
     def get_parent(self, time):
         return super(BalanceManager, self).get_query_set().filter(Q(operation=OPENING) & Q(date__lt=time)).latest('date')

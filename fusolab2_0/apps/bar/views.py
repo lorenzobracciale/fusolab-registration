@@ -1,23 +1,18 @@
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext, loader
-#from forms import EditFormSocio
-from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
-from registration.views import activate
-from registration.backends import get_backend
-from registration.models import RegistrationProfile
 from django.contrib.auth.models import User
 from django.db.models import Q
-from base.models import * 
-from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import simplejson
 from decimal import Decimal
 from datetime import datetime, timedelta
+from base.models import * 
 from bar.models import *
 from base.tests import in_turnisti
 from django.contrib.auth.decorators import user_passes_test
+from bar.forms import *
 
 
 @user_passes_test(in_turnisti)
@@ -68,3 +63,50 @@ def addpurchasedproduct(request):
        return HttpResponse( simplejson.dumps(response_data), mimetype="application/json" )
     else:
        return HttpResponseNotFound
+
+@user_passes_test(in_turnisti)
+def bar_balance_form(request, balance_type):
+    forms = {
+                'open': { 'name': 'Apri Cassa Bar', 'form': BarOpeningModelForm }, 
+                'close': { 'name': 'Chiudi Cassa Bar', 'form': BarClosingModelForm },
+                'withdraw': { 'name': 'Inserisci Prelievo', 'form': BarWithdrawModelForm },
+                'payment': { 'name': 'Inserisci Pagamento', 'form': BarPaymentModelForm },
+                'deposit': { 'name': 'Inserisci Deposito', 'form': BarPaymentModelForm },
+            }
+    if balance_type in forms.keys():
+        formname = forms[balance_type]['name']
+        if request.method == 'POST':
+            form = forms[balance_type]['form'](request.POST)  
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/tuttoapposto/bar/')
+        else:
+            form = forms[balance_type]['form']()  
+    else:
+        raise Http404
+    return render_to_response('base/bar_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
+
+
+@user_passes_test(in_turnisti)
+def bar_smallbalance_form(request, balance_type):
+    forms = {
+                'point': { 'name': 'Punto di Cassa', 'form': SmallCashpointModelForm}, 
+                'payment': { 'name': 'Pagamento ', 'form': SmallPaymentModelForm},
+                'deposito': { 'name': 'Deposito', 'form': SmallDepositModelForm},
+                'withdraw': { 'name': 'Prelievo', 'form': SmallWithdrawModelForm},
+            }
+    if balance_type in forms.keys():
+        formname = forms[balance_type]['name']
+        if request.method == 'POST':
+            form = forms[balance_type]['form'](request.POST)  
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/tuttoapposto/bar/')
+        else:
+            form = forms[balance_type]['form']()  
+    else:
+        raise Http404
+    return render_to_response('base/bar_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
+
+
+
