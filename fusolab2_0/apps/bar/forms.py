@@ -16,6 +16,7 @@ import datetime
 class BarBalanceModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(BarBalanceModelForm, self).__init__(*args, **kwargs)
+        self.fields['cashier'].queryset = UserProfile.objects.filter(user__groups__name="turnisti")
         
     class Meta:
         model = BarBalance  
@@ -61,6 +62,7 @@ class BarWithdrawModelForm(BarBalanceModelForm):
 class SmallBalanceModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(SmallBalanceModelForm, self).__init__(*args, **kwargs)
+        self.fields['cashier'].queryset = UserProfile.objects.filter(user__groups__name="turnisti")
         
     class Meta:
         model = SmallBalance    

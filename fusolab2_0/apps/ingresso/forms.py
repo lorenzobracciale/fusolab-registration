@@ -16,7 +16,8 @@ import datetime
 class EntranceBalanceModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(EntranceBalanceModelForm, self).__init__(*args, **kwargs)
-        
+        self.fields['cashier'].queryset = UserProfile.objects.filter(user__groups__name="turnisti")
+
     class Meta:
         model = EntranceBalance 
         exclude = ('parent','subtype', 'date')
