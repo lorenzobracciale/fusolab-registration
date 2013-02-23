@@ -40,7 +40,10 @@ class BalanceManager(models.Manager):
             return False
 
     def get_parent(self, time):
-        return super(BalanceManager, self).get_query_set().filter(Q(operation=OPENING) & Q(date__lt=time)).latest('date')
+        try:
+            return super(BalanceManager, self).get_query_set().filter(Q(operation=OPENING) & Q(date__lt=time)).latest('date')
+        except ObjectDoesNotExist:
+            return None
 
     def get_closing_amount_before(self,current_opening):
         return super(BalanceManager, self).get_query_set().get(id=current_opening.id).get_previous_by_date(operation=CLOSING).amount

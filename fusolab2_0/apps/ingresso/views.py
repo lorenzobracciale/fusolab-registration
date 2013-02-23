@@ -43,7 +43,7 @@ def entrance_balance_form(request, balance_type):
                 form.save()
                 return HttpResponseRedirect('/tuttoapposto/ingresso/')
         else:
-            form = forms[balance_type]['form']()  
+            form = forms[balance_type]['form'](initial={'cashier': request.user.get_profile()})  
     else:
         raise Http404
     return render_to_response('base/entrance_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))

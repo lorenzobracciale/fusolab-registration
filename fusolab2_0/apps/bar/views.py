@@ -81,7 +81,7 @@ def bar_balance_form(request, balance_type):
                 form.save()
                 return HttpResponseRedirect('/tuttoapposto/bar/')
         else:
-            form = forms[balance_type]['form']()  
+            form = forms[balance_type]['form'](initial={'cashier': request.user.get_profile()})  
     else:
         raise Http404
     return render_to_response('base/bar_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
@@ -92,7 +92,7 @@ def bar_smallbalance_form(request, balance_type):
     forms = {
                 'point': { 'name': 'Punto di Cassa', 'form': SmallCashpointModelForm}, 
                 'payment': { 'name': 'Pagamento ', 'form': SmallPaymentModelForm},
-                'deposito': { 'name': 'Deposito', 'form': SmallDepositModelForm},
+                'deposit': { 'name': 'Deposito', 'form': SmallDepositModelForm},
                 'withdraw': { 'name': 'Prelievo', 'form': SmallWithdrawModelForm},
             }
     if balance_type in forms.keys():
@@ -103,7 +103,7 @@ def bar_smallbalance_form(request, balance_type):
                 form.save()
                 return HttpResponseRedirect('/tuttoapposto/bar/')
         else:
-            form = forms[balance_type]['form']()  
+            form = forms[balance_type]['form'](initial={'cashier': request.user.get_profile()})  
     else:
         raise Http404
     return render_to_response('base/bar_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
