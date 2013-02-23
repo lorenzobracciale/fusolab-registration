@@ -65,6 +65,7 @@ def edit(request, activation_key=None):
                         'doc_type': profile.doc_type,
                         'doc_id': profile.doc_id,
                         'how_hear': profile.how_hear,
+                        'salutatore': profile.salutatore,
                         'photo': profile.photo,
                         }
             if activation_key:

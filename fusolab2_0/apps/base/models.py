@@ -22,6 +22,7 @@ class UserProfile(models.Model):
 
     photo = models.ImageField(upload_to='photo/', blank=True) #TODO fare check nel form per size ed eventualmente resizing
     how_hear = models.CharField(max_length=500, blank=True)
+    salutatore = models.CharField(max_length=500, blank=True)
 
     def __unicode__(self):
         return u'%s %s' % (self.user.first_name, self.user.last_name)

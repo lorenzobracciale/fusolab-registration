@@ -16,7 +16,7 @@ class RegistrationFormSocio(RegistrationForm):
 
     born_date = forms.DateField(input_formats=["%d/%m/%Y"] , label=_(u'Data di Nascita (gg/mm/aaaa)'))
     born_place = forms.CharField(max_length=50, label=_(u'Luogo di Nascita'))
-    accepted_eula = forms.BooleanField(label=_(u'Si, lo voglio'))
+    accepted_eula = forms.BooleanField(label=_(u'Si, lo voglio'), initial=True)
 
     #override
     username = forms.CharField(max_length=30, required=False, label=_(u'Username/Nickname')) 
@@ -66,6 +66,7 @@ class EditFormSocio(RegistrationForm):
 
     photo = forms.ImageField(required=False, label=_(u'Foto (opzionale)'), widget=ImageWidget(width=50, height=50, template='%(input)s<br />%(image)s') )
     how_hear = forms.CharField(max_length=500, widget=forms.Textarea, label=_(u'Come ci hai conosciuto?'), required=False)
+    salutatore = forms.CharField(max_length=500, widget=forms.Textarea, label=_(u'Saluto personalizzato sul salutatore'), required=False)
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
@@ -138,6 +139,8 @@ class EditFormSocio(RegistrationForm):
         profile.doc_type, profile.doc_id = data['doc_type'], data['doc_id']
         if 'how_hear' in data and len(data['how_hear']):
             profile.how_hear = data['how_hear']
+        if 'salutatore' in data and len(data['salutatore']):
+            profile.salutatore = data['salutatore']
         if 'photo' in data and data['photo']:
             image = self.request.FILES['photo']
             profile.photo.save(image.name, image) 
