@@ -41,7 +41,7 @@ class BalanceManager(models.Manager):
 
     def get_parent(self, time):
         try:
-            return super(BalanceManager, self).get_query_set().filter(Q(operation=OPENING) & Q(date__lt=time)).latest('date')
+            return super(BalanceManager, self).get_query_set().filter(Q(operation__in=[OPENING,CASHPOINT]) & Q(date__lt=time)).latest('date')
         except ObjectDoesNotExist:
             return None
 
@@ -61,6 +61,8 @@ class BalanceManager(models.Manager):
     def get_checkpoint_before(self,saved_balance):
         return super(BalanceManager, self).get_query_set().get(id=saved_balance.id).get_previous_by_date(operation=CASHPOINT)
 
+    def get_last_n(self,n):
+        return super(BalanceManager, self).get_query_set().order_by('-date')[:n]
 
 class ReceiptManager(models.Manager):
 	def total_between(self, opening_date, closing_date):

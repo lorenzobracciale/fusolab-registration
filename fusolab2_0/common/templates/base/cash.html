@@ -165,10 +165,12 @@
 </div>
 {% else %}
 <div id="cash-manager">
+    {% if user.is_staff %}
     <a href="/bar/smallbalance/point/">Punto di Cassa</a>
     <a href="/bar/smallbalance/withdraw/">Prelievo</a>
     <a href="/bar/smallbalance/deposit/">Deposito</a>
     <a href="/bar/smallbalance/payment/">Pagamento</a>
+    {% endif %}
     <a href="/bar/balance/open/">Apri Cassa</a>
 </div>
 {% endifbalanceopen %}
