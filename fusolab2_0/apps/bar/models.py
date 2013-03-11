@@ -113,3 +113,5 @@ class SmallBalance(Balance):
 			self.parent = SmallBalance.objects.get_parent(self.date)
 		super(SmallBalance, self).save(*args, **kwargs)
 
+
+import signals

@@ -14,7 +14,7 @@ urlpatterns = patterns('',
     url(r'^bar/', include('bar.urls')),
     url(r'^ingresso/', include('ingresso.urls')),
     url(r'^salutatore/', include('salutatore.urls')),
-    url(r'^stats/', include('stats.urls')),
+    url(r'^reports/', include('reports.urls')),
 
 
     url(r'^accounts/register/$', register, {'form_class': RegistrationFormSocio,

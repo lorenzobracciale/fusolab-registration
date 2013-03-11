@@ -1,6 +1,7 @@
 from django import template
 from django.template import resolve_variable
 from django.contrib.auth.models import Group
+from django.template import Library, TemplateSyntaxError, Node, NodeList
 
 register = template.Library()
 
