@@ -33,7 +33,7 @@ def entrance_balance_form(request, balance_type):
                 'close': { 'name': 'Chiudi Cassa Ingresso', 'form': EntranceClosingModelForm },
                 'withdraw': { 'name': 'Inserisci Prelievo', 'form': EntranceWithdrawModelForm },
                 'payment': { 'name': 'Inserisci Pagamento', 'form': EntrancePaymentModelForm },
-                'deposit': { 'name': 'Inserisci Deposito', 'form': EntrancePaymentModelForm },
+                'deposit': { 'name': 'Inserisci Deposito', 'form': EntranceDepositModelForm },
             }
     if balance_type in forms.keys():
         formname = forms[balance_type]['name']

@@ -1,0 +1,50 @@
+<html>
+<body>
+<table>
+    <tr>
+        <td>controllo</td>
+        <td>apertura</td>
+        <td>chiusura</td>
+    </tr>
+    <tr>
+        <td>{{ opening_check }}</td>
+        <td>{{ opening_amount }}</td>
+        <td>{{ last_closing_amount }}</td>
+    </tr>
+    <tr>
+        <td>controllo</td>
+        <td>attesa</td>
+        <td>in cassa</td>
+    </tr>
+    <tr>
+        <td>{{ closing_check }}</td>
+        <td>{{ expected_balance }}</td>
+        <td>{{ closing_amount }}</td>
+    </tr>
+</table>
+<table>
+    <tr>
+        <td>data</td>
+        <td>apertura</td>
+        <td>ricevute</td>
+        <td>depositi</td>
+        <td>prelievi</td>
+        <td>pagamenti</td>
+        <td>chiusura</td>
+    </tr>
+    <tr>
+        <td>{{ date }}</td>
+        <td>{{ opening_amount }}</td>
+        <td>{{ receipt_count }}</td>
+        <td>{{ de }}</td>
+        <td>{{ wi }}</td>
+        <td>{{ pa }}</td>
+        <td>{{ closing_amount}}</td>
+    </tr>
+</table>
+{% for i in notes %}
+<div>{{ i }}</div>
+{% endfor %}
+
+</body>
+</html>

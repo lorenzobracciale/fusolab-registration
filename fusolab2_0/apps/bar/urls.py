@@ -6,5 +6,6 @@ urlpatterns = patterns('',
     url(r'smallbalance/(?P<balance_type>\w+)/$', 'bar.views.bar_smallbalance_form', name='bar_small_form'),
     url(r'balance/(?P<balance_type>\w+)/$', 'bar.views.bar_balance_form', name='bar_form'),
     url(r'$', 'bar.views.barcash', name='barcash'),
+    url(r'^csv/','bar.csv.create_resume', name='create_resume'),
 )
 

@@ -71,7 +71,7 @@ def bar_balance_form(request, balance_type):
                 'close': { 'name': 'Chiudi Cassa Bar', 'form': BarClosingModelForm },
                 'withdraw': { 'name': 'Inserisci Prelievo', 'form': BarWithdrawModelForm },
                 'payment': { 'name': 'Inserisci Pagamento', 'form': BarPaymentModelForm },
-                'deposit': { 'name': 'Inserisci Deposito', 'form': BarPaymentModelForm },
+                'deposit': { 'name': 'Inserisci Deposito', 'form': BarDepositModelForm },
             }
     if balance_type in forms.keys():
         formname = forms[balance_type]['name']

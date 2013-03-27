@@ -1,9 +1,10 @@
 #from ingresso.managers import BalanceManager
+from decimal import Decimal
 from django.db import models
 from datetime import datetime
-from django.db.models import Q
+from django.db.models import Sum, Q
 from django.core.exceptions import ObjectDoesNotExist
-#from bar.models import Balance
+from bar.models import *
 
 OPENING = 'op'
 CLOSING = 'cl'
@@ -39,23 +40,43 @@ class BalanceManager(models.Manager):
         except ObjectDoesNotExist:
             return False
 
-    def get_parent(self, time):
+    def get_parent_t(self, current_time):
         try:
-            return super(BalanceManager, self).get_query_set().filter(Q(operation__in=[OPENING,CASHPOINT]) & Q(date__lt=time)).latest('date')
+            return super(BalanceManager, self).get_query_set().filter(Q(operation__in=[OPENING,CASHPOINT]) & Q(date__lt=current_time)).latest('date')
         except ObjectDoesNotExist:
             return None
-
+    
+    def get_parent_o(self, current_operation):
+        try:
+            return super(BalanceManager, self).get_query_set().filter(id=current_operation.parent).get()
+        except ObjectDoesNotExist:
+            return None    
+    def get_closing(self,current_transaction):
+        return super(BalanceManager, self).get_query_set().get(Q(id=current_transaction.id) & Q(operation=CLOSING))
+            
+    def get_last_closing(self,current_opening):
+        return super(BalanceManager, self).get_query_set().get(id=current_opening.id).get_previous_by_date(operation=CLOSING)
+    
     def get_closing_amount_before(self,current_opening):
         return super(BalanceManager, self).get_query_set().get(id=current_opening.id).get_previous_by_date(operation=CLOSING).amount
 
     def get_transactions_for(self, current_opening):
-        return super(BalanceManager, self).get_query_set().filter(parent=current_opening)
+        return super(BalanceManager, self).get_query_set().filter(parent=current_opening.id)
+
+    def get_payments_for(self, current_opening):
+        return super(BalanceManager, self).get_query_set().filter(Q(parent=current_opening.id) & Q(operation=PAYMENT)).aggregate(Sum('amount'))['amount__sum']
+
+    def get_deposits_for(self, current_opening):
+        return super(BalanceManager, self).get_query_set().filter(Q(parent=current_opening.id) & Q(operation=DEPOSIT)).aggregate(Sum('amount'))['amount__sum']
+
+    def get_withdraws_for(self, current_opening):
+        return super(BalanceManager, self).get_query_set().filter(Q(parent=current_opening.id) & Q(operation=WITHDRAW)).aggregate(Sum('amount'))['amount__sum']
 
     def get_opening_times(self,start_date,end_date):
         list = super(BalanceManager, self).get_query_set().filter(Q(date__range=[start_date,end_date]) & Q(parent__isnull=True)).select_related()
         ret = []
         for l in list:
-            ret.append([l.date,Balance.objects.filter(Q(parent=l.id) & Q(operation=CLOSING)).get().date])
+            ret.append([l.date,super(BalanceManager, self).get_query_set().filter(Q(parent=l.id) & Q(operation=CLOSING)).get().date])
         return ret  
 
     def get_checkpoint_before(self,saved_balance):

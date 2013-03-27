@@ -88,7 +88,7 @@ class BarBalance(Balance):
 	#assegna l'id automaticamente durante il salvataggio per raggruppare gli eventi
 	def save(self, *args, **kwargs):
 		if self.operation != OPENING:
-			self.parent = BarBalance.objects.get_parent(self.date)
+			self.parent = BarBalance.objects.get_parent_t(self.date)
 		super(BarBalance, self).save(*args, **kwargs)
 
 	
@@ -113,5 +113,50 @@ class SmallBalance(Balance):
 			self.parent = SmallBalance.objects.get_parent(self.date)
 		super(SmallBalance, self).save(*args, **kwargs)
 
+def get_opening_summary(closing):
+    notes = []
+    d = {}
+    d['date'] = closing.parent.date.strftime("%d/%m/%Y")
+    d['opening_amount'] = closing.parent.amount
+    if closing.parent.note:
+        notes.append("apertura "+str(closing.parent.amount)+" "+closing.parent.note)
+    d['last_closing_amount'] = BarBalance.objects.get_last_closing(closing.parent).amount
+    d['closing_amount'] = closing.amount
+    
+    #calcolo del valore atteso della chiusura
+    d['expected_balance'] = 0
+    d['expected_balance']+=closing.parent.amount
+    
+    try:
+        opening_transactions = BarBalance.objects.get_transactions_for(closing.parent)
+    except(IndexError, BarBalance.DoesNotExist):
+        pass
+        #send_mail('allarme chiusura bar', 'errore tragico #1', 'cassafusolab@gmail.com',NOTIFICATION_ADDRESS_LIST, fail_silently=False)
+    if Receipt.objects.total_between(closing.parent.date,closing.date):
+        d['receipt_count'] = Receipt.objects.total_between(closing.parent.date,closing.date)
+    else:
+        d['receipt_count'] = 0
+    d['expected_balance']+=d['receipt_count']
+    
+    d[DEPOSIT] = 0
+    d[PAYMENT] = 0
+    d[WITHDRAW] = 0
+    d[CLOSING] = 0
+    
+    for transaction in opening_transactions:
+        d[transaction.operation]+=transaction.amount
+        if transaction.operation in [DEPOSIT]:
+            d['expected_balance']+=transaction.amount
+        elif transaction.operation in [PAYMENT,WITHDRAW]:
+            d['expected_balance']-=transaction.amount
+            
+        if transaction.note:
+                notes.append(transaction.get_operation_display()+" "+str(transaction.amount)+": "+transaction.note)
 
+    d['notes'] = notes
+    d['opening_check'] = d['opening_amount'] - d['last_closing_amount']
+    d['closing_check'] = d['closing_amount'] - d['expected_balance']
+        
+    return d
+    
 import signals
