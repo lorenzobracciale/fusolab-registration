@@ -1,9 +1,10 @@
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.core.servers.basehttp import FileWrapper
 import os, mimetypes, urllib
-from models import *
+from ingresso.models import Card
+from models import Greeting
 
-def salutatore(request, cardid=None):
+def salutatore(request, cardid=None, manual_speech=None):
     to_say, name = "", ""
     last_greeting, first_time, current_greeting = None, None, None
     c = None
@@ -28,8 +29,17 @@ def salutatore(request, cardid=None):
     elif first_time:
         to_say += first_time
 
+    if manual_speech:
+        to_say = manual_speech
+
     os.system("cd /var/www/fusolab/media/salutatore; echo \"" + to_say + "\"|/usr/bin/text2wave -eval \"(voice_pc_diphone)\" -o saluto.wav -; lame -b 80 saluto.wav saluto.mp3")
     wrapper = FileWrapper(file( '/var/www/fusolab/media/salutatore/saluto.mp3' ))
     response = HttpResponse(wrapper, content_type='audio/mpeg')
     response['Content-Length'] = os.path.getsize( '/var/www/fusolab/media/salutatore/saluto.mp3' )
     return response
+
+def say(request, sentence):
+    if sentence == "criticalmass":
+        sentence = "Benvenuta critical mass al fusolab, la sai questa e' fortissima: due ciclisti si incontrano a trastevere quando uno dei due dice all'altro: sai come si chiama questo fiume? e l'altro: no. Aaaarhrhrhrhhahahahahahharrrhhh ahh ahhhh ahhhhrrrrr"
+    return salutatore(request, manual_speech=sentence)
+

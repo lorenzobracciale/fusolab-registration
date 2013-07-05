@@ -10,7 +10,7 @@ OPENING = 'op'
 CLOSING = 'cl'
 PAYMENT = 'pa'
 DEPOSIT = 'de'
-WITHDRAW = 'wi'	
+WITHDRAW = 'wi' 
 CASHPOINT = 'pt'
 OPERATION_TYPES = ( 
     (OPENING, 'apertura'),
@@ -25,7 +25,7 @@ PAYMENT_SUBTYPES = (
     ('ba','barman'),
     ('pu','pulizie'),
     ('va','varie')
-)	
+)   
 DEPOSIT_SUBTYPES = (
     ('co','contante'),
     ('do','donazione')
@@ -48,15 +48,18 @@ class BalanceManager(models.Manager):
     
     def get_parent_o(self, current_operation):
         try:
-            return super(BalanceManager, self).get_query_set().filter(id=current_operation.parent).get()
+            return super(BalanceManager, self).get_query_set().filter(pk=current_operation.parent.pk).get()
         except ObjectDoesNotExist:
             return None    
     def get_closing(self,current_transaction):
         return super(BalanceManager, self).get_query_set().get(Q(id=current_transaction.id) & Q(operation=CLOSING))
             
     def get_last_closing(self,current_opening):
-        return super(BalanceManager, self).get_query_set().get(id=current_opening.id).get_previous_by_date(operation=CLOSING)
-    
+        if super(BalanceManager, self).get_query_set().filter(id__lt=current_opening.id).exists():
+            return super(BalanceManager, self).get_query_set().get(id=current_opening.id).get_previous_by_date(operation=CLOSING).amount
+        else:
+            return Decimal('0.00')
+
     def get_closing_amount_before(self,current_opening):
         return super(BalanceManager, self).get_query_set().get(id=current_opening.id).get_previous_by_date(operation=CLOSING).amount
 
@@ -80,18 +83,26 @@ class BalanceManager(models.Manager):
         return ret  
 
     def get_checkpoint_before(self,saved_balance):
-        return super(BalanceManager, self).get_query_set().get(id=saved_balance.id).get_previous_by_date(operation=CASHPOINT)
+        try:
+            return super(BalanceManager, self).get_query_set().get(id=saved_balance.id).get_previous_by_date(operation=CASHPOINT)
+        except ObjectDoesNotExist:
+            return None  
 
     def get_last_n(self,n):
         return super(BalanceManager, self).get_query_set().order_by('-date')[:n]
 
 class ReceiptManager(models.Manager):
-	def total_between(self, opening_date, closing_date):
-		if super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).exists():
-			return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).aggregate(Sum('total'))['total__sum']
-		else:
-			return Decimal('0.00')
-	def receipts_between(self, opening_date, closing_date):
-		return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date])
+
+    def total_amount(self):
+        return super(ReceiptManager, self).get_query_set().aggregate(Sum('total'))['total__sum']
+
+    def total_between(self, opening_date, closing_date):
+        if super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).exists():
+            return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date]).aggregate(Sum('total'))['total__sum']
+        else:
+            return Decimal('0.00')
+
+    def receipts_between(self, opening_date, closing_date):
+        return super(ReceiptManager, self).get_query_set().filter(date__range=[opening_date,closing_date])
 
 

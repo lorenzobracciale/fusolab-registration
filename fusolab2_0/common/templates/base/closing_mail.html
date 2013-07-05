@@ -2,35 +2,37 @@
 <body>
 <table>
     <tr>
-        <td>controllo</td>
-        <td>apertura</td>
-        <td>chiusura</td>
+        <th></th>
+        <th>ultima chiusura</th>
+        <th>apertura</th>
     </tr>
     <tr>
-        <td>{{ opening_check }}</td>
-        <td>{{ opening_amount }}</td>
+        <td>{% if opening_warning %}WARNING{% endif %}
+        </td>
         <td>{{ last_closing_amount }}</td>
+        <td>{{ opening_amount }}</td>
     </tr>
     <tr>
-        <td>controllo</td>
-        <td>attesa</td>
-        <td>in cassa</td>
+        <th></th>
+        <th>chiusura attesa</th>
+        <th>in cassa</th>
     </tr>
     <tr>
-        <td>{{ closing_check }}</td>
+        <td>{% if closing_warning %}WARNING{% endif %}
+        </td>
         <td>{{ expected_balance }}</td>
         <td>{{ closing_amount }}</td>
     </tr>
 </table>
 <table>
     <tr>
-        <td>data</td>
-        <td>apertura</td>
-        <td>ricevute</td>
-        <td>depositi</td>
-        <td>prelievi</td>
-        <td>pagamenti</td>
-        <td>chiusura</td>
+        <th>data</th>
+        <th>apertura</th>
+        <th>ricevute</th>
+        <th>depositi</th>
+        <th>prelievi</th>
+        <th>pagamenti</th>
+        <th>chiusura</th>
     </tr>
     <tr>
         <td>{{ date }}</td>
@@ -39,7 +41,7 @@
         <td>{{ de }}</td>
         <td>{{ wi }}</td>
         <td>{{ pa }}</td>
-        <td>{{ closing_amount}}</td>
+        <td>{{ closing_amount }}</td>
     </tr>
 </table>
 {% for i in notes %}

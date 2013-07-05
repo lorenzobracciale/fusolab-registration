@@ -22,7 +22,7 @@ def create_resume(request):
     response = HttpResponse(mimetype='text/csv')
     response['Content-Disposition'] = 'attachment; filename="bar.csv"'
     writer = csv.writer(response,delimiter=';')
-    writer.writerow(['data',
+    writer.writerow([   'data',
                         'apertura',
                         'pagamenti',
                         'prelievi',
@@ -30,15 +30,17 @@ def create_resume(request):
                         'chiusura',
                         'ricevute',
                         'check_apertura',
-                        'check_chiusura',
-                        'ricavo',
-                        'costi',
-                        'guadagno'])
+                        'check_chiusura'])
+                        
     for cl in BarBalance.objects.filter(operation=CLOSING):
-        date = op.date
-        opening = op.amount
-        payments = BarBalance.objects.get_payments_for(op)
-        withdraws = BarBalance.objects.get_withdraws_for(op)
-        deposits = BarBalance.objects.get_deposits_for(op)
-        closing = BarBalance.filter
-
+        d = get_bar_summary(cl)
+        writer.writerow([   d['date'],
+                            d['opening_amount'],
+                            d[PAYMENT],
+                            d[WITHDRAW],
+                            d[DEPOSIT],
+                            d['closing_amount'],
+                            d['receipt_count'],
+                            d['opening_check'],
+                            d['closing_check']])
+    return response

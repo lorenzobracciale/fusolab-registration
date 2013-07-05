@@ -1,5 +1,8 @@
 #from bar.managers import BalanceManager
+from decimal import Decimal
 from django.db import models
+from django.db.models import Sum, Q
+from datetime import datetime
 
 class EntranceManager(models.Manager):
 	def total_between(self, opening_date, closing_date):

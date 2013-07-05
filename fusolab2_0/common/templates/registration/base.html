@@ -6,7 +6,9 @@
 {% url home as home %}
 {% url edit as edit %}
 {% url card as card %}
+{% url open_gate as open_gate %}
 {% url barcash as barcash %}
+{% url reports as reports_active %}
 {% url viewcard as viewcard %}
 {% url statuto as statuto %}
 {% url registration_register as register %}
@@ -16,10 +18,13 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>{% block title %}Benvenuto al fusolab{% endblock %}</title>
+  <link rel="stylesheet" type="text/css" href="/static/css/smoothness/jquery-ui-1.10.3.custom.min.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/style.css" />
-  <script type="text/javascript" src="/static/js/jquery-1.8.0.min.js"></script>  
-  <script type="text/javascript" src="/static/js/jquery-ui-1.8.23.custom.min.js"></script>  
+  <script type="text/javascript" src="/static/js/jquery-1.9.1.js"></script>  
+  <script type="text/javascript" src="/static/js/jquery-ui-1.10.3.custom.min.js"></script>  
   <script type="text/javascript"> 
+    
+
       /*
   $(function() {
           $( "#id_born_date" ).datepicker({dateFormat: 'dd/mm/yy'});
@@ -48,8 +53,10 @@
             
         {% if user.is_authenticated %}
             {% ifusergroup turnisti %}
+                <li class="{% active request open_gate %}"><a href="/ingresso/open_gate/">Apri Cancello</a></li>
                 <li class="{% active request card %}"><a href="/ingresso/">Tessere</a></li>
                 <li class="{% active request barcash %}"><a href="/bar/">Cassa Bar</a></li>
+                <li class="{% active request reports_active %}"><a href="{% url reports %}">Bilancio</a></li>
             {% else %}
                 <li class="{% active request statuto %}"><a href="/statuto/">Statuto</a></li>
             {% endifusergroup %}

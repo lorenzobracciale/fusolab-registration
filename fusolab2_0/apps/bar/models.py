@@ -8,6 +8,7 @@ from decimal import Decimal
 from datetime import datetime 
 from bar.managers import * 
 from base.models import UserProfile
+from django.conf import settings
 
 DATE_FORMAT = "%d-%m-%Y" 
 TIME_FORMAT = "%H:%M:%S"
@@ -113,19 +114,20 @@ class SmallBalance(Balance):
 			self.parent = SmallBalance.objects.get_parent(self.date)
 		super(SmallBalance, self).save(*args, **kwargs)
 
-def get_opening_summary(closing):
+def get_bar_summary(closing):
     notes = []
     d = {}
     d['date'] = closing.parent.date.strftime("%d/%m/%Y")
     d['opening_amount'] = closing.parent.amount
     if closing.parent.note:
         notes.append("apertura "+str(closing.parent.amount)+" "+closing.parent.note)
-    d['last_closing_amount'] = BarBalance.objects.get_last_closing(closing.parent).amount
+    d['last_closing_amount'] = BarBalance.objects.get_last_closing(closing.parent)
+
     d['closing_amount'] = closing.amount
     
     #calcolo del valore atteso della chiusura
     d['expected_balance'] = 0
-    d['expected_balance']+=closing.parent.amount
+    d['expected_balance']+=d['opening_amount']
     
     try:
         opening_transactions = BarBalance.objects.get_transactions_for(closing.parent)
@@ -142,6 +144,7 @@ def get_opening_summary(closing):
     d[PAYMENT] = 0
     d[WITHDRAW] = 0
     d[CLOSING] = 0
+    d[OPENING] = 0 #lorenzo - altrimenti errore 2 nel for
     
     for transaction in opening_transactions:
         d[transaction.operation]+=transaction.amount
@@ -156,7 +159,65 @@ def get_opening_summary(closing):
     d['notes'] = notes
     d['opening_check'] = d['opening_amount'] - d['last_closing_amount']
     d['closing_check'] = d['closing_amount'] - d['expected_balance']
-        
+    
+    if (d['opening_check'] < - settings.MONEY_DELTA):
+        d['opening_warning'] = True
+        d['warning'] = True
+    if (d['closing_check'] < - settings.MONEY_DELTA):
+        d['closing_warning'] = True    
+        d['warning'] = True    
+ 
+    
     return d
+ 
+def get_small_summary(checkpoint):
+    notes = []
+    d = {}
+    d['date'] = checkpoint.date.strftime("%d/%m/%Y")
+    d['checkpoint'] = checkpoint.amount
+    l = SmallBalance.objects.get_checkpoint_before(checkpoint)  
+    if l:       
+        d['last_checkpoint'] = SmallBalance.objects.get_checkpoint_before(checkpoint).amount
+        start_date = SmallBalance.objects.get_checkpoint_before(checkpoint).date
+        try:
+            checkpoint_transactions = SmallBalance.objects.get_transactions_for(l)
+        except(IndexError, SmallBalance.DoesNotExist):
+            pass    
+    else:
+        d['last_checkpoint'] = 0
+        start_date = datetime(2012,11,01,00,00,00)
+
+    d['expected_checkpoint'] = d['last_checkpoint']
+    receipts = Receipts.objects.filter(date__range=[l.date,checkpoint.date])
+    for o in BarBalance.objects.get_opening_times(start_date,checkpoint.date):
+        receipts.exclude(date__range=[o[0],o[1]])
+        
+    if receipts:
+        d['receipt_count'] = receipts.total_amount()
+    else:
+        d['receipt_count'] = 0      
+    
+    d['expected_checkpoint'] += d['receipt_count']
+       
+    d[DEPOSIT] = 0
+    d[PAYMENT] = 0
+    d[WITHDRAW] = 0
+    
+    for transaction in checkpoint_transactions:
+        d[transaction.operation]+=transaction.amount
+        if transaction.operation in [DEPOSIT]:
+            d['expected_checkpoint']+=transaction.amount
+        elif transaction.operation in [PAYMENT,WITHDRAW]:
+            d['expected_checkpoint']-=transaction.amount
+            
+        if transaction.note:
+                notes.append(transaction.get_operation_display()+" "+str(transaction.amount)+": "+transaction.note)
+
+    d['notes'] = notes
+    d['check'] = d['checkpoint'] - d['expected_checkpoint']
+    if (d['check'] < - settings.MONEY_DELTA):
+        d['warning'] = True
+    return d    
+    
     
 import signals

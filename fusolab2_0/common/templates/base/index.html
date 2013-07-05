@@ -4,27 +4,6 @@
 {% load ifusergroup %}
 {% block js %}
 {% ifusergroup turnisti %}
-<script type="text/javascript"> 
-    $(function() {
-        $('.date-picker').datepicker( {
-            changeMonth: true,
-            changeYear: true,
-            showButtonPanel: true,
-            dateFormat: 'mm yy',
-            onClose: function(dateText, inst) { 
-                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
-                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-                $(this).datepicker('setDate', new Date(year, month, 1));
-                alert(dateText);
-                if (dateText != "") {
-                       var month = dateText.split(" ")[0];
-                       var year = dateText.split(" ")[1];
-                       window.location.href = '/reports/excel/' + year + '/' + month + '/';
-                }
-            },
-        });
-    });
-</script>
 <style>
 .ui-datepicker-calendar {
     display: none;
@@ -41,13 +20,6 @@
 <a href="/accounts/edit" class="button green">Modifica il tuo profilo</a>
 oppure
 <a href="/accounts/logout" class="button red">Esci</a>
-{% ifusergroup turnisti %}
-<br />
-<br />
-<br />
-    <label for="startDate">Visualizza report del mese di :</label>
-    <input name="startDate" id="startDate" class="date-picker" />
-{% endifusergroup %}
 {% else %}
 <p>
 Per entrare a far parte dell'associazione devi tesserarti. <br />

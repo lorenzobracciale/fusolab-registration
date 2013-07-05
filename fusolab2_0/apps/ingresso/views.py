@@ -100,6 +100,18 @@ def makecard(request):
     return HttpResponse("Errore: non ho trovato il socio o il sn non e' valido.")
 
 @user_passes_test(in_turnisti)
+def open_gate(request):
+    import socket
+    from fusolab2_0 import settings
+    UDP_IP = settings.IP_OPENER
+    UDP_PORT = settings.PORT_OPENER
+    MESSAGE = settings.OPEN_GATE_PW
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    return HttpResponse("Cancello Aperto")
+
+
+@user_passes_test(in_turnisti)
 def ajax_user_search(request, q=None):
     if q:            
         results = User.objects.filter( 
