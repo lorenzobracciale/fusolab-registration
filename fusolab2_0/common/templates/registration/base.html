@@ -53,7 +53,7 @@
             
         {% if user.is_authenticated %}
             {% ifusergroup turnisti %}
-                <li class="{% active request open_gate %}"><a href="/ingresso/open_gate/">Apri Cancello</a></li>
+            <li class="{% active request open_gate %}"><a href="/cancello/open_gate/">Apri Cancello</a></li>
                 <li class="{% active request card %}"><a href="/ingresso/">Tessere</a></li>
                 <li class="{% active request barcash %}"><a href="/bar/">Cassa Bar</a></li>
                 <li class="{% active request reports_active %}"><a href="{% url reports %}">Bilancio</a></li>

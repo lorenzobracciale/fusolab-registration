@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^ingresso/', include('ingresso.urls')),
     url(r'^salutatore/', include('salutatore.urls')),
     url(r'^reports/', include('reports.urls')),
+    url(r'^cancello/', include('cancello.urls')),
 
 
     url(r'^accounts/register/$', register, {'form_class': RegistrationFormSocio,

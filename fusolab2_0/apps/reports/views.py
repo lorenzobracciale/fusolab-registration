@@ -62,7 +62,7 @@ def excel(request, from_day, from_month, from_year, to_day, to_month, to_year):
         sheet.write(rowx, 8, data['receipt_count'])
         # excel rows start from one
         if rowx != 1:
-            sheet.write(rowx, 9, xlwt.Formula('B%d-E%d' % (rowx+1, rowx-1+1))) #check1
+            sheet.write(rowx, 9, xlwt.Formula('B%d-F%d' % (rowx+1, rowx-1+1))) #check1
         sheet.write(rowx, 10, xlwt.Formula('L%d-I%d' % (rowx+1, rowx+1))) #check2
         sheet.write(rowx, 11, xlwt.Formula('F%d-B%d' % (rowx+1, rowx+1))) #ricavi
         sheet.write(rowx, 12, xlwt.Formula('E%d' % (rowx+1))) #costi

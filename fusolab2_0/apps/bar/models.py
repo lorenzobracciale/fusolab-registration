@@ -10,6 +10,7 @@ from bar.managers import *
 from base.models import UserProfile
 from django.conf import settings
 
+
 DATE_FORMAT = "%d-%m-%Y" 
 TIME_FORMAT = "%H:%M:%S"
 
@@ -37,7 +38,7 @@ class PurchasedProduct(models.Model):
 
 class Receipt(models.Model):
 	cashier = models.ForeignKey('base.UserProfile', verbose_name="Cassiere")
-	date = models.DateTimeField(auto_now_add = True)
+	date = models.DateTimeField(default=datetime.now)#auto_now_add = True)
 	total = models.DecimalField("totale", max_digits=10, decimal_places=2)
 
 	objects = ReceiptManager()
@@ -75,22 +76,23 @@ class Balance(models.Model):
 #
 
 class BarBalance(Balance):
-
-	def __unicode__(self):
-		if self.operation == OPENING:
-			return "%d - -  %s %.2f %s" % (self.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
-		else:
-			return "%d - %d %s %.2f %s" % (self.id, self.parent.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
-		
-	class Meta:
-		verbose_name = "Voce di bilancio del Bar"
-		verbose_name_plural = "Voci di bilancio del Bar"		
+    promoter = models.CharField("Organizzatore (se esterno)",  max_length=30, blank=True, null=True)
+    name = models.CharField("Nome della serata",  max_length=100, blank=True, null=True)
+    def __unicode__(self):
+        if self.operation == OPENING:
+            return "%d - -  %s %.2f %s" % (self.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
+        else:
+            return "%d - %d %s %.2f %s" % (self.id, self.parent.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
+    
+    class Meta:
+        verbose_name = "Voce di bilancio del Bar"
+        verbose_name_plural = "Voci di bilancio del Bar"		
 
 	#assegna l'id automaticamente durante il salvataggio per raggruppare gli eventi
-	def save(self, *args, **kwargs):
-		if self.operation != OPENING:
-			self.parent = BarBalance.objects.get_parent_t(self.date)
-		super(BarBalance, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if self.operation != OPENING:
+            self.parent = BarBalance.objects.get_parent_t(self.date)
+        super(BarBalance, self).save(*args, **kwargs)
 
 	
 		

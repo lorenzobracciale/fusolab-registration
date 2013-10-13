@@ -62,7 +62,7 @@ def addpurchasedproduct(request):
        response_data = { 'receipt_id' : r.id }
        return HttpResponse( simplejson.dumps(response_data), mimetype="application/json" )
     else:
-       return HttpResponseNotFound
+       return HttpResponseNotFound("errore: non sono stati trovati dati")
 
 @user_passes_test(in_turnisti)
 def bar_balance_form(request, balance_type):

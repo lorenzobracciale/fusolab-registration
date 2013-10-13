@@ -41,10 +41,6 @@ class Entrance(models.Model):
 
 
 class EntranceBalance(Balance):
-    # solo x l'apertura?
-    promoter = models.CharField("Organizzatore (se esterno)",  max_length=30, blank=True, null=True)
-    name = models.CharField("Nome della serata",  max_length=100, blank=True, null=True)
-    #condizioni economiche?
     def __unicode__(self):
         if self.operation == OPENING:
             return "%d - -  %s %.2f %s" % (self.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
