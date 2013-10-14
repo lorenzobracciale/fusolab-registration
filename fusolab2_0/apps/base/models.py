@@ -26,10 +26,11 @@ class UserProfile(models.Model):
 
     def __unicode__(self):
         return u'%s %s' % (self.user.first_name, self.user.last_name)
+
 	class Meta:
 		verbose_name = "Utente"
 		verbose_name_plural = "Utenti"		
-    
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

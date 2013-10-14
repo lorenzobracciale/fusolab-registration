@@ -48,6 +48,7 @@ class EntranceBalance(Balance):
             return "%d - %d %s %.2f %s" % (self.id, self.parent.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))    
 
     class Meta:
+        ordering = ['-date']
         verbose_name = "Voce di bilancio dell'entrata"
         verbose_name_plural = "Voci di bilancio dell'entrata"       
 
@@ -60,6 +61,7 @@ class EntranceBalance(Balance):
 def get_entrance_summary(closing):
     notes = []
     d = {}
+    d['cashier'] = closing.cashier
     d['date'] = closing.parent.date.strftime("%d/%m/%Y")
     d['opening_amount'] = closing.parent.amount
     if closing.parent.note:
@@ -99,13 +101,13 @@ def get_entrance_summary(closing):
                 notes.append(transaction.get_operation_display()+" "+str(transaction.amount)+": "+transaction.note)
 
     d['notes'] = notes
-    d['opening_check'] = d['opening_amount'] - d['last_closing_amount']
-    d['closing_check'] = d['closing_amount'] - d['expected_balance']
+    d['opening_check'] = abs(d['opening_amount'] - d['last_closing_amount'])
+    d['closing_check'] = abs(d['closing_amount'] - d['expected_balance'])
     
-    if (d['opening_check'] < - settings.MONEY_DELTA):
+    if (d['opening_check'] > settings.MONEY_DELTA):
         d['opening_warning'] = True
         d['warning'] = True
-    if (d['closing_check'] < - settings.MONEY_DELTA):
+    if (d['closing_check'] > settings.MONEY_DELTA):
         d['closing_warning'] = True    
         d['warning'] = True  
             

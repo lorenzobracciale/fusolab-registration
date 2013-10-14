@@ -13,14 +13,15 @@ DATE_FORMAT = "%d-%m-%Y"
 TIME_FORMAT = "%H:%M:%S"
 
 @receiver(post_save, sender=EntranceBalance)
-def bar_handler(sender, **kwargs):
+def entrance_handler(sender, **kwargs):
     saved_balance = kwargs['instance']
 
-    if False and saved_balance.operation == CLOSING:
+    if saved_balance.operation == CLOSING:
         subject = ''           
         template = get_template('base/closing_mail.html')
         
-        context = Context(get_entrance_summary(saved_balance))
+        d = get_entrance_summary(saved_balance)
+        context = Context(d)
         content = template.render(context)
         
         if ('warning' in d):

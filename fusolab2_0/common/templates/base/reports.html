@@ -41,15 +41,15 @@
 
 {% ifbalanceopen ingresso %}
 <p>
-<a class="button orange" href="{% url daily_stats %}"/>Guarda le entrate della serata</a>
+<a class="button orange" href="{% url 'daily_stats' %}"/>Guarda le entrate della serata</a>
 </p>
 {% endifbalanceopen %}
 
 <span id="output"></span>
-<form id="make_balance_form" action='{% url make_balance %}' />
+<form id="make_balance_form" action='{% url 'make_balance' %}' />
     <input id="from_date" class="date-picker" type="text"/>
     <input id="to_date" class="date-picker" type="text"/>
-    <input id="make_balance" class="button green" type="submit" value="Crea Bilancio"/>
+    <input id="make_balance" class="button green" type="submit" value="Bilancio"/>
     <br/>
     <span class="hint">Inserisci le date di riferimento:</span>
 </form>

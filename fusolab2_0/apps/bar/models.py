@@ -67,7 +67,6 @@ class Balance(models.Model):
     objects = BalanceManager()		
 
     class Meta:
-        ordering = ['-date']
         abstract = True	
 
 
@@ -85,6 +84,7 @@ class BarBalance(Balance):
             return "%d - %d %s %.2f %s" % (self.id, self.parent.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
     
     class Meta:
+        ordering = ['-date']
         verbose_name = "Voce di bilancio del Bar"
         verbose_name_plural = "Voci di bilancio del Bar"		
 
@@ -120,6 +120,7 @@ def get_bar_summary(closing):
     notes = []
     d = {}
     d['date'] = closing.parent.date.strftime("%d/%m/%Y")
+    d['cashier'] = closing.cashier
     d['opening_amount'] = closing.parent.amount
     if closing.parent.note:
         notes.append("apertura "+str(closing.parent.amount)+" "+closing.parent.note)
@@ -162,10 +163,10 @@ def get_bar_summary(closing):
     d['opening_check'] = d['opening_amount'] - d['last_closing_amount']
     d['closing_check'] = d['closing_amount'] - d['expected_balance']
     
-    if (d['opening_check'] < - settings.MONEY_DELTA):
+    if (abs(d['opening_check']) > settings.MONEY_DELTA):
         d['opening_warning'] = True
         d['warning'] = True
-    if (d['closing_check'] < - settings.MONEY_DELTA):
+    if (abs(d['closing_check']) > settings.MONEY_DELTA):
         d['closing_warning'] = True    
         d['warning'] = True    
  

@@ -1,19 +1,9 @@
 <html>
 
 
-{% load tags %}
 {% load ifusergroup %}
-{% url home as home %}
-{% url edit as edit %}
-{% url card as card %}
-{% url open_gate as open_gate %}
-{% url barcash as barcash %}
-{% url reports as reports_active %}
-{% url viewcard as viewcard %}
-{% url statuto as statuto %}
-{% url registration_register as register %}
-{% url auth_login as login %}
-{% url auth_logout  as logout %}
+{% load url from future %}
+{% load current from navigation %}
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -49,23 +39,23 @@
       <div id="menubar">
         <ul id="menu">
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
-          <li class="{% active request home %}"><a href="/">Home</a></li>
+          <li class="{% current 'home' %}"><a href="{% url 'home' %}">Home</a></li>
             
         {% if user.is_authenticated %}
             {% ifusergroup turnisti %}
-            <li class="{% active request open_gate %}"><a href="/cancello/open_gate/">Apri Cancello</a></li>
-                <li class="{% active request card %}"><a href="/ingresso/">Tessere</a></li>
-                <li class="{% active request barcash %}"><a href="/bar/">Cassa Bar</a></li>
-                <li class="{% active request reports_active %}"><a href="{% url reports %}">Bilancio</a></li>
+                <li class="{% current 'open_gate' %}"><a href="{% url 'open_gate' %}">Apri Cancello</a></li>
+                <li class="{% current 'card' %}"><a href="{% url 'card' %}">Tessere</a></li>
+                <li class="{% current 'barcash' %}"><a href="{% url 'barcash' %}">Cassa Bar</a></li>
+                <li class="{% current 'reports_active' %}"><a href="{% url 'reports' %}">Bilancio</a></li>
             {% else %}
-                <li class="{% active request statuto %}"><a href="/statuto/">Statuto</a></li>
+                <li class="{% current 'statuto' %}"><a href="{% url 'statuto' %}">Statuto</a></li>
             {% endifusergroup %}
-            <li class="{% active request edit %}"><a href="/accounts/edit">Modifica Profilo</a></li>
-            <li class="{% active request logout %}"><a href="/accounts/logout">Logout</a></li>
+            <li class="{% current 'edit' %}"><a href="{% url 'edit' %}">Modifica Profilo</a></li>
+            <li class="{% current 'auth_logout' %}"><a href="{% url 'auth_logout' %}">Logout</a></li>
         {% else %}
-            <li class="{% active request statuto %}"><a href="/statuto/">Statuto</a></li>
-            <li class="{% active request register %}"><a href="/accounts/register">Registrati</a></li>
-            <li class="{% active request login %}"><a href="/accounts/login">Log-in</a></li>
+            <li class="{% current 'statuto' %}"><a href="{% url 'statuto' %}">Statuto</a></li>
+            <li class="{% current 'registration_register' %}"><a href="{% url 'registration_register' %}">Registrati</a></li>
+            <li class="{% current 'auth_login' %}"><a href="{% url 'auth_login' %}">Log-in</a></li>
         {% endif %}
         {% if user.is_staff %}
             <li><a href="/admin">Admin</a></li>

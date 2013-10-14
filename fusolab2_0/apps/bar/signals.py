@@ -17,7 +17,7 @@ TIME_FORMAT = "%H:%M:%S"
 def bar_handler(sender, **kwargs):
     saved_balance = kwargs['instance']
 
-    if False and saved_balance.operation == CLOSING:
+    if saved_balance.operation == CLOSING:
         subject  =  ''
         template = get_template('base/closing_mail.html')
        
