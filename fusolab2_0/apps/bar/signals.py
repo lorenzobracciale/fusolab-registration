@@ -19,7 +19,7 @@ def bar_handler(sender, **kwargs):
 
     if saved_balance.operation == CLOSING:
         subject  =  ''
-        template = get_template('base/closing_mail.html')
+        template = get_template('closing_mail.html')
        
         print "saved_balance parent:" , saved_balance.parent
         d = get_bar_summary(saved_balance)

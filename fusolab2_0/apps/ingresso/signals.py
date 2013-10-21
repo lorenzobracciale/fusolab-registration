@@ -18,7 +18,7 @@ def entrance_handler(sender, **kwargs):
 
     if saved_balance.operation == CLOSING:
         subject = ''           
-        template = get_template('base/closing_mail.html')
+        template = get_template('closing_mail.html')
         
         d = get_entrance_summary(saved_balance)
         context = Context(d)

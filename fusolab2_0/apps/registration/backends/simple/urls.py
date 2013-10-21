@@ -29,7 +29,7 @@ from registration.views import register
 urlpatterns = patterns('',
                        url(r'^register/$',
                            register,
-                           {'backend': 'registration.backends.simple.SimpleBackend'},
+                           {'backend': 'registration.backends.simple.SimpleBackend', 'template_name': 'form_account.html', 'success_url': '/'},
                            name='registration_register'),
                        url(r'^register/closed/$', TemplateView.as_view(template_name='registration/registration_closed.html'), name="registration_disallowed"),
                        #url(r'^register/closed/$',

@@ -12,6 +12,7 @@ from django.db.models import Q
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import simplejson
+import json
 from decimal import Decimal
 from datetime import datetime, timedelta
 from django.http import Http404
@@ -19,12 +20,18 @@ from ingresso.models import *
 from django.contrib.auth.decorators import user_passes_test
 from base.tests import in_turnisti
 from ingresso.forms import *
+from bar.managers import OPENING
 
 from base.regbackend import FusolabBackend
 
 @user_passes_test(in_turnisti)
 def card(request):
-    return render_to_response('base/card.html', { 'URL_CARD': settings.URL_CARD } , context_instance=RequestContext(request))
+    entrance_balances = EntranceBalance.objects.filter(operation=OPENING).order_by('-date')
+    if entrance_balances.exists():
+        customers_n = Entrance.objects.filter(date__gte=entrance_balances[0].date).count()  
+    else:
+        customers_n = 0 
+    return render_to_response('ingresso/card.html', { 'URL_CARD': settings.URL_CARD, 'customers_n': customers_n } , context_instance=RequestContext(request))
 
 @user_passes_test(in_turnisti)
 def entrance_balance_form(request, balance_type):
@@ -46,32 +53,46 @@ def entrance_balance_form(request, balance_type):
             form = forms[balance_type]['form'](initial={'cashier': request.user.get_profile()})  
     else:
         raise Http404
-    return render_to_response('base/entrance_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
+    return render_to_response('ingresso/entrance_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
 
 
 @user_passes_test(in_turnisti)
 def delete_entrance(request, entranceid=None):
+    resp = {}
     try:
         e = Entrance.objects.get(id=entranceid)
         e.delete()
-        return HttpResponse("Ingresso eliminato<br /><a href='/ingresso/card'>Torna alla pagina precedente</a>")
+        resp['txt'] = "Ingresso eliminato"
     except Entrance.DoesNotExist:
-        return HttpResponseNotFound("Ingresso non trovato<br /><a href='/ingresso/card'>Torna alla pagina precedente</a>")
+        resp['txt'] = "Ingresso non trovato"
+    entrance_balances = EntranceBalance.objects.filter(operation=OPENING).order_by('-date')
+    resp['customers_n'] = Entrance.objects.filter(date__gte=entrance_balances[0].date).count()
+    return HttpResponse(json.dumps(resp), mimetype="application/json" )
 
 
 @user_passes_test(in_turnisti)
 def entrance(request, cost=None):
+    resp = {}
     if cost:
         e = Entrance()
         # set the cost
         try:
             e.cost = Decimal(cost) 
         except:
-            return HttpResponse("Il costo non e' valido.")
+            resp['txt'] = "Il costo non e' valido." 
+            return HttpResponse(json.dumps(resp), mimetype="application/json" )
         e.save()
-        return HttpResponse("Aggiunto ingresso di %.1f euro (id %d). <a href='/ingresso/delete/%d/'>Cancella Ingresso</a>" % (e.cost , e.id, e.id ) )
+        resp['txt'] = "Aggiunto ingresso di %.1f euro (id %d). <a href='#' class='cancel-entrance' data-eid='%d'>Cancella Ingresso</a>" % (e.cost , e.id, e.id) 
+        entrance_balances = EntranceBalance.objects.filter(operation=OPENING).order_by('-date')
+        if entrance_balances.exists():
+            resp['customers_n'] = Entrance.objects.filter(date__gte=entrance_balances[0].date).count()  
+        else:
+            resp['customers_n'] = 0 
+
+        return HttpResponse(json.dumps(resp), mimetype="application/json" )
     else:
-        return HttpResponse("Non e' stato inserito nessun costo (mettere 0 se entra aggratis)")
+        resp['txt'] = "Non e' stato inserito nessun costo (mettere 0 se entra aggratis)" 
+        return HttpResponse(json.dumps(resp), mimetype="application/json" )
 
 
 @user_passes_test(in_turnisti)
@@ -96,8 +117,8 @@ def makecard(request):
             c.save()
         except:
             return HttpResponse("Errore: non e' stato possibile inserire la carta nel database. Tessera gia' inserita? ")
-        return HttpResponse("Card registrata con id " + str(c.id) )
-    return HttpResponse("Errore: non ho trovato il socio o il sn non e' valido.")
+        return HttpResponse("Tessera per %s registrata con id %s" % (str(user[0].user.get_full_name()), str(c.id)) )
+    return HttpResponse("Errore: non ho trovato il socio o il numero seriale non e' valido.")
 
 
 @user_passes_test(in_turnisti)
@@ -108,7 +129,7 @@ def ajax_user_search(request, q=None):
             Q(last_name__icontains = q)).order_by('username')
         for user in results:
             user.cards = Card.objects.filter(user=user.get_profile())
-        template = 'base/results.html'
+        template = 'ingresso/results.html'
         data = {
             'results': results,
         }

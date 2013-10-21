@@ -1,8 +1,8 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
-    url(r'^/daily_stats/$', 'reports.views.daily_stats', name='daily_stats'),    
-    url(r'^/make_balance/$', 'reports.views.make_balance', name='make_balance'),    
+    url(r'^/daily_stats/$', 'reports.views.daily_stats', name='reports_daily_stats'),    
+    url(r'^/make_balance/$', 'reports.views.make_balance', name='reports_make_balance'),    
 
     url(r'^excel/(?P<from_day>\d{2})/(?P<from_month>\d{2})/(?P<from_year>\d{4})/(?P<to_day>\d{2})/(?P<to_month>\d{2})/(?P<to_year>\d{4})/$', 'reports.views.excel', name='excel'),
     #url(r'^stats/(?P<what>\S+)/(?P<interval>\S+)/(?P<dd>\d{2})/(?P<mm>\d{2})/(?P<yyyy>\d{4})/$', 'stats.stats.ajax_stats', name='ajax_stats'),

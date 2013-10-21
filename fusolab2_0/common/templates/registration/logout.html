@@ -1,8 +1,24 @@
-{% extends "registration/base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Logged out{% endblock %}
+{% block title %}Sei uscito{% endblock %}
 
-{% block content %}
-<h1>Sei uscito</h1>
-<p>Sei uscito dal sito. Per accedere ancora vai su <a href="/accounts/login/">log in</a>.</p>
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Sei uscito dal sito</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="body">
+                <p>Sei uscito dal sito. Per accedere di nuovo ti basta fare il  
+                <a class="btn btn-primary" href="{% url 'auth_login' %}">Login <i class="icon-eicon-login"></i></a> 
+                </p>
+                
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+

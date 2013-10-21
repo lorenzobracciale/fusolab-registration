@@ -18,7 +18,7 @@ from bar.forms import *
 @user_passes_test(in_turnisti)
 def barcash(request):
     p = Product.objects.all()
-    return render_to_response('base/cash.html', { 'products': p } , context_instance=RequestContext(request))
+    return render_to_response('bar/cash.html', { 'products': p } , context_instance=RequestContext(request))
 
 
 @user_passes_test(in_turnisti)
@@ -84,7 +84,7 @@ def bar_balance_form(request, balance_type):
             form = forms[balance_type]['form'](initial={'cashier': request.user.get_profile()})  
     else:
         raise Http404
-    return render_to_response('base/bar_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
+    return render_to_response('bar/bar_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
 
 
 @user_passes_test(in_turnisti)
@@ -106,7 +106,7 @@ def bar_smallbalance_form(request, balance_type):
             form = forms[balance_type]['form'](initial={'cashier': request.user.get_profile()})  
     else:
         raise Http404
-    return render_to_response('base/bar_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
+    return render_to_response('bar/bar_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
 
 
 

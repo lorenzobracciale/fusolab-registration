@@ -10,7 +10,6 @@ from django.template import RequestContext
 
 from registration.backends import get_backend
 
-
 def activate(request, backend,
              template_name='registration/activate.html',
              success_url=None, extra_context=None, **kwargs):
@@ -90,7 +89,7 @@ def activate(request, backend,
                               kwargs,
                               context_instance=context)
 
-
+#registration/registration_form.html'
 def register(request, backend, success_url=None, form_class=None,
              disallowed_url='registration_disallowed',
              template_name='registration/registration_form.html',
@@ -197,7 +196,6 @@ def register(request, backend, success_url=None, form_class=None,
     context = RequestContext(request)
     for key, value in extra_context.items():
         context[key] = callable(value) and value() or value
-
     return render_to_response(template_name,
                               {'form': form},
                               context_instance=context)

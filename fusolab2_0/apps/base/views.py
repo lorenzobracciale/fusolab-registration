@@ -15,17 +15,16 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import simplejson
 from decimal import Decimal
 from datetime import datetime, timedelta
+from django.contrib.auth.decorators import login_required
 
 from base.regbackend import FusolabBackend
 
+@login_required
 def home(request):
-    return render_to_response('base/index.html', {} , context_instance=RequestContext(request))
-
-def statuto(request):
-    return render_to_response('base/statuto.html', {} , context_instance=RequestContext(request))
+    return render_to_response('index.html', {} , context_instance=RequestContext(request))
 
 def tuttoapposto(request, next_page):
-    return render_to_response('base/tuttoapposto.html', {'next_page': next_page} , context_instance=RequestContext(request))
+    return render_to_response('tuttoapposto.html', {'next_page': next_page} , context_instance=RequestContext(request))
 
 def edit(request, activation_key=None):
     if request.user.is_authenticated() or activation_key:

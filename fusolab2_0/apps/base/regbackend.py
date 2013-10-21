@@ -41,8 +41,14 @@ class FusolabBackend(DefaultBackend):
             site = Site.objects.get_current()
         else:
             site = RequestSite(request)
-        new_user = RegistrationProfile.objects.create_inactive_user(username, email,
+
+        #todo eccezione SMTPRecipientsRefused quando dominio non valido
+        try:
+            new_user = RegistrationProfile.objects.create_inactive_user(username, email,
                                                                     password, site)
+        except:
+            pass
+
         new_user.first_name = first_name
         new_user.last_name = last_name
         new_user.set_unusable_password()

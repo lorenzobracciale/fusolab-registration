@@ -19,5 +19,20 @@ def open_gate(request):
     else:
         return HttpResponseForbidden("Non hai i permessi per aprire il cancello del fusolab. Fatti abilitare dal presidente!")
 
+@user_passes_test(in_turnisti)
+def open_door(request):
+    from fusolab2_0 import settings
+    has_permissions = GatePermission.objects.filter(user=request.user.get_profile()).exists()
+    if has_permissions:
+        UDP_IP = settings.IP_OPENER
+        UDP_PORT = settings.PORT_OPENER
+        MESSAGE = settings.OPEN_DOOR_PW
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+        return HttpResponse("Porta Aperta")
+    else:
+        return HttpResponseForbidden("Non hai i permessi per aprire il cancello del fusolab. Fatti abilitare dal presidente!")
+
+
 
 

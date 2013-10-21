@@ -44,7 +44,7 @@ urlpatterns = patterns('',
                            name='registration_activate'),
                        url(r'^register/$',
                            register,
-                           {'backend': 'registration.backends.default.DefaultBackend'},
+                           {'backend': 'registration.backends.default.DefaultBackend', 'template_name': 'form_account.html'},
                            name='registration_register'),
 
                        url(r'^register/complete/$',

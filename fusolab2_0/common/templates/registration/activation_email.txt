@@ -4,4 +4,11 @@ per attivare il tuo profilo Fusolab vai a questo indirizzo:
 
 http://soci.fusolab.net/accounts/activate/{{ activation_key }}/
 
-Se non sei stato tu a registrarti, ti preghiamo di non fare nulla. Non riceverai piùemail e questo account scadra' automaticamente tra {{ expiration_days|apnumber }} giorni.
+Una volta attivato potrai entrare su sul sito http://soci.fusolab.net ed interagire con cose o persone all'interno del Fusolab!
+
+Se non sei stato tu a registrarti, ti preghiamo di non fare nulla. Non riceverai piu' email e questo account scadra' automaticamente tra {{ expiration_days|apnumber }} giorni.
+
+--
+Fusolab 
+Associazione di Promozione Sociale
+Viale della Bella Villa, 94, 00172 Roma

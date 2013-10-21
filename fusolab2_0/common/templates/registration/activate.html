@@ -1,20 +1,36 @@
-{% extends "registration/base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Inserisci gli ultimi dati{% endblock %}
+{% block title %}Benvenuto!{% endblock %}
 
-{% block content %}
-  {% load humanize %}
-  {% if account %}
-      <h1>Wow! Sei stato aggiunto con sucesso!</h1>
-      <p>Profilo aggiunto con successo! Torna alla <a href="/">home</a>.</p>
-  {% else %}
-    <p>Errore, forse la tua chiave di attivazione e' scaduta? oppure l'hai gia' attivata?</p>
-  {% endif %}
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            {% if account %}
+            <h2 class="page-title">Sei dentro!</h2>
+            {% else %}
+            <h2 class="page-title">Errore</h2>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="body">
+                {% if account %}
+                    <p>Tutto ok! Ora puoi effettuare il <a class="btn btn-primary" href="{% url 'auth_login' %}">Login</a></p>
+                {% else %}
+                    <p>Errore :-(</p>
+                    <p>Se hai gia' attivato il tuo profilo, puoi fare direttamente il <a class="btn btn-primary" href="{% url 'auth_login' %}">Login</a></p>
+                    <p>Altrimenti la tua chiave di attivazione e' scaduta. <a class="btn btn-primary" href="{% url 'auth_password_reset' %}">Riattivala</a></p>
+                {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
-{% block sidebar %}
-<h3>Perche' iscriversi?</h3>
 
-<p>Il fusolab è un'associazione e per legge, per accedere ai locali dell'associazione devi iscriverti</p>
-<p>Inoltre iscrivendoti ti invieremo il calendario delle iniziative mensilmente</p>
-<p>Infine in un futuro non molto lontano, da questo pannello, se iscritto, potrai interagire con il fusolab...</p>
-{% endblock %}
+
+
+
+
