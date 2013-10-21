@@ -13,10 +13,22 @@
                 
             },
         });
-        $('#make_balance_form').submit(function() {
+        $('#make_bar_balance_form').submit(function() {
             var from_date = $('#from_date').val();
             var to_date = $('#to_date').val();
-            window.location.href = '/reports/excel/' + from_date + '/' + to_date + '/';
+            window.location.href = '/reports/excel/bar/' + from_date + '/' + to_date + '/';
+            return false;
+        });
+        $('#make_entrance_balance_form').submit(function() {
+            var from_date = $('#from_date').val();
+            var to_date = $('#to_date').val();
+            window.location.href = '/reports/excel/ingresso/' + from_date + '/' + to_date + '/';
+            return false;
+        });
+        $('#make_small_balance_form').submit(function() {
+            var from_date = $('#from_date').val();
+            var to_date = $('#to_date').val();
+            window.location.href = '/reports/excel/interregno/' + from_date + '/' + to_date + '/';
             return false;
         });
             /*
@@ -46,10 +58,24 @@
 {% endifbalanceopen %}
 
 <span id="output"></span>
-<form id="make_balance_form" action='{% url 'make_balance' %}' />
+<form id="make_bar_balance_form" action='{% url 'make_balance' %}' />
     <input id="from_date" class="date-picker" type="text"/>
     <input id="to_date" class="date-picker" type="text"/>
-    <input id="make_balance" class="button green" type="submit" value="Bilancio"/>
+    <input id="make_balance" class="button green" type="submit" value="Bilancio Bar"/>
+    <br/>
+    <span class="hint">Inserisci le date di riferimento:</span>
+</form>
+<form id="make_entrance_balance_form" action='{% url 'make_balance' %}' />
+    <input id="from_date" class="date-picker" type="text"/>
+    <input id="to_date" class="date-picker" type="text"/>
+    <input id="make_balance" class="button green" type="submit" value="Bilancio Ingresso"/>
+    <br/>
+    <span class="hint">Inserisci le date di riferimento:</span>
+</form>
+<form id="make_small_balance_form" action='{% url 'make_balance' %}' />
+    <input id="from_date" class="date-picker" type="text"/>
+    <input id="to_date" class="date-picker" type="text"/>
+    <input id="make_balance" class="button green" type="submit" value="Bilancio Interregno"/>
     <br/>
     <span class="hint">Inserisci le date di riferimento:</span>
 </form>

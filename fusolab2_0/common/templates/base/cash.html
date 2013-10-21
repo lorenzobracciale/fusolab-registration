@@ -159,18 +159,18 @@
 </div>
 {% ifbalanceopen bar %}
 <div id="cash-manager">
-    <a href="/bar/balance/withdraw/">Prelievo</a>
-    <a href="/bar/balance/deposit/">Deposito</a>
     <a href="/bar/balance/payment/">Pagamento</a>
+    <a href="/bar/balance/deposit/">Deposito</a>
+    <a href="/bar/balance/withdraw/">Prelievo tesoriere</a>
     <a href="/bar/balance/close/">Chiudi Cassa</a>
 </div>
 {% else %}
 <div id="cash-manager">
     {% if user.is_staff %}
     <a href="/bar/smallbalance/point/">Punto di Cassa</a>
-    <a href="/bar/smallbalance/withdraw/">Prelievo</a>
-    <a href="/bar/smallbalance/deposit/">Deposito</a>
     <a href="/bar/smallbalance/payment/">Pagamento</a>
+    <a href="/bar/smallbalance/deposit/">Deposito</a>
+    <a href="/bar/smallbalance/withdraw/">Prelievo tesoriere</a>
     {% endif %}
     <a href="/bar/balance/open/">Apri Cassa</a>
 </div>
@@ -196,7 +196,9 @@
                         <li id="cancel-last"><a href="javascript:removelastitem()">Annulla Ultimo</a></li>
                         <li id="cancel-all"><a href="javascript:clearitems()">Annulla Tutto</a></li>
                         <!-- li id="members-cost"><a href="javascript:membercost()">Prezzo di Costo</a></li -->
+                        {% ifbalanceopen bar %}
                         <li id="print-receipt"><a href="javascript:printreceipt()">Stampa</a></li>
+                        {% endifbalanceopen %}
                         <li id="dont-print-receipt"><a href="javascript:dontprintreceipt()">Stampa Peffinta</a></li>
                     </ul>
                 </div>

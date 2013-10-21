@@ -33,3 +33,24 @@ def bar_handler(sender, **kwargs):
         msg = EmailMessage(subject, content, 'cassafusolab@gmail.com', to=settings.EMAIL_NOTIFICATION_LIST)
         msg.content_subtype = "html"
         msg.send()
+
+@receiver(post_save, sender=SmallBalance)
+def bar_handler(sender, **kwargs):
+    saved_balance = kwargs['instance']
+
+    if saved_balance.operation == CASHPOINT:
+        subject  =  ''
+        template = get_template('base/smallbalance_mail.html')
+       
+        print "saved_balance parent:" , saved_balance.parent
+        d = get_small_summary(saved_balance)
+        context = Context(d)
+        content = template.render(context)
+        
+        if ('warning' in d):
+            subject += 'WARNING '
+        subject += 'riepilogo interregno '+saved_balance.date.strftime("%d/%m/%Y")
+        
+        msg = EmailMessage(subject, content, 'cassafusolab@gmail.com', to=settings.EMAIL_NOTIFICATION_LIST)
+        msg.content_subtype = "html"
+        msg.send()

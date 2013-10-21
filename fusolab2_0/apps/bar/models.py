@@ -113,7 +113,7 @@ class SmallBalance(Balance):
 	#assegna l'id automaticamente durante il salvataggio per raggruppare gli eventi
 	def save(self, *args, **kwargs):
 		if self.operation != CASHPOINT:
-			self.parent = SmallBalance.objects.get_parent(self.date)
+			self.parent = SmallBalance.objects.get_parent_t(self.date)
 		super(SmallBalance, self).save(*args, **kwargs)
 
 def get_bar_summary(closing):
@@ -125,23 +125,24 @@ def get_bar_summary(closing):
     if closing.parent.note:
         notes.append("apertura "+str(closing.parent.amount)+" "+closing.parent.note)
     d['last_closing_amount'] = BarBalance.objects.get_last_closing(closing.parent)
-
     d['closing_amount'] = closing.amount
     
     #calcolo del valore atteso della chiusura
     d['expected_balance'] = 0
     d['expected_balance']+=d['opening_amount']
-    
-    try:
-        opening_transactions = BarBalance.objects.get_transactions_for(closing.parent)
-    except(IndexError, BarBalance.DoesNotExist):
-        pass
-        #send_mail('allarme chiusura bar', 'errore tragico #1', 'cassafusolab@gmail.com',NOTIFICATION_ADDRESS_LIST, fail_silently=False)
+
     if Receipt.objects.total_between(closing.parent.date,closing.date):
         d['receipt_count'] = Receipt.objects.total_between(closing.parent.date,closing.date)
     else:
         d['receipt_count'] = 0
     d['expected_balance']+=d['receipt_count']
+
+    try:
+        opening_transactions = BarBalance.objects.get_transactions_for(closing.parent)
+    except(IndexError, BarBalance.DoesNotExist):
+        pass
+        #send_mail('allarme chiusura bar', 'errore tragico #1', 'cassafusolab@gmail.com',NOTIFICATION_ADDRESS_LIST, fail_silently=False)
+
     
     d[DEPOSIT] = 0
     d[PAYMENT] = 0
@@ -157,7 +158,7 @@ def get_bar_summary(closing):
             d['expected_balance']-=transaction.amount
             
         if transaction.note:
-                notes.append(transaction.get_operation_display()+" "+str(transaction.amount)+": "+transaction.note)
+                notes.append(transaction.get_operation_display()+" "+str(transaction.amount)+" "+transaction.note+"\n")
 
     d['notes'] = notes
     d['opening_check'] = d['opening_amount'] - d['last_closing_amount']
@@ -178,6 +179,7 @@ def get_small_summary(checkpoint):
     d = {}
     d['date'] = checkpoint.date.strftime("%d/%m/%Y")
     d['checkpoint'] = checkpoint.amount
+    d['cashier'] = checkpoint.cashier
     l = SmallBalance.objects.get_checkpoint_before(checkpoint)  
     if l:       
         d['last_checkpoint'] = SmallBalance.objects.get_checkpoint_before(checkpoint).amount
@@ -185,18 +187,19 @@ def get_small_summary(checkpoint):
         try:
             checkpoint_transactions = SmallBalance.objects.get_transactions_for(l)
         except(IndexError, SmallBalance.DoesNotExist):
-            pass    
+            checkpoint_transactions = None   
     else:
         d['last_checkpoint'] = 0
         start_date = datetime(2012,11,01,00,00,00)
+        checkpoint_transactions = None
 
     d['expected_checkpoint'] = d['last_checkpoint']
-    receipts = Receipts.objects.filter(date__range=[l.date,checkpoint.date])
+    receipts = Receipt.objects.filter(date__range=[start_date,checkpoint.date]).order_by('date')
     for o in BarBalance.objects.get_opening_times(start_date,checkpoint.date):
-        receipts.exclude(date__range=[o[0],o[1]])
+        receipts = receipts.exclude(date__range=[o[0],o[1]])
         
     if receipts:
-        d['receipt_count'] = receipts.total_amount()
+        d['receipt_count'] = receipts.aggregate(Sum('total'))['total__sum']
     else:
         d['receipt_count'] = 0      
     
@@ -205,16 +208,16 @@ def get_small_summary(checkpoint):
     d[DEPOSIT] = 0
     d[PAYMENT] = 0
     d[WITHDRAW] = 0
-    
-    for transaction in checkpoint_transactions:
-        d[transaction.operation]+=transaction.amount
-        if transaction.operation in [DEPOSIT]:
-            d['expected_checkpoint']+=transaction.amount
-        elif transaction.operation in [PAYMENT,WITHDRAW]:
-            d['expected_checkpoint']-=transaction.amount
+    if checkpoint_transactions:
+        for transaction in checkpoint_transactions:
+            d[transaction.operation]+=transaction.amount
+            if transaction.operation in [DEPOSIT]:
+                d['expected_checkpoint']+=transaction.amount
+            elif transaction.operation in [PAYMENT,WITHDRAW]:
+                d['expected_checkpoint']-=transaction.amount
             
-        if transaction.note:
-                notes.append(transaction.get_operation_display()+" "+str(transaction.amount)+": "+transaction.note)
+            if transaction.note:
+                    notes.append(transaction.get_operation_display()+" "+str(transaction.amount)+": "+transaction.note)
 
     d['notes'] = notes
     d['check'] = d['checkpoint'] - d['expected_checkpoint']
