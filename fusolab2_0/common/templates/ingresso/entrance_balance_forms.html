@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block nav-ingresso %}<li class="active"><a href="{% url 'ingresso_home' %}"><i class="icon-edit"></i> <span class="name">Ingresso</span></a></li>{% endblock %}
+
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Ingresso</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <section class="widget">
+                <header>
+                    <h4><i class="icon-group"></i> {{ formname }}</h4>
+                </header>
+                <div class="body">
+                    {{ form.non_field_errors }}
+                    <form class="form-horizontal label-left" action="" method="post">{% csrf_token %}
+                        {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                        {% endfor %}
+                        {% for field in form.visible_fields %}
+                        <div class="control-group">
+                            <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="required">*</span>{% endif %}</label>
+                            <div class="controls form-group">
+                                {{ field }}
+                                {% if field.errors %}
+                                    <ul class="parsley-error-list" style="display: block;">
+                                        <li class="type" style="display: list-item;">{{ field.errors.as_text }}</li>
+                                    </ul>
+                                {% endif %} 
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">OK</button>
+                            <a href="{% url 'ingresso_home' %}" type="button" class="btn btn-default">Annulla</a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block nav-regolamento %}<li class="active"><a href="{% url 'base_regolamento' %}"><i class="icon-legal"></i> <span class="name">Regolamento</span></a></li>{% endblock %}
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Regolamento Interno Fusolab <small>Cose utili da sapere</small></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <section class="box">
+                <div class="body">
+                    <div class="wrapper">
+                        <iframe src="https://docs.google.com/document/d/1as3Jqp7KCmehG0oq7_JpHyrzj5Ow7KREZH9DgGOM44E/pub?embedded=false" width="100%" height="700" frameborder="0" style="overflow-x: hidden; overflow-y: scroll; "></iframe>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

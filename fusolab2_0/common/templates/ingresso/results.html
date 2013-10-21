@@ -1,0 +1,46 @@
+{% if results|length %}
+    <header>
+        <h4>
+            <i class="icon-list-alt"></i>
+            Trovati {{ results|length }} utenti
+        </h4>
+    </header>
+    <div class="body">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Azioni</th>
+                <th>Nome</th>
+                <th class="hidden-xs-portrait">Cognome</th>
+                <th>Email</th>
+                <th class="hidden-xs-portrait">Registrato da</th>
+                <th>Tessere</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in results %}
+                <tr>
+                    <td><button data-uid="{{ user.id }}" href='#' class="make-card btn {% if user.cards|length > 0 %} btn-danger {% else %} btn-success {% endif %}">Tesseralo</button></td>
+                    <td>{{ user.first_name }}</td>
+                    <td class="hidden-xs-portrait">{{ user.last_name }}</td>
+                    <td>{% if user.is_active %}<span class="badge badge-success">{% else %}<span class="badge badge-danger">{% endif %}
+                        {{ user.email }}
+                        </span>
+                    </td>
+                    <td class="hidden-xs-portrait">{{ user.date_joined|timesince }}</td>
+                    <td>
+                        {% if user.cards|length == 0 %}
+                           Nessuna 
+                        {% else %}
+                            {% for card in user.cards %}<a href="/admin/fusoci/card/{{ card.id }}">{{ card.id }}</a>{% if not forloop.last %}-{% endif %}{% endfor %}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="note">Non ho trovato un bel nulla.</div>
+{% endif %}
+
