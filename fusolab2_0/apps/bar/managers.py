@@ -31,6 +31,13 @@ DEPOSIT_SUBTYPES = (
     ('do','donazione')
 )
 
+def get_payment_display(key):
+    d = dict(PAYMENT_SUBTYPES)
+    return d[key] if key in d else None
+        
+def get_deposit_display(key):
+    d = dict(DEPOSIT_SUBTYPES)
+    return d[key] if key in d else None
 
 class BalanceManager(models.Manager):
 
@@ -76,7 +83,7 @@ class BalanceManager(models.Manager):
         return super(BalanceManager, self).get_query_set().filter(Q(parent=current_opening.id) & Q(operation=WITHDRAW)).aggregate(Sum('amount'))['amount__sum']
 
     def get_opening_times(self,start_date,end_date):
-        list = super(BalanceManager, self).get_query_set().filter(Q(date__range=[start_date,end_date]) & Q(parent__isnull=True)).select_related()
+        list = super(BalanceManager, self).get_query_set().filter(Q(date__range=[start_date,end_date]) & Q(parent__isnull=True)).select_related().order_by('date')
         ret = []
         for l in list:
             ret.append([l.date,super(BalanceManager, self).get_query_set().filter(Q(parent=l.id) & Q(operation=CLOSING)).get().date])
@@ -90,6 +97,8 @@ class BalanceManager(models.Manager):
 
     def get_last_n(self,n):
         return super(BalanceManager, self).get_query_set().order_by('-date')[:n]
+
+
 
 class ReceiptManager(models.Manager):
 
