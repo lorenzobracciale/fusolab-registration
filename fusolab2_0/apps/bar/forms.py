@@ -17,7 +17,8 @@ class BarBalanceModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(BarBalanceModelForm, self).__init__(*args, **kwargs)
         self.fields['cashier'].queryset = UserProfile.objects.filter(user__groups__name="turnisti")
-        
+        self.fields['amount'].localize = True
+             
     class Meta:
         model = BarBalance  
         exclude = ('parent', 'date')
@@ -33,7 +34,8 @@ class BarOpeningModelForm(BarBalanceModelForm):
         self.fields['promoter'] = forms.CharField(required=False)
         self.fields['name'] = forms.CharField(required=False)
         self.fields['subtype'] = forms.CharField(widget=forms.HiddenInput(), required=False)
-
+        self.fields['amount'].label = 'Contanti iniziali'
+        
 class BarClosingModelForm(BarBalanceModelForm):
     def __init__(self, *args, **kwargs):
         super(BarClosingModelForm, self).__init__(*args, **kwargs)
@@ -41,6 +43,7 @@ class BarClosingModelForm(BarBalanceModelForm):
         self.fields['subtype'] = forms.CharField(widget=forms.HiddenInput(), required=False)
         self.fields['promoter'] = forms.CharField(widget=forms.HiddenInput(), required=False)
         self.fields['name'] = forms.CharField(widget=forms.HiddenInput(), required=False)
+        self.fields['amount'].label = 'Contanti finali'
         
 class BarPaymentModelForm(BarBalanceModelForm):
     def __init__(self, *args, **kwargs):
@@ -49,7 +52,7 @@ class BarPaymentModelForm(BarBalanceModelForm):
         self.fields['subtype'] = forms.CharField(widget=forms.Select(choices=PAYMENT_SUBTYPES))
         self.fields['promoter'] = forms.CharField(widget=forms.HiddenInput(), required=False)
         self.fields['name'] = forms.CharField(widget=forms.HiddenInput(), required=False)
-        
+        self.fields['amount'].label = 'Contanti finali'        
                 
 class BarDepositModelForm(BarBalanceModelForm):
     def __init__(self, *args, **kwargs):
@@ -75,6 +78,7 @@ class SmallBalanceModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(SmallBalanceModelForm, self).__init__(*args, **kwargs)
         self.fields['cashier'].queryset = UserProfile.objects.filter(user__groups__name="turnisti")
+        self.fields['amount'].localize = True
         
     class Meta:
         model = SmallBalance    
@@ -87,7 +91,8 @@ class SmallBalanceModelForm(ModelForm):
 class SmallCashpointModelForm(SmallBalanceModelForm):
     def __init__(self, *args, **kwargs):
         super(SmallCashpointModelForm, self).__init__(*args, **kwargs)
-        self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=CASHPOINT)    
+        self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=CASHPOINT) 
+        self.fields['amount'].label = 'In cassa'        
 
 class SmallPaymentModelForm(SmallBalanceModelForm):
     def __init__(self, *args, **kwargs):

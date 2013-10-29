@@ -63,7 +63,6 @@ class Balance(models.Model):
     date = models.DateTimeField("Data", default=datetime.now)
     cashier = models.ForeignKey('base.UserProfile', verbose_name="Cassiere")
     note = models.TextField(blank=True)
-	
     objects = BalanceManager()		
 
     class Meta:
@@ -84,7 +83,7 @@ class BarBalance(Balance):
             return "%d - %d %s %.2f %s" % (self.id, self.parent.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
     
     class Meta:
-        ordering = ['-date']
+        ordering = ['date']
         verbose_name = "Voce di bilancio del Bar"
         verbose_name_plural = "Voci di bilancio del Bar"		
 
@@ -106,7 +105,7 @@ class SmallBalance(Balance):
 		return "%d - %s %.2f %s" % (self.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
 		
 	class Meta:
-		ordering = ['-date']
+		ordering = ['date']
 		verbose_name = "Voce di bilancio dell'Interregno"
 		verbose_name_plural = "Voci di bilancio dell'Interregno"		
 
@@ -119,11 +118,20 @@ class SmallBalance(Balance):
 def get_bar_summary(closing):
     notes = []
     d = {}
+    
+    notes.append("apertura "+ str(closing.parent.amount))
+    if closing.parent.promoter:
+        notes.append(" "+closing.parent.promoter) 
+    if closing.parent.name:
+        notes.append(" "+closing.parent.name)         
+    if closing.parent.note:
+        notes.append(closing.parent.note.replace("\r\n"," "+"\n"))
+    else:
+        notes.append("\n")
+
     d['date'] = closing.parent.date.strftime("%d/%m/%Y")
     d['cashier'] = closing.cashier
     d['opening_amount'] = closing.parent.amount
-    if closing.parent.note:
-        notes.append("apertura "+str(closing.parent.amount)+" "+closing.parent.note)
     d['last_closing_amount'] = BarBalance.objects.get_last_closing(closing.parent)
     d['closing_amount'] = closing.amount
     
@@ -152,13 +160,33 @@ def get_bar_summary(closing):
     
     for transaction in opening_transactions:
         d[transaction.operation]+=transaction.amount
+        notes.append(transaction.get_operation_display() + " " + str(transaction.amount))
         if transaction.operation in [DEPOSIT]:
             d['expected_balance']+=transaction.amount
-        elif transaction.operation in [PAYMENT,WITHDRAW]:
+            if transaction.subtype:
+                notes.append(" "+get_deposit_display(transaction.subtype))
+            if transaction.note:
+                notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
+            else:
+                notes.append("\n")
+        elif transaction.operation in [PAYMENT]:
             d['expected_balance']-=transaction.amount
-            
-        if transaction.note:
-                notes.append(transaction.get_operation_display()+" "+str(transaction.amount)+" "+transaction.note+"\n")
+            if transaction.subtype:
+                notes.append(" "+get_payment_display(transaction.subtype))
+            if transaction.note:
+                notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
+            else:
+                notes.append("\n")
+        elif transaction.operation in [WITHDRAW]:
+            d['expected_balance']-=transaction.amount
+            if transaction.note:
+                notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
+            else:
+                notes.append("\n")
+        else:         
+            if transaction.note:
+                notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
+           
 
     d['notes'] = notes
     d['opening_check'] = d['opening_amount'] - d['last_closing_amount']
@@ -211,13 +239,32 @@ def get_small_summary(checkpoint):
     if checkpoint_transactions:
         for transaction in checkpoint_transactions:
             d[transaction.operation]+=transaction.amount
+            notes.append(transaction.get_operation_display() + " " + str(transaction.amount))
             if transaction.operation in [DEPOSIT]:
-                d['expected_checkpoint']+=transaction.amount
-            elif transaction.operation in [PAYMENT,WITHDRAW]:
-                d['expected_checkpoint']-=transaction.amount
-            
-            if transaction.note:
-                    notes.append(transaction.get_operation_display()+" "+str(transaction.amount)+": "+transaction.note)
+                d['expected_balance']+=transaction.amount
+                if transaction.subtype:
+                    notes.append(" "+get_deposit_display(transaction.subtype))
+                if transaction.note:
+                    notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
+                else:
+                    notes.append("\n")
+            elif transaction.operation in [PAYMENT]:
+                d['expected_balance']-=transaction.amount
+                if transaction.subtype:
+                    notes.append(" "+get_payment_display(transaction.subtype))
+                if transaction.note:
+                    notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
+                else:
+                    notes.append("\n")
+            elif transaction.operation in [WITHDRAW]:
+                d['expected_balance']-=transaction.amount
+                if transaction.note:
+                    notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
+                else:
+                    notes.append("\n")
+            else:         
+                if transaction.note:
+                    notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
 
     d['notes'] = notes
     d['check'] = d['checkpoint'] - d['expected_checkpoint']

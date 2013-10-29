@@ -48,7 +48,7 @@ class EntranceBalance(Balance):
             return "%d - %d %s %.2f %s" % (self.id, self.parent.id, self.get_operation_display(), self.amount, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))    
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['date']
         verbose_name = "Voce di bilancio dell'entrata"
         verbose_name_plural = "Voci di bilancio dell'entrata"       
 
@@ -61,13 +61,17 @@ class EntranceBalance(Balance):
 def get_entrance_summary(closing):
     notes = []
     d = {}
+    
+    notes.append("apertura "+ str(closing.parent.amount))
+    if closing.parent.note:
+        notes.append(closing.parent.note.replace("\r\n"," ")+"\n")
+    else:
+        notes.append("\n")
+
     d['cashier'] = closing.cashier
     d['date'] = closing.parent.date.strftime("%d/%m/%Y")
     d['opening_amount'] = closing.parent.amount
-    if closing.parent.note:
-        notes.append("apertura "+str(closing.parent.amount)+" "+closing.parent.note)
     d['last_closing_amount'] = EntranceBalance.objects.get_last_closing(closing.parent)
-
     d['closing_amount'] = closing.amount
     
     #calcolo del valore atteso della chiusura
@@ -92,13 +96,32 @@ def get_entrance_summary(closing):
     
     for transaction in opening_transactions:
         d[transaction.operation]+=transaction.amount
+        notes.append(transaction.get_operation_display() + " " + str(transaction.amount))
         if transaction.operation in [DEPOSIT]:
             d['expected_balance']+=transaction.amount
-        elif transaction.operation in [PAYMENT,WITHDRAW]:
+            if transaction.subtype:
+                notes.append(" "+get_deposit_display(transaction.subtype))
+            if transaction.note:
+                notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
+            else:
+                notes.append("\n")
+        elif transaction.operation in [PAYMENT]:
             d['expected_balance']-=transaction.amount
-            
-        if transaction.note:
-                notes.append(transaction.get_operation_display()+" "+str(transaction.amount)+": "+transaction.note)
+            if transaction.subtype:
+                notes.append(" "+get_payment_display(transaction.subtype))
+            if transaction.note:
+                notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
+            else:
+                notes.append("\n")
+        elif transaction.operation in [WITHDRAW]:
+            d['expected_balance']-=transaction.amount
+            if transaction.note:
+                notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
+            else:
+                notes.append("\n")
+        else:         
+            if transaction.note:
+                notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
 
     d['notes'] = notes
     d['opening_check'] = abs(d['opening_amount'] - d['last_closing_amount'])

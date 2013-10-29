@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block nav-turni %}
+<li class="panel">
+    <a class="accordion-toggle" data-toggle="collapse"
+        data-parent="#side-nav" href="#forms-turni-collapse"><i class="icon-calendar"></i> <span class="name">Turni</span></a>
+    <ul id="forms-turni-collapse" class="panel-collapse open in">
+        <li class="active"><a href="{% url 'base_disponibilita' %}">Disponibilita'</a></li>
+        <li><a href="{% url 'base_turni' %}">Turni</a></li>
+    </ul>
+</li>
+{% endblock %}
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Disponiblita' <small>per i turni al lab</small></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <section class="box">
+                <div class="body">
+                    <div class="wrapper">
+                        <p>Per modificare il documento, <a href="https://docs.google.com/spreadsheet/ccc?key=0AvZMRZ2w4fdqdDVqTkRpa3hXcG5vVEQwSHN6MTJuOEE">vai a questo link</a></p>
+                        <iframe width='100%' height='700' frameborder='0' style="overflow-x: hidden; overflow-y: scroll; " src='https://docs.google.com/spreadsheet/pub?key=0AvZMRZ2w4fdqdDVqTkRpa3hXcG5vVEQwSHN6MTJuOEE&single=true&gid=0&output=html&widget=true'></iframe>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+

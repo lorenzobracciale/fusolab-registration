@@ -11,6 +11,8 @@
 </head>
 
 {% load ifusergroup %}
+{% load thumbnail %}
+
 {% block 'body' %}
 <body class="background-dark">
     <div class="logo">
@@ -36,6 +38,17 @@
                     </ul>
                 </li>
                 {% endblock %}
+                {% block nav-turni %}
+                <li class="panel">
+                    <a class="accordion-toggle collapsed" data-toggle="collapse"
+                        data-parent="#side-nav" href="#forms-turni-collapse"><i class="icon-calendar"></i> <span class="name">Turni</span></a>
+                    <ul id="forms-turni-collapse" class="panel-collapse collapse">
+                        <li><a href="{% url 'base_disponibilita' %}">Disponibilita'</a></li>
+                        <li><a href="{% url 'base_turni' %}">Turni</a></li>
+                    </ul>
+                </li>
+                {% endblock %}
+
                 {% block nav-stats %}
                 <li class="panel">
                     <a class="accordion-toggle collapsed" data-toggle="collapse"
@@ -69,8 +82,12 @@
                     </a>
                     <ul id="account-menu" class="dropdown-menu account" role="menu">
                         <li role="presentation" class="account-picture">
-                        <img src="{{ MEDIA_URL }}{{ request.user.get_profile.photo }}" alt="">
-                            {{ request.user.first_name }} {{ request.user.last_name }}  
+
+                        {% thumbnail request.user.get_profile.photo "50x50"  as im %}
+                        <img class="img-circle" src="{{ im.url }}">
+                        {% endthumbnail %}
+                        <!-- img src="{{ MEDIA_URL }}{{ request.user.get_profile.photo }} " alt="" -->
+                        {{ request.user.first_name }} {{ request.user.last_name }}  
                         </li>
                         <li role="presentation">
                             <a href="{% url 'base_account_edit' %}" class="link">
@@ -78,6 +95,7 @@
                                    Profilo 
                             </a>
                         </li>
+                        {% comment %}
                         <li role="presentation">
                             <a href="component_calendar.html" class="link">
                                 <i class="icon-calendar"></i>
@@ -90,6 +108,7 @@
                                 Inbox
                             </a>
                         </li>
+                        {% endcomment %}
                     </ul>
                 </li> 
                 <li class="visible-xs">
@@ -173,6 +192,8 @@
     {% block 'page_scripts' %}
     {% endblock %}
 
+    {% endblock %}
+    {% block 'bottom' %}
     {% endblock %}
 </body>
 {% endblock %}

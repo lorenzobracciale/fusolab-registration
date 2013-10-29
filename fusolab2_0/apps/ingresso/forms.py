@@ -12,11 +12,21 @@ from form_utils.widgets import ImageWidget
 from django.forms.widgets import HiddenInput
 import datetime
 
+# class EntranceModelForm(ModelForm):
+#     def __init__(self, *args, **kwargs):
+#         super(EntranceModelForm, self).__init__(*args, **kwargs)
+#         self.fields['cost'].localize = True
+#         self.fields['cost'].label = 'Inserisci il costo (ad es. 3.5)'
+# 
+#     class Meta:
+#         model = Entrance 
+#         exclude = ('date')
 
 class EntranceBalanceModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(EntranceBalanceModelForm, self).__init__(*args, **kwargs)
         self.fields['cashier'].queryset = UserProfile.objects.filter(user__groups__name="turnisti")
+        self.fields['amount'].localize = True
 
     class Meta:
         model = EntranceBalance 
@@ -28,13 +38,15 @@ class EntranceBalanceModelForm(ModelForm):
 class EntranceOpeningModelForm(EntranceBalanceModelForm):
     def __init__(self, *args, **kwargs):
         super(EntranceOpeningModelForm, self).__init__(*args, **kwargs)
-        self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=OPENING)  
+        self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=OPENING)
+        self.fields['amount'].label = 'Contanti iniziali'        
 
 class EntranceClosingModelForm(EntranceBalanceModelForm):
     def __init__(self, *args, **kwargs):
         super(EntranceClosingModelForm, self).__init__(*args, **kwargs)
         self.fields['operation'] = forms.CharField(widget=forms.HiddenInput(),initial=CLOSING)  
-
+        self.fields['amount'].label = 'Contanti finali'
+        
 class EntrancePaymentModelForm(EntranceBalanceModelForm):
     def __init__(self, *args, **kwargs):
         super(EntrancePaymentModelForm, self).__init__(*args, **kwargs)

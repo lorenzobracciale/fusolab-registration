@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+
+{% load thumbnail %}
+
 {% block 'content' %}
 <div class="content container">
     <div class="row">
@@ -20,7 +23,10 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="text-align-center">
-                                    <img class="img-circle" src="{{ MEDIA_URL }}{{ request.user.get_profile.photo }}" alt="64x64" style="height: 112px;">
+                                    <!-- img class="img-circle" src="{{ MEDIA_URL }}{{ request.user.get_profile.photo }}" alt="64x64" style="height: 112px;" -->
+                                    {% thumbnail request.user.get_profile.photo "112x112"  as im %}
+                                    <img class="img-circle" src="{{ im.url }}" alt="64x64" style="height: 112px;">
+                                    {% endthumbnail %}
                                 </div>
                             </div>
                             <div class="col-md-8">
@@ -38,7 +44,12 @@
                         </div>
 
                         <fieldset>
-                            <legend>Dicci qualcosa di te <small></small></legend>
+                            {% if activation_key %}
+                            <legend>Ci siamo quasi... <small> meno di un minuto</small></legend>
+                                <p>Ci servono alcuni tuoi dati per completare l'attivazione. Una volta fatta potrai accedere tramite questo sito ed interagire con persone e cose all'interno del FusoLab.</p>
+                            {% else %}
+                            <legend>Presentati <small>Dicci qualcosa di te...</small></legend>
+                            {% endif %}
                         </fieldset>
 
                         <fieldset>
@@ -149,7 +160,7 @@
                                         </div>
                                         <input type="text" id="photo-path-display" class="form-control" disabled="disabled" placeholder="Scegli una foto (possibilmente 200x200 pixel)" value="{{ form.photo.value|default_if_none:"" }}">
                                         <span class="input-group-btn">
-                                            <button class="btn btn-success" type="button" onclick="getFile()">Carica una foto</button>
+                                            <button class="btn btn-success" type="button" id="photo-loader">Carica una foto</button>
                                         </span>
                                     </div>
                                 </div>
@@ -264,10 +275,11 @@
 <script src="{{ STATIC_URL }}light-blue/js/forms.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        function getFile(){
+        $(document).on('click', '#photo-loader', function() {
             document.getElementById("{{ form.photo.id_for_label }}").click();
-        }
-        $("#{{ form.photo.id_for_label }}").live("change", function () {
+        });
+
+        $(document).on('change', '#{{ form.photo.id_for_label }}', function () {
             if ($("#{{ form.photo.id_for_label }}").val() == "") {
                 return;
             }

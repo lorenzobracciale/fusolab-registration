@@ -1,242 +1,252 @@
 {% extends 'base.html' %}
 {% block nav-home %}<li class="active"><a href="{% url 'home' %}"><i class="icon-home"></i> <span class="name">Dashboard</span></a></li>{% endblock %}
 
+{% load usertags %}
+{% load salutatoretags %}
+{% load ingressotags %}
+{% load thumbnail %}
+
 {% block 'content' %}
     <div class="content container">
         <div class="row">
             <div class="col-md-12">
-                <h2 class="page-title">Dashboard <small>Statistics and more</small></h2>
+                <h2 class="page-title">Dashboard <small>interagisci col FusoLab!</small></h2>
             </div>
         </div>
         <div class="row">
             <div class="col-md-8">
-                <section class="widget">
-                    <header>
-                        <h4>
-                            <i class="icon-group"></i>
-                            Visits
-                            <small>
-                                Based on a three months data
-                            </small>
-                        </h4>
-                    </header>
-                    <div class="body no-margin">
-                        <div id="visits-chart" class="chart visits-chart">
-                            <svg></svg>
-                        </div>
-                        <div class="visits-info well well-sm">
-                            <div class="row">
-                                <div class="col-sm-3 col-xs-6">
-                                    <div class="key"><i class="eicon-users"></i> Total Traffic</div>
-                                    <div class="value">24 541 <i class="icon-caret-up color-green"></i></div>
-                                </div>
-                                <div class="col-sm-3 col-xs-6">
-                                    <div class="key"><i class="eicon-user"></i> Unique Visits</div>
-                                    <div class="value">14 778 <i class="icon-caret-down color-red"></i></div>
-                                </div>
-                                <div class="col-sm-3 col-xs-6">
-                                    <div class="key"><i class="icon-plus-sign-alt"></i> Revenue</div>
-                                    <div class="value">$3 583.18 <i class="icon-caret-up color-green"></i></div>
-                                </div>
-                                <div class="col-sm-3 col-xs-6">
-                                    <div class="key"><i class="icon-user"></i> Total Sales</div>
-                                    <div class="value">$59 871.12 <i class="icon-caret-down color-red"></i></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                <section class="widget">
-                    <header>
-                        <h4>
-                            <i class="icon-shopping-cart"></i>
-                            Traffic Sources
-                            <small>
-                                One month tracking
-                            </small>
-                        </h4>
-                    </header>
-                    <div class="body">
-                        <table class="table table-striped no-margin sources-table">
-                            <thead>
-                            <tr>
-                                <th class="source-col-header">Source</th>
-                                <th>Amount</th>
-                                <th>Change</th>
-                                <th class="hidden-xs">Percent.,%</th>
-                                <th>Target</th>
-                                <th class="chart-col-header hidden-xs">Trend</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><span class="label label-important">Direct</span></td>
-                                <td>713</td>
-                                <td><strong class="color-green">+53</strong></td>
-                                <td class="hidden-xs">+12</td>
-                                <td>900</td>
-                                <td class="chart-cell hidden-xs">
-                                    <div id="direct-trend"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="label label-warning">Refer</span></td>
-                                <td>562</td>
-                                <td><strong>+84</strong></td>
-                                <td class="hidden-xs">+64</td>
-                                <td>500</td>
-                                <td class="chart-cell hidden-xs">
-                                    <div id="refer-trend"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="label label-success">Social</span></td>
-                                <td>148</td>
-                                <td><strong class="color-red">-12</strong></td>
-                                <td class="hidden-xs">+3</td>
-                                <td>180</td>
-                                <td class="chart-cell hidden-xs">
-                                    <div id="social-trend"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="label label-info">Search</span></td>
-                                <td>653</td>
-                                <td><strong class="color-green">+23</strong></td>
-                                <td class="hidden-xs">+43</td>
-                                <td>876</td>
-                                <td class="chart-cell hidden-xs">
-                                    <div id="search-trend"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="label label-inverse">Internal</span></td>
-                                <td>976</td>
-                                <td><strong>+101</strong></td>
-                                <td class="hidden-xs">-7</td>
-                                <td>844</td>
-                                <td class="chart-cell hidden-xs">
-                                    <div id="internal-trend"></div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
                 <section class="widget large">
                     <header>
                         <h4>
                             <i class="eicon-chat"></i>
-                            Chat
+                            Frasi lette dal salutatore
                         </h4>
                     </header>
                     <div class="body">
-                        <div id="chat" class="chat">
-                            <div id="chat-messages" class="chat-messages">
+                        <div id="salutatore" class="salutatore chat">
+                            <div id="salutatore-messages" class="chat-messages">
+                                {% last_sentences 5 as last_salutati_sentences %}
+                                {% for s in last_salutati_sentences %}
                                 <div class="chat-message">
                                     <div class="sender pull-left">
                                         <div class="icon">
-                                            <img src="{{ STATIC_URL }}light-blue/img/2.jpg" class="img-circle" alt="">
+                                            {% thumbnail s.user.photo "50x50"  as im %}
+                                                <img class="img-circle" src="{{ im.url }}" />
+                                            {% empty %}
+                                                <img class="img-circle" src="{{ STATIC_URL }}images/fusolab_unnamed.jpg" />
+                                            {% endthumbnail %}
                                         </div>
                                         <div class="time">
-                                            4 min
+                                            {{ s.created_on|timesince }} 
                                         </div>
                                     </div>
                                     <div class="chat-message-body">
                                         <span class="arrow"></span>
-                                        <div class="sender"><a href="#">Tikhon Laninga</a></div>
+                                        <div class="sender"><a href="#">{{ s.user.user.username }}</a></div>
                                         <div class="text">
-                                            Hey Sam, how is it going? But I must explain to you how all this mistaken
-                                            idea of denouncing of a pleasure and praising pain was born
+                                            {{ s.sentence }}
                                         </div>
                                     </div>
                                 </div>
-                                <div class="chat-message">
-                                    <div class="sender pull-right">
-                                        <div class="icon">
-                                            <img src="{{ STATIC_URL }}light-blue/img/1.jpg" class="img-circle" alt="">
-                                        </div>
-                                        <div class="time">
-                                            3 min
-                                        </div>
-                                    </div>
-                                    <div class="chat-message-body on-left">
-                                        <span class="arrow"></span>
-                                        <div class="sender"><a href="#">Cenhelm Houston</a></div>
-                                        <div class="text">
-                                            Pretty good. Doing my homework..  No one rejects, dislikes, or avoids
-                                            pleasure itself, because it is pleasure, but because
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="chat-message">
-                                    <div class="sender pull-left">
-                                        <div class="icon">
-                                            <img src="{{ STATIC_URL }}light-blue/img/2.jpg" class="img-circle" alt="">
-                                        </div>
-                                        <div class="time">
-                                            2 min
-                                        </div>
-                                    </div>
-                                    <div class="chat-message-body">
-                                        <span class="arrow"></span>
-                                        <div class="sender"><a href="#">Tikhon Laninga</a></div>
-                                        <div class="text">
-                                            Any chance to go out? To take a trivial example, which of us ever undertakes
-                                            laborious physical exercise, except to obtain some advantage
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="chat-message">
-                                    <div class="sender pull-right">
-                                        <div class="icon">
-                                            <img src="{{ STATIC_URL }}light-blue/img/1.jpg" class="img-circle" alt="">
-                                        </div>
-                                        <div class="time">
-                                            2 min
-                                        </div>
-                                    </div>
-                                    <div class="chat-message-body on-left">
-                                        <span class="arrow"></span>
-                                        <div class="sender"><a href="#">Cenhelm Houston</a></div>
-                                        <div class="text">
-                                            .. Maybe 40-50 mins. I don't know exactly. On the other hand, we denounce
-                                            with righteous indignation and dislike men who are so beguiled
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="chat-message">
-                                    <div class="sender pull-left">
-                                        <div class="icon">
-                                            <img src="{{ STATIC_URL }}light-blue/img/2.jpg" class="img-circle" alt="">
-                                        </div>
-                                        <div class="time">
-                                            1 min
-                                        </div>
-                                    </div>
-                                    <div class="chat-message-body">
-                                        <span class="arrow"></span>
-                                        <div class="sender"><a href="#">Tikhon Laninga</a></div>
-                                        <div class="text">
-                                            Anyway sounds great! These cases are perfectly simple and easy to
-                                            distinguish.
-                                        </div>
-                                    </div>
-                                </div>
+                                {% empty %}
+                                    Nessuna :-(
+                                {% endfor %}
                             </div>
                             <footer class="chat-footer row">
-                                <div class="col-xs-9">
-                                    <input id="new-message" type="text" class="form-control input-transparent" placeholder="Enter your message..">
-                                </div>
-                                <div class="col-xs-3">
-                                    <button type="button" id="new-message-btn" class="btn btn-transparent btn-block">Send</button>
-                                </div>
+                                <form action="." method="post">
+                                    <div class="col-xs-9">
+                                        <input id="new-message" type="text" class="form-control input-transparent" placeholder="Scrivi una frase da far leggere al salutatore...">
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <button type="button" id="new-message-btn" class="btn btn-transparent btn-block">Invia</button>
+                                    </div>
+                                </form>
                             </footer>
                         </div>
                     </div>
                 </section>
             </div>
             <div class="col-md-4">
+                <section class="widget">
+                    <header>
+                        <h4>
+                            <i class="icon-stethoscope"></i>
+                            Stato del Fusolab 
+                        </h4>
+                    </header>
+                    <div class="body">
+                        <ul class="server-stats">
+                            {% entrances as ent %}
+                            {% if ent %}
+                                <li>
+                                    <div class="key pull-right">Persone entrate</div>
+                                    <div class="stat">
+                                        <div class="info">{{ ent }}</div>
+                                        <div class="progress progress-small">
+                                            <div class="progress-bar progress-bar-danger" style="width: {% widthratio ent 100 100 %}%;"></div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    {% alcoholic_l as alc %}
+                                    <div class="key pull-right">Litri di alcolici venduti</div>
+                                    <div class="stat">
+                                        <div class="info">{{ alc }}</div>
+                                        <div class="progress progress-small">
+                                            <div class="progress-bar progress-bar-success" style="width: {% widthratio al 100 100 %}%;"></div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    {% alcohol_l as al %}
+                                    <div class="key pull-right">Litri di alcol in circolazione</div>
+                                    <div class="stat">
+                                        <div class="info">{{ al }}</div>
+                                        <div class="progress progress-small">
+                                            <div class="progress-bar" style="width: {% widthratio al 10 100 %}%;"></div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    {% tasso_alcolemico as ta %}
+                                    <div class="key pull-right">Tasso alcolemico medio</div>
+                                    <div class="stat">
+                                        <div class="info">{{ ta }}</i></div>
+                                        <div class="progress progress-small">
+                                            <div class="progress-bar progress-bar-inverse" style="width: {% widthratio ta 0.1 100 %}%;"></div>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% else %}
+                                Il fusolab e' chiuso
+                            {% endif %}
+                        </ul>
+                    </div>
+                </section>
+
+
+
+                <section class="widget widget-tabs">
+                    <header>
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#stats" data-toggle="tab">Online</a>
+                            </li>
+                            <li>
+                                <a href="#report" data-toggle="tab">Registrati</a>
+                            </li>
+                            <li>
+                                <a href="#dropdown1" data-toggle="tab">Salutati</a>
+                            </li>
+                        </ul>
+                    </header>
+                    <div class="body tab-content">
+                        <div id="stats" class="tab-pane active clearfix">
+                            {% online_users 5 as last_online_users %}
+                            <h5 class="tab-header"><i class="icon-group"></i> Ultimi soci online</h5>
+                            <ul class="users-list">
+                                {% for u in last_online_users %}
+                                <li>
+                                    {% thumbnail u.get_profile.photo "50x50"  as im %}
+                                        <img class="pull-left img-circle" src="{{ im.url }}" />
+                                    {% empty %}
+                                        <img class="pull-left img-circle" src="{{ STATIC_URL }}images/fusolab_unnamed.jpg" />
+                                    {% endthumbnail %}
+                                    <div class="user-info">
+                                        <div class="name"><a href="#">{{u.first_name }}</a></div>
+                                        <div class="position">Nickname: {{ u.username }}</div>
+                                        <div class="time">Entrato/a da {{ u.last_login|timesince }}</div>
+                                    </div>
+                                </li>
+                                {% empty %}
+                                    <li>Nessuno :(</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div id="report" class="tab-pane">
+                            {% last_registers 5 as last_registers_users %}
+                            <h5 class="tab-header"><i class="icon-star"></i> Ultimi utenti registati</h5>
+                            <ul class="users-list user-list-no-hover">
+                                {% for u in last_registers_users %} 
+                                <li>
+                                    {% thumbnail u.get_profile.photo "50x50"  as im %}
+                                        <img class="pull-left img-circle" src="{{ im.url }}" />
+                                    {% empty %}
+                                        <img class="pull-left img-circle" src="{{ STATIC_URL }}images/fusolab_unnamed.jpg" />
+                                    {% endthumbnail %}
+                                    <div class="user-info">
+                                        <div class="name"><a href="#">{{ u.first_name }}</a></div>
+                                        <div class="position">Nickname: {{ u.username }}</div>
+                                        <div class="time">Registrato/a il: {{ u.date_joined|date:"SHORT_DATE_FORMAT" }}</div>
+                                    </div>
+                                </li>
+                                {% empty %}
+                                    <li>Nessuno :(</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div id="dropdown1" class="tab-pane">
+                            {% last_salutati 5 as last_salutati_greetings %}
+                            <h5 class="tab-header"><i class="icon-comments"></i> Salutati</h5>
+                            <ul class="users-list">
+                                {% for g in last_salutati_greetings  %}
+                                <li>
+                                    {% thumbnail g.user.get_profile.photo "50x50"  as im %}
+                                        <img class="pull-left img-circle" src="{{ im.url }}" />
+                                    {% empty %}
+                                        <img class="pull-left img-circle" src="{{ STATIC_URL }}images/fusolab_unnamed.jpg" />
+                                    {% endthumbnail %}
+                                    <div class="user-info">
+                                        <div class="name"><a href="#">{{ g.user.user.first_name }}</a></div>
+                                        <div class="position">Nickname: {{ g.user.user.username }}</div>
+                                        <div class="time">Salutato/a da {{ g.date|timesince }}</div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="widget">
+                    <form method="post" >
+                        <header>
+                            <h4>
+                                <i class="icon-magic"></i>
+                                Cambia i colori del bar 
+                            </h4>
+                        </header>
+                        <div class="body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="control-group">
+                                        <label for="color-bar-sopra" class="control-label">Bancone di sopra</label>
+                                        <div class="input-group">
+                                            <input id="color-bar-sopra" class="form-control colorpicker" type="text" name="color" value="#eac85e">
+                                            <span id="color-holder-bar-sopra" class="input-group-addon" style="background-color: rgb(125, 52, 194);">&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="input-group-btn">
+                                                <button type="button" id="mode-bar-sopra" class="btn btn-default">Cambia Mode</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label for="color-bar-sotto" class="control-label">Bancone di sotto</label>
+                                        <div class="input-group">
+                                            <input id="color-bar-sotto" class="form-control colorpicker" type="text" name="color" value="#eac85e">
+                                            <span id="color-holder-bar-sotto" class="input-group-addon" style="background-color: rgb(125, 52, 194);">&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="input-group-btn">
+                                                <button type="button" id="mode-bar-sotto" class="btn btn-default">Cambia Mode</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <blockquote>Seleziona il colore che vuoi per cambiare le luci dei bar del fusolab. Premi "Cambia Mode" per cambiare l'effetto
+                                    </blockquote>
+                                </div>
+                            </div>
+                         </div>
+                    </form>
+                </section>
                 <section class="widget large">
                     <header>
                         <h4>
@@ -256,247 +266,6 @@
                         </div>
                     </div>
                 </section>
-                <section class="widget widget-tabs">
-                    <header>
-                        <ul class="nav nav-tabs">
-                            <li class="active">
-                                <a href="#stats" data-toggle="tab">Users</a>
-                            </li>
-                            <li>
-                                <a href="#report" data-toggle="tab">Favorites</a>
-                            </li>
-                            <li>
-                                <a href="#dropdown1" data-toggle="tab">Commenters</a>
-                            </li>
-                        </ul>
-                    </header>
-                    <div class="body tab-content">
-                        <div id="stats" class="tab-pane active clearfix">
-                            <h5 class="tab-header"><i class="icon-group"></i> Last logged-in users</h5>
-                            <ul class="users-list">
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/1.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Finees Lund</a></div>
-                                        <div class="position">Product Designer</div>
-                                        <div class="time">Last logged-in: Mar 20, 18:46</div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/3.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Erebus Novak</a></div>
-                                        <div class="position">Software Engineer</div>
-                                        <div class="time">Last logged-in: Mar 23, 9:02</div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/2.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Leopoldo Reier</a></div>
-                                        <div class="position">Chief Officer</div>
-                                        <div class="time">Last logged-in: Jun 6, 15:34</div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/13.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Frans Garey</a></div>
-                                        <div class="position">Financial Assistant</div>
-                                        <div class="time">Last logged-in: Jun 8, 17:20</div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/14.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Jessica Johnsson</a></div>
-                                        <div class="position">Sales Manager</div>
-                                        <div class="time">Last logged-in: Jun 8, 9:13</div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        <div id="report" class="tab-pane">
-                            <h5 class="tab-header"><i class="icon-star"></i> Popular contacts</h5>
-                            <ul class="users-list user-list-no-hover">
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/14.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Jessica Johnsson</a></div>
-                                        <div class="options">
-                                            <button class="btn btn-xs btn-success">
-                                                <i class="icon-phone"></i>
-                                                Call
-                                            </button>
-                                            <button class="btn btn-xs btn-warning">
-                                                <i class="icon-envelope-alt"></i>
-                                                Message
-                                            </button>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/13.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Frans Garey</a></div>
-                                        <div class="options">
-                                            <button class="btn btn-xs btn-success">
-                                                <i class="icon-phone"></i>
-                                                Call
-                                            </button>
-                                            <button class="btn btn-xs btn-warning">
-                                                <i class="icon-envelope-alt"></i>
-                                                Message
-                                            </button>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/3.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Erebus Novak</a></div>
-                                        <div class="options">
-                                            <button class="btn btn-xs btn-success">
-                                                <i class="icon-phone"></i>
-                                                Call
-                                            </button>
-                                            <button class="btn btn-xs btn-warning">
-                                                <i class="icon-envelope-alt"></i>
-                                                Message
-                                            </button>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/2.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Leopoldo Reier</a></div>
-                                        <div class="options">
-                                            <button class="btn btn-xs btn-success">
-                                                <i class="icon-phone"></i>
-                                                Call
-                                            </button>
-                                            <button class="btn btn-xs btn-warning">
-                                                <i class="icon-envelope-alt"></i>
-                                                Message
-                                            </button>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/1.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Finees Lund</a></div>
-                                        <div class="options">
-                                            <button class="btn btn-xs btn-success">
-                                                <i class="icon-phone"></i>
-                                                Call
-                                            </button>
-                                            <button class="btn btn-xs btn-warning">
-                                                <i class="icon-envelope-alt"></i>
-                                                Message
-                                            </button>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        <div id="dropdown1" class="tab-pane">
-                            <h5 class="tab-header"><i class="icon-comments"></i> Top Commenters</h5>
-                            <ul class="users-list">
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/13.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Frans Garey</a></div>
-                                        <div class="comment">
-                                            Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit,
-                                            sed quia
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/1.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Finees Lund</a></div>
-                                        <div class="comment">
-                                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
-                                            eu fugiat.
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/14.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Jessica Johnsson</a></div>
-                                        <div class="comment">
-                                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                                            deserunt.
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/3.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Erebus Novak</a></div>
-                                        <div class="comment">
-                                            Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium
-                                            doloremque.
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                <img src="{{ STATIC_URL }}light-blue/img/2.jpg" alt="" class="pull-left img-circle"/>
-                                    <div class="user-info">
-                                        <div class="name"><a href="#">Leopoldo Reier</a></div>
-                                        <div class="comment">
-                                            Laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis
-                                            et quasi.
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-                <section class="widget">
-                    <header>
-                        <h4>
-                            <i class="icon-magnet"></i>
-                            Server Overview
-                        </h4>
-                    </header>
-                    <div class="body">
-                        <ul class="server-stats">
-                            <li>
-                                <div class="key pull-right">CPU</div>
-                                <div class="stat">
-                                    <div class="info">60% / 37&deg;C / 3.3 Ghz</div>
-                                    <div class="progress progress-small">
-                                        <div class="progress-bar progress-bar-danger" style="width: 70%;"></div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="key pull-right">Mem</div>
-                                <div class="stat">
-                                    <div class="info">29% / 4GB (16 GB)</div>
-                                    <div class="progress progress-small">
-                                        <div class="progress-bar" style="width: 29%;"></div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="key pull-right">LAN</div>
-                                <div class="stat">
-                                    <div class="info">6 Mb/s <i class="icon-caret-down"></i> &nbsp; 3 Mb/s <i class="icon-caret-up"></i></div>
-                                    <div class="progress progress-small">
-                                        <div class="progress-bar progress-bar-inverse" style="width: 48%;"></div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </section>
             </div>
         </div>
     </div>
@@ -505,23 +274,65 @@
 {% block 'page_scripts' %}
 <!-- page specific -->
 <script src="{{ STATIC_URL }}light-blue/js/index.js"></script>
-<script src="{{ STATIC_URL }}light-blue/js/chat.js"></script>
+<!-- script src="{{ STATIC_URL }}light-blue/js/chat.js"></script -->
+<script src="{{ STATIC_URL }}/js/salutatore.js"></script>
+
+<script type="text/javascript"> 
+$('#color-bar-sotto').colorpicker().on('changeColor', function(ev){
+        $("#color-holder-bar-sotto").css("backgroundColor", ev.color.toHex());
+        var x = ev.color.toHex().substring(1);
+        $.get( "/ingresso/change_color_bancone_sotto/" + String(x) + "/");
+
+});
+$('#color-bar-sopra').colorpicker().on('changeColor', function(ev){
+        $("#color-holder-bar-sopra").css("backgroundColor", ev.color.toHex());
+        var x = ev.color.toHex().substring(1);
+        $.get( "/ingresso/change_color_bancone_sopra/" + String(x) + "/");
+});
+$(document).on('click', '#mode-bar-sopra', function(e) {
+   $.get("/ingresso/change_mode_bancone_sopra/");
+});
+
+$(document).on('click', '#mode-bar-sotto', function(e) {
+   $.get("/ingresso/change_mode_bancone_sotto/");
+});
+
+$("#salutatore-messages").slimscroll({
+    height: '240px',
+    size: '5px',
+    alwaysVisible: true,
+    railVisible: true
+});
+
+
+{% thumbnail request.user.photo "50x50"  as im %}
+var avatar_url = "{{ im.url }}";
+{% empty %}
+var avatar_url = "{{ STATIC_URL }}images/fusolab_unnamed_avatar.jpg";
+{% endthumbnail %}
+
+</script>
+
 
 <script type="text/template" id="message-template">
         <div class="sender pull-left">
             <div class="icon">
-                <img src="{{ STATIC_URL }}light-blue/img/2.jpg" class="img-circle" alt="">
+                <img src="<%- image %>" class="img-circle" alt="">
             </div>
             <div class="time">
-                just now
+                <%- date %>
             </div>
         </div>
         <div class="chat-message-body">
             <span class="arrow"></span>
-            <div class="sender">Tikhon Laninga</div>
+            <div class="sender"><%- sender %></div>
             <div class="text">
                 <%- text %>
             </div>
         </div>
 </script>
+
+{% endblock %}
+
+{% block 'bottom' %}
 {% endblock %}

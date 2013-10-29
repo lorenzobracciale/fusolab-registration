@@ -120,6 +120,55 @@ def makecard(request):
         return HttpResponse("Tessera per %s registrata con id %s" % (str(user[0].user.get_full_name()), str(c.id)) )
     return HttpResponse("Errore: non ho trovato il socio o il numero seriale non e' valido.")
 
+def change_mode_bancone_sopra(request):
+    import liblo
+    UDP_IP = settings.BAR_SOPRA_IP
+    UDP_PORT = settings.BAR_SOPRA_PORT
+    try:
+        target = liblo.Address(UDP_IP, UDP_PORT)
+        liblo.send(target, "/modd")
+    except liblo.AddressError, err:
+        print str(err)
+    return HttpResponse('changed sopra')
+
+def change_mode_bancone_sotto(request):
+    import liblo
+    UDP_IP = settings.BAR_SOTTO_IP
+    UDP_PORT = settings.BAR_SOTTO_PORT
+    try:
+        target = liblo.Address(UDP_IP, UDP_PORT)
+        liblo.send(target, "/modd")
+    except liblo.AddressError, err:
+        print str(err)
+    return HttpResponse('changed sotto')
+
+def change_color_bancone_sopra(request, color):
+    import liblo
+    UDP_IP = settings.BAR_SOPRA_IP
+    UDP_PORT = settings.BAR_SOPRA_PORT
+    try:
+        target = liblo.Address(UDP_IP, UDP_PORT)
+        liblo.send(target, "/knbr", float(int(color[0:2], 16))/255.0)
+        liblo.send(target, "/knbg", float(int(color[2:4], 16))/255.0)
+        liblo.send(target, "/knbb", float(int(color[4:6], 16))/255.0)
+    except liblo.AddressError, err:
+        print str(err)
+    return HttpResponse(color)
+
+
+
+def change_color_bancone_sotto(request, color):
+    import liblo
+    UDP_IP = settings.BAR_SOTTO_IP
+    UDP_PORT = settings.BAR_SOTTO_PORT
+    try:
+        target = liblo.Address(UDP_IP, UDP_PORT)
+        liblo.send(target, "/knbr", float(int(color[0:2], 16))/255.0)
+        liblo.send(target, "/knbg", float(int(color[2:4], 16))/255.0)
+        liblo.send(target, "/knbb", float(int(color[4:6], 16))/255.0)
+    except liblo.AddressError, err:
+        print str(err)
+    return HttpResponse(color)
 
 @user_passes_test(in_turnisti)
 def ajax_user_search(request, q=None):

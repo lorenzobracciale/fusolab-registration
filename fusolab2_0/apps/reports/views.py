@@ -94,7 +94,7 @@ def excel(request, what, from_day, from_month, from_year, to_day, to_month, to_y
             # excel rows start from one
             if rowx != 1:
                 sheet.write(rowx, 9, xlwt.Formula('B%d-F%d' % (rowx+1, rowx-1+1))) #check1
-            sheet.write(rowx, 10, xlwt.Formula('N%d-F%d' % (rowx+1, rowx+1))) #check2
+            sheet.write(rowx, 10, xlwt.Formula('L%d+M%d-I%d' % (rowx+1, rowx+1, rowx+1))) #check2
             sheet.write(rowx, 11, xlwt.Formula('F%d-B%d' % (rowx+1, rowx+1))) #ricavi
             sheet.write(rowx, 12, xlwt.Formula('E%d+C%d-D%d' % (rowx+1, rowx+1, rowx+1))) #costi
             sheet.write(rowx, 13, xlwt.Formula('L%d-M%d' % (rowx+1, rowx+1))) #risultato
@@ -145,7 +145,7 @@ def excel(request, what, from_day, from_month, from_year, to_day, to_month, to_y
             # excel rows start from one
             if rowx != 1:
                 sheet.write(rowx, 9, xlwt.Formula('B%d-F%d' % (rowx+1, rowx-1+1))) #check1
-            sheet.write(rowx, 10, xlwt.Formula('N%d-F%d' % (rowx+1, rowx+1))) #check2
+            sheet.write(rowx, 10, xlwt.Formula('L%d+M%d-I%d' % (rowx+1, rowx+1, rowx+1))) #check2
             sheet.write(rowx, 11, xlwt.Formula('F%d-B%d' % (rowx+1, rowx+1))) #ricavi
             sheet.write(rowx, 12, xlwt.Formula('E%d+C%d-D%d' % (rowx+1, rowx+1, rowx+1))) #costi
             sheet.write(rowx, 13, xlwt.Formula('L%d-M%d' % (rowx+1, rowx+1))) #risultato

@@ -17,18 +17,14 @@ def entrance_handler(sender, **kwargs):
     saved_balance = kwargs['instance']
 
     if saved_balance.operation == CLOSING:
-        subject = ''           
-        template = get_template('closing_mail.html')
-        
         d = get_entrance_summary(saved_balance)
-        context = Context(d)
-        content = template.render(context)
-        
         if ('warning' in d):
-            subject += 'WARNING '
-        subject += 'riepilogo ingresso '+saved_balance.parent.date.strftime("%d/%m/%Y")
-        
-        
-        msg = EmailMessage(subject, content, 'cassafusolab@gmail.com', to=settings.EMAIL_NOTIFICATION_LIST)
-        msg.content_subtype = "html"
-        msg.send()
+            subject = ''           
+            template = get_template('closing_mail.html')
+            context = Context(d)
+            content = template.render(context)
+            subject = 'WARNING riepilogo ingresso '+saved_balance.parent.date.strftime("%d/%m/%Y")
+            msg = EmailMessage(subject, content, 'cassafusolab@gmail.com', to=settings.EMAIL_NOTIFICATION_LIST)
+            msg.content_subtype = "html"
+            msg.send()
+

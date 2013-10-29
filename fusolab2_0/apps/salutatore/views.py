@@ -1,8 +1,13 @@
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, HttpResponseServerError
+from django.utils import simplejson
+from django.views.decorators.csrf import csrf_exempt
 from django.core.servers.basehttp import FileWrapper
+from django.contrib.auth.decorators import login_required
+from django.utils import timesince
 import os, mimetypes, urllib
 from ingresso.models import Card
-from models import Greeting
+from salutatore.models import Greeting, ToBeSaid
+from sorl.thumbnail import get_thumbnail
 
 def salutatore(request, cardid=None, manual_speech=None):
     to_say, name = "", ""
@@ -43,3 +48,26 @@ def say(request, sentence):
         sentence = "Benvenuta critical mass al fusolab, la sai questa e' fortissima: due ciclisti si incontrano a trastevere quando uno dei due dice all'altro: sai come si chiama questo fiume? e l'altro: no. Aaaarhrhrhrhhahahahahahharrrhhh ahh ahhhh ahhhhrrrrr"
     return salutatore(request, manual_speech=sentence)
 
+@csrf_exempt
+@login_required
+def sentences_list(request):
+    import json
+    if request.method == "POST" and request.is_ajax():
+        #create new element
+        json_data = simplejson.loads(request.raw_post_data)
+        try:
+            post_txt = json_data['text'] 
+        except KeyError:
+            HttpResponseServerError("Malformed data!")
+
+        if post_txt:
+            ToBeSaid(sentence=post_txt, user=request.user.get_profile()).save()
+
+        return HttpResponse(str(request.raw_post_data))
+    else:
+        qs = ToBeSaid.objects.all()[:5]
+        mlist = []
+        for q in qs: 
+            im = get_thumbnail(q.user.photo, '50x50', crop='center', quality=99)
+            mlist.append({"id": q.id, "sender": q.user.user.username, "text": q.sentence, "image": im.url , "date": timesince.timesince(q.created_on)})
+        return HttpResponse(json.dumps(mlist), content_type="application/json")

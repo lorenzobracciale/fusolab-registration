@@ -48,7 +48,7 @@ def edit(request, activation_key=None):
                     user.is_active = True
                     user.save()
                 form.do_save(user=user)
-                return render_to_response('registration/edit_complete.html', { } , context_instance=RequestContext(request))
+                return render_to_response('registration/edit_complete.html', { 'activation_key': activation_key} , context_instance=RequestContext(request))
         else:
             if profile.born_date:
                 mydate = profile.born_date.strftime('%d/%m/%Y')
@@ -70,7 +70,7 @@ def edit(request, activation_key=None):
             if activation_key:
                 init_dict.pop('username') #force users to choose a username
             form = EditFormSocio(initial=init_dict, request=request) #create empty form
-        return render_to_response('registration/edit.html', {'form': form} , context_instance=RequestContext(request))
+        return render_to_response('registration/edit.html', {'form': form, 'activation_key': activation_key} , context_instance=RequestContext(request))
 
     else: #user is not authenticated or no activation key is provided
         return HttpResponseRedirect("/accounts/login/")
