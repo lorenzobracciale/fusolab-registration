@@ -9,6 +9,7 @@ from datetime import datetime
 from bar.managers import * 
 from base.models import UserProfile
 from django.conf import settings
+import simplejson
 
 
 DATE_FORMAT = "%d-%m-%Y" 
@@ -30,6 +31,7 @@ class PurchasedProduct(models.Model):
     name = models.CharField("nome", max_length=30)
     cost = models.DecimalField("prezzo", max_digits=5, decimal_places=2)
     receipt = models.ForeignKey('Receipt')
+    
     def __unicode__(self):
         return self.name + " " + self.receipt.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
     class Meta:
@@ -47,7 +49,7 @@ class Receipt(models.Model):
 		return "#%d - %.2f EUR %s" % (self.id, self.total, self.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT)))
 
 	class Meta:
-		ordering = ['-date']
+		ordering = ['date']
 		verbose_name = "Scontrino"
 		verbose_name_plural = "Scontrini"
 
@@ -166,7 +168,7 @@ def get_bar_summary(closing):
             if transaction.subtype:
                 notes.append(" "+get_deposit_display(transaction.subtype))
             if transaction.note:
-                notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
+                notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
             else:
                 notes.append("\n")
         elif transaction.operation in [PAYMENT]:
@@ -180,12 +182,12 @@ def get_bar_summary(closing):
         elif transaction.operation in [WITHDRAW]:
             d['expected_balance']-=transaction.amount
             if transaction.note:
-                notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
+                notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
             else:
                 notes.append("\n")
         else:         
             if transaction.note:
-                notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
+                notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
            
 
     d['notes'] = notes
@@ -245,7 +247,7 @@ def get_small_summary(checkpoint):
                 if transaction.subtype:
                     notes.append(" "+get_deposit_display(transaction.subtype))
                 if transaction.note:
-                    notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
+                    notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
                 else:
                     notes.append("\n")
             elif transaction.operation in [PAYMENT]:
@@ -259,18 +261,18 @@ def get_small_summary(checkpoint):
             elif transaction.operation in [WITHDRAW]:
                 d['expected_balance']-=transaction.amount
                 if transaction.note:
-                    notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
+                    notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
                 else:
                     notes.append("\n")
             else:         
                 if transaction.note:
-                    notes.append(" "+transaction.note.replace("\r\n"," "+"\n"))
+                    notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
 
     d['notes'] = notes
     d['check'] = d['checkpoint'] - d['expected_checkpoint']
     if (d['check'] < - settings.MONEY_DELTA):
         d['warning'] = True
     return d    
-    
-    
+
+   
 import signals

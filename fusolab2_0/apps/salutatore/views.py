@@ -1,5 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, HttpResponseServerError
 from django.utils import simplejson
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
@@ -8,6 +10,7 @@ import os, mimetypes, urllib
 from ingresso.models import Card
 from salutatore.models import Greeting, ToBeSaid
 from sorl.thumbnail import get_thumbnail
+from base.utils import * 
 
 def salutatore(request, cardid=None, manual_speech=None):
     to_say, name = "", ""
@@ -61,13 +64,20 @@ def sentences_list(request):
             HttpResponseServerError("Malformed data!")
 
         if post_txt:
-            ToBeSaid(sentence=post_txt, user=request.user.get_profile()).save()
+            if is_polite(post_txt):
+                ToBeSaid(sentence=post_txt, user=request.user.get_profile()).save()
+            else:
+                raise ValidationError('Ti perdono, ma non lo posso scrivere!')
 
         return HttpResponse(str(request.raw_post_data))
     else:
-        qs = ToBeSaid.objects.all()[:5]
+        qs = ToBeSaid.objects.all().order_by("-created_on")[:5]
         mlist = []
-        for q in qs: 
-            im = get_thumbnail(q.user.photo, '50x50', crop='center', quality=99)
-            mlist.append({"id": q.id, "sender": q.user.user.username, "text": q.sentence, "image": im.url , "date": timesince.timesince(q.created_on)})
+        for q in reversed(qs): 
+            im_url = ""
+            if q.user.photo:
+                im_url = get_thumbnail(q.user.photo , '50x50', crop='center', quality=99).url 
+            else:
+                im_url = settings.STATIC_URL + "images/fusolab_unnamed_avatar.jpg" 
+            mlist.append({"id": q.id, "sender": q.user.user.username, "text": q.sentence, "image": im_url , "date": timesince.timesince(q.created_on)})
         return HttpResponse(json.dumps(mlist), content_type="application/json")

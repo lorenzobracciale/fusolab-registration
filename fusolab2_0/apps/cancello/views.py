@@ -15,6 +15,7 @@ def open_gate(request):
         MESSAGE = settings.OPEN_GATE_PW
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+        sock.close()
         return HttpResponse("Cancello Aperto")
     else:
         return HttpResponseForbidden("Non hai i permessi per aprire il cancello del fusolab. Fatti abilitare dal presidente!")
@@ -29,6 +30,7 @@ def open_door(request):
         MESSAGE = settings.OPEN_DOOR_PW
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+        sock.close()
         return HttpResponse("Porta Aperta")
     else:
         return HttpResponseForbidden("Non hai i permessi per aprire il cancello del fusolab. Fatti abilitare dal presidente!")

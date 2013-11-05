@@ -3,6 +3,7 @@
 
 {% load usertags %}
 {% load salutatoretags %}
+{% load baraledtags %}
 {% load ingressotags %}
 {% load thumbnail %}
 
@@ -15,47 +16,51 @@
         </div>
         <div class="row">
             <div class="col-md-8">
-                <section class="widget large">
+                <section class="widget">
                     <header>
                         <h4>
-                            <i class="eicon-chat"></i>
+                            <i class="icon-bullhorn"></i>
                             Frasi lette dal salutatore
                         </h4>
+                        <br/>
+                        <blockquote>Il salutatore e' quel simpatico pupazzo all'entrata del Fusolab. Scrivi una frase e lui la leggera' per te</blockquote>
                     </header>
                     <div class="body">
                         <div id="salutatore" class="salutatore chat">
                             <div id="salutatore-messages" class="chat-messages">
-                                {% last_sentences 5 as last_salutati_sentences %}
-                                {% for s in last_salutati_sentences %}
-                                <div class="chat-message">
-                                    <div class="sender pull-left">
-                                        <div class="icon">
-                                            {% thumbnail s.user.photo "50x50"  as im %}
-                                                <img class="img-circle" src="{{ im.url }}" />
-                                            {% empty %}
-                                                <img class="img-circle" src="{{ STATIC_URL }}images/fusolab_unnamed.jpg" />
-                                            {% endthumbnail %}
-                                        </div>
-                                        <div class="time">
-                                            {{ s.created_on|timesince }} 
-                                        </div>
-                                    </div>
-                                    <div class="chat-message-body">
-                                        <span class="arrow"></span>
-                                        <div class="sender"><a href="#">{{ s.user.user.username }}</a></div>
-                                        <div class="text">
-                                            {{ s.sentence }}
-                                        </div>
-                                    </div>
-                                </div>
-                                {% empty %}
-                                    Nessuna :-(
-                                {% endfor %}
+                                <!-- populated by salutatore.js -->
                             </div>
                             <footer class="chat-footer row">
                                 <form action="." method="post">
                                     <div class="col-xs-9">
                                         <input id="new-message" type="text" class="form-control input-transparent" placeholder="Scrivi una frase da far leggere al salutatore...">
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <button type="button" id="new-message-btn" class="btn btn-transparent btn-block">Invia</button>
+                                    </div>
+                                </form>
+                            </footer>
+                        </div>
+                    </div>
+                </section>
+                <section class="widget">
+                    <header>
+                        <h4>
+                            <i class="icon-barcode"></i>
+                                Bara Led 
+                        </h4>
+                        <br/>
+                        <blockquote>Scrivi qualcosa e comparira' sulla barra led all'ingresso del Fusolab</blockquote>
+                    </header>
+                    <div class="body">
+                        <div id="baraled" class="baraled chat">
+                            <div id="baraled-messages" class="chat-messages">
+                                <!-- populated by salutatore.js -->
+                            </div>
+                            <footer class="chat-footer row">
+                                <form action="" method="post">
+                                    <div class="col-xs-9">
+                                        <input id="new-message" type="text" class="form-control input-transparent" placeholder="Scrivi una frase da far comparire sulla barra led...">
                                     </div>
                                     <div class="col-xs-3">
                                         <button type="button" id="new-message-btn" class="btn btn-transparent btn-block">Invia</button>
@@ -151,7 +156,7 @@
                                     {% thumbnail u.get_profile.photo "50x50"  as im %}
                                         <img class="pull-left img-circle" src="{{ im.url }}" />
                                     {% empty %}
-                                        <img class="pull-left img-circle" src="{{ STATIC_URL }}images/fusolab_unnamed.jpg" />
+                                        <img class="pull-left img-circle" src="{{ STATIC_URL }}images/fusolab_unnamed_avatar.jpg" />
                                     {% endthumbnail %}
                                     <div class="user-info">
                                         <div class="name"><a href="#">{{u.first_name }}</a></div>
@@ -173,7 +178,7 @@
                                     {% thumbnail u.get_profile.photo "50x50"  as im %}
                                         <img class="pull-left img-circle" src="{{ im.url }}" />
                                     {% empty %}
-                                        <img class="pull-left img-circle" src="{{ STATIC_URL }}images/fusolab_unnamed.jpg" />
+                                        <img class="pull-left img-circle" src="{{ STATIC_URL }}images/fusolab_unnamed_avatar.jpg" />
                                     {% endthumbnail %}
                                     <div class="user-info">
                                         <div class="name"><a href="#">{{ u.first_name }}</a></div>
@@ -195,7 +200,7 @@
                                     {% thumbnail g.user.get_profile.photo "50x50"  as im %}
                                         <img class="pull-left img-circle" src="{{ im.url }}" />
                                     {% empty %}
-                                        <img class="pull-left img-circle" src="{{ STATIC_URL }}images/fusolab_unnamed.jpg" />
+                                        <img class="pull-left img-circle" src="{{ STATIC_URL }}images/fusolab_unnamed_avatar.jpg" />
                                     {% endthumbnail %}
                                     <div class="user-info">
                                         <div class="name"><a href="#">{{ g.user.user.first_name }}</a></div>
@@ -270,14 +275,38 @@
         </div>
     </div>
 
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                    <h4 class="modal-title" id="myModalLabel">Ti perdoniamo</h4>
+                </div>
+                <div class="modal-body">
+                    <h4>Ma non farlo piu'!</h4>
+                    <hr>
+                    <img id="ecce-homo" >
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Mi Pento!</button>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+
+
 {% endblock %}
 {% block 'page_scripts' %}
 <!-- page specific -->
 <script src="{{ STATIC_URL }}light-blue/js/index.js"></script>
 <!-- script src="{{ STATIC_URL }}light-blue/js/chat.js"></script -->
 <script src="{{ STATIC_URL }}/js/salutatore.js"></script>
+<script src="{{ STATIC_URL }}/js/baraled.js"></script>
 
 <script type="text/javascript"> 
+
 $('#color-bar-sotto').colorpicker().on('changeColor', function(ev){
         $("#color-holder-bar-sotto").css("backgroundColor", ev.color.toHex());
         var x = ev.color.toHex().substring(1);
@@ -304,17 +333,27 @@ $("#salutatore-messages").slimscroll({
     railVisible: true
 });
 
+$("#baraled-messages").slimscroll({
+    height: '240px',
+    size: '5px',
+    alwaysVisible: true,
+    railVisible: true
+});
 
-{% thumbnail request.user.photo "50x50"  as im %}
+
+
+{% thumbnail request.user.get_profile.photo "50x50"  as im %}
 var avatar_url = "{{ im.url }}";
 {% empty %}
 var avatar_url = "{{ STATIC_URL }}images/fusolab_unnamed_avatar.jpg";
 {% endthumbnail %}
+var myname = "{{ request.user.username }}";
 
 </script>
 
 
 <script type="text/template" id="message-template">
+    <div class="chat-message">
         <div class="sender pull-left">
             <div class="icon">
                 <img src="<%- image %>" class="img-circle" alt="">
@@ -325,11 +364,12 @@ var avatar_url = "{{ STATIC_URL }}images/fusolab_unnamed_avatar.jpg";
         </div>
         <div class="chat-message-body">
             <span class="arrow"></span>
-            <div class="sender"><%- sender %></div>
+            <div class="sender"><a href="#"><%- sender %></a></div>
             <div class="text">
                 <%- text %>
             </div>
         </div>
+    </div>
 </script>
 
 {% endblock %}

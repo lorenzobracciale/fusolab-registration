@@ -23,6 +23,7 @@ OPERATION_TYPES = (
 PAYMENT_SUBTYPES = (
     ('ar','artisti'),
     ('ba','barman'),
+    ('fo','fonico'),
     ('pu','pulizie'),
     ('va','varie')
 )   

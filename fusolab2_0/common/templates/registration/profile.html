@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+
+{% load thumbnail %}
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Modifica Profilo</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-7">
+            <section class="widget">
+                <header>
+                    <h4><i class="icon-user"></i> Il tuo profilo</h4>
+                </header>
+                <div class="body">
+                    <form enctype="multipart/form-data" id="user-form" class="form-horizontal label-left"
+                          novalidate="novalidate"
+                          method="post"
+                          data-validate="parsley">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-align-center">
+                                    <!-- img class="img-circle" src="{{ MEDIA_URL }}{{ request.user.get_profile.photo }}" alt="64x64" style="height: 112px;" -->
+                                    {% thumbnail request.user.get_profile.photo "112x112"  as im %}
+                                    <img class="img-circle" src="{{ im.url }}" alt="64x64" style="height: 112px;">
+                                    {% endthumbnail %}
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h3 class="no-margin">{{ request.user.username|capfirst }}</h3>
+                                <address>
+                                    <strong>{{ request.user.first_name }} {{ request.user.first_name }}</strong> <br>
+                                    <abbr title="email">e-mail:</abbr> <a href="mailto:{{ request.user.email }}">{{ request.user.email }}</a><br>
+                                    {% for card in request.user.get_profile.card_set.all %}
+                                    <abbr title="email">Tessera Fusolab:</abbr> <span>{{ card.sn }}</span><br>
+                                    {% empty %}
+                                    <p>Non hai tessere registrate</p><br>
+                                    {% endfor %}
+                                </address>
+                            </div>
+                        </div>
+
+                        <fieldset>
+                            {% if activation_key %}
+                            <legend>Ci siamo quasi... <small> meno di un minuto</small></legend>
+                                <p>Ci servono alcuni tuoi dati per completare l'attivazione. Una volta fatta potrai accedere tramite questo sito ed interagire con persone e cose all'interno del FusoLab.</p>
+                            {% else %}
+                            <legend>Presentati <small>Dicci qualcosa di te...</small></legend>
+                            {% endif %}
+                        </fieldset>
+
+                        <fieldset>
+                            <legend class="section">Dati Personali</legend>
+                            {% csrf_token %}
+                            {{ form.non_field_errors }}
+
+                            <div class="control-group">
+                                <label class="control-label" for="normal-field">{{ form.first_name.label }}
+                                    {% if form.first_name.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                    <input type="text" id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.html_name }}" value="{{ form.first_name.value |default_if_none:""  }}" class="form-control parsley-validated {% if form.first_name.errors %}parsley-error{% endif %}" placeholder="Nome" data-trigger="change" data-minlength="3" {% if form.first_name.field.required %}required="required"{% endif %}>
+                                    {% if form.first_name.errors %}
+                                    <ul class="parsley-error-list" style="display: block;">
+                                        <li class="type" style="display: list-item;">{{ form.first_name.errors.as_text }}</li>
+                                    </ul>
+                                    {% endif %} 
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="normal-field">{{ form.last_name.label }}
+                                    {% if form.last_name.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                    <input type="text" id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.html_name }}" value="{{ form.last_name.value |default_if_none:"" }}" class="form-control parsley-validated {% if form.last_name.errors %}parsley-error{% endif %}" placeholder="Cognome" data-trigger="change" data-minlength="3" {% if form.last_name.field.required %}required="required"{% endif %}>
+                                    {% if form.last_name.errors %}
+                                    <ul class="parsley-error-list" style="display: block;">
+                                        <li class="type" style="display: list-item;">{{ form.last_name.errors.as_text }}</li>
+                                    </ul>
+                                    {% endif %} 
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="normal-field">{{ form.born_date.label }}
+                                    {% if form.born_date.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                        <input type="text" id="{{ form.born_date.id_for_label }}" name="{{ form.born_date.html_name }}" value="{{ form.born_date.value |default_if_none:"" }}" class="form-control date-picker parsley-validated {% if form.born_date.errors %}parsley-error{% endif %}" placeholder="Ad es. 31/01/1987" pattern="[0-9]{2}\/[0-9]{2}\/[0-9]{4}" data-trigger="change" {% if form.born_date.field.required %}required="required"{% endif %} readonly="" data-date-minviewmode="days" data-date-viewmode="years" data-date-format="dd/mm/yyyy">
+                                    {% if form.born_date.errors %}
+                                    <ul class="parsley-error-list" style="display: block;">
+                                        <li class="type" style="display: list-item;">{{ form.born_date.errors.as_text }}</li>
+                                    </ul>
+                                    {% endif %} 
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="normal-field">{{ form.born_place.label }}
+                                    {% if form.born_place.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                    <input type="text" id="{{ form.born_place.id_for_label }}" name="{{ form.born_place.html_name }}" value="{{ form.born_place.value |default_if_none:"" }}" class="form-control parsley-validated {% if form.born_place.errors %}parsley-error{% endif %}" placeholder="Dove sei nato" data-trigger="change" data-minlength="3" {% if form.born_place.field.required %}required="required"{% endif %}>
+                                    {% if form.born_place.errors %}
+                                    <ul class="parsley-error-list" style="display: block;">
+                                        <li class="type" style="display: list-item;">{{ form.born_place.errors.as_text }}</li>
+                                    </ul>
+                                    {% endif %} 
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}
+                                    {% if form.email.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                    <input type="email" id="{{ form.email.id_for_label }}" name="{{ form.email.html_name }}" value="{{ form.email.value |default_if_none:"" }}" class="form-control parsley-validated {% if form.email.errors %}parsley-error{% endif %}" data-trigger="change" data-validation-minlength="5" placeholder="La tua email" {% if form.email.field.required %}required="required"{% endif %}>
+                                    {% if form.email.errors %}
+                                    <ul class="parsley-error-list" style="display: block;">
+                                        <li class="type" style="display: list-item;">{{ form.email.errors.as_text }}</li>
+                                    </ul>
+                                    {% endif %} 
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="{{ form.doc_id.id_for_label }}" class="control-label">{{ form.doc_id.label }}
+                                    {% if form.doc_id.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                    <div class="input-group">
+                                        <input id="{{ form.doc_id.id_for_label }}" class="form-control  mask"
+                                            {% if form.doc_id.field.required %}required="required"{% endif %} type="text"
+                                            name="{{ form.doc_id.html_name }}" value="{{ form.doc_id.value|default_if_none:"" }}" maxlength="28" class="form-control parsley-validated {% if form.doc_id.errors %}parsley-error{% endif %}" data-trigger="change" data-validation-minlength="5" placeholder="Numero documento" required="required">
+                                        <span class="input-group-btn">
+                                            <select id="{{ form.doc_type.id_for_label }}" name="{{ form.doc_type.html_name }}" class="selectpicker" data-style="btn-default">
+                                                {% for x,y in form.fields.doc_type.choices %}
+                                                    <option value="{{ x }}">{{ y }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </span>
+                                        {% if form.doc_id.errors or form.doc_type.errors %}
+                                        <ul class="parsley-error-list" style="display: block;">
+                                            {% if form.doc_id.errors %}
+                                            <li class="type" style="display: list-item;">{{ form.doc_id.errors.as_text }}</li>
+                                            {% endif %}
+                                            {% if form.doc_type.errors %}
+                                            <li class="type" style="display: list-item;">{{ form.doc_type.errors.as_text }}</li>
+                                            {% endif %}
+                                        </ul>
+                                        {% endif %} 
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="{{ form.photo.id_for_label }}">{{ form.photo.label }} {% if form.photo.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                    <div class="input-group">
+                                        <div style="height: 0px;width:0px; overflow:hidden;">
+                                            <input id="{{ form.photo.id_for_label }}" type="file" {% if form.photo.field.required %}required="required"{% endif %} class="form-control" name="{{ form.photo.html_name }}" value="{{ form.photo.value|default_if_none:"" }}" placeholder="Scegli una foto (possibilmente 200x200 pixel)">
+                                        </div>
+                                        <input type="text" id="photo-path-display" class="form-control" disabled="disabled" placeholder="Scegli una foto (possibilmente 200x200 pixel)" value="{{ form.photo.value|default_if_none:"" }}">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-success" type="button" id="photo-loader">Carica una foto</button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="{{ form.how_hear.id_for_label }}">{{ form.how_hear.label }} {% if form.how_hear.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                    <textarea cols="40" rows="10" id="{{ form.how_hear.id_for_label }}" name="{{ form.how_hear.html_name }}" {% if form.how_hear.field.required %}required="required" {% endif %} class="col-xs-12" placeholder="da blog, giornali, facebook, passaparola o altro?" >{{ form.how_hear.value | default_if_none:"" }}</textarea>
+                                        {% if form.how_hear.errors %}
+                                        <ul class="parsley-error-list" style="display: block;">
+                                            <li class="type" style="display: list-item;">{{ form.how_hear.errors.as_text }}</li>
+                                        </ul>
+                                        {% endif %} 
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend class="section">Credenziali di accesso </legend>
+                            <div class="control-group">
+                                <label class="control-label" for="{{ form.username.id_for_label }}">{{ form.username.label }}
+                                    {% if form.username.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="icon-user"></i></span>
+                                        <input type="text" id="{{ form.username.id_for_label }}" name="{{ form.username.html_name }}" {% if form.username.field.required %}required="required" {% endif %} value="{{ form.username.value | default_if_none:"" }}" class="col-xs-12 form-control parsley-validated" data-trigger="change" data-validation-minlength="5" placeholder="Username" >
+                                    </div>
+                                        {% if form.username.errors %}
+                                        <ul class="parsley-error-list" style="display: block;">
+                                            <li class="type" style="display: list-item;">{{ form.username.errors.as_text }}</li>
+                                        </ul>
+                                        {% endif %} 
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="{{ form.password1.id_for_label }}">{{ form.password1.label }} {% if form.password1.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="icon-lock"></i></span>
+                                        <input type="password" id="{{ form.password1.id_for_label }}" name="{{ form.password1.html_name }}" {% if form.password1.field.required %}required="required" {% endif %} class="col-xs-12 form-control parsley-validated" data-trigger="change" data-validation-minlength="5" placeholder="Password (se è la prima volta o se la vuoi cambiare)">
+                                    </div>
+                                        {% if form.password1.errors %}
+                                        <ul class="parsley-error-list" style="display: block;">
+                                            <li class="type" style="display: list-item;">{{ form.password1.errors.as_text }}</li>
+                                        </ul>
+                                        {% endif %} 
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="{{ form.password2.id_for_label }}">{{ form.password2.label }} {% if form.password2.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="icon-lock"></i></span>
+                                        <input type="password" id="{{ form.password2.id_for_label }}" name="{{ form.password2.html_name }}" {% if form.password2.field.required %}required="required" {% endif %} class="col-xs-12 form-control parsley-validated" data-trigger="change" data-validation-minlength="5" placeholder="Ripeti la password" >
+                                    </div>
+                                        {% if form.password2.errors %}
+                                        <ul class="parsley-error-list" style="display: block;">
+                                            <li class="type" style="display: list-item;">{{ form.password2.errors.as_text }}</li>
+                                        </ul>
+                                        {% endif %} 
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend class="section">Fatti salutare!</legend>
+                            <p>Quando vieni al Fusolab avvicina la tessera a Salvo il Salutatore per farti salutare come più ti piace</p>
+                            <div class="control-group">
+                                <label class="control-label" for="{{ form.salutatore.id_for_label }}">{{ form.salutatore.label }} {% if form.salutatore.field.required %}<span class="required">*</span>{% endif %}</label>
+                                <div class="controls form-group">
+                                    <textarea cols="40" rows="10" id="{{ form.salutatore.id_for_label }}" name="{{ form.salutatore.html_name }}" {% if form.salutatore.field.required %}required="required" {% endif %} class="col-xs-12" placeholder="as es. Ciao {{ request.user.first_name }} batti il cinque!" >{{ form.salutatore.value | default_if_none:"" }}</textarea>
+                                        {% if form.salutatore.errors %}
+                                        <ul class="parsley-error-list" style="display: block;">
+                                            <li class="type" style="display: list-item;">{{ form.salutatore.errors.as_text }}</li>
+                                        </ul>
+                                        {% endif %} 
+                                </div>
+                            </div>
+
+
+                        </fieldset>
+                        <div>
+                            <button type="submit" class="btn btn-primary btn-block btn-lg">Salva</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+
+          <div class="col-md-5">
+            <section class="widget">
+                <header>
+                    <h4><i class="icon-question-sign"></i> Perchè ?</h4>
+                </header>
+                <div class="body">
+                    <p>Il fusolab è una associazione di promozione sociale e come tutte le associazioni in italia è obbligata per legge richiederti alcuni dati.</p>
+                    <p>Inoltre impostando una tua username/password potrai, attraverso questo sito, interagire con altre persone (o cose) del Fusolab!</p>
+                </div>
+            </section>
+        </div>
+ 
+    </div>
+</div>
+
+{% endblock %}
+
+{% block 'page_scripts' %}
+<!-- page specific -->
+<script src="{{ STATIC_URL }}light-blue/js/forms.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(document).on('click', '#photo-loader', function() {
+            document.getElementById("{{ form.photo.id_for_label }}").click();
+        });
+
+        $(document).on('change', '#{{ form.photo.id_for_label }}', function () {
+            if ($("#{{ form.photo.id_for_label }}").val() == "") {
+                return;
+            }
+            // get the inputs value
+            var fileInputContent = $("#{{ form.photo.id_for_label }}").val().replace("C:\\fakepath\\", "");;
+            // reset the field
+            $("#photo-path-display").val(fileInputContent);
+
+        });
+    });
+</script>
+{% endblock %}
+
+

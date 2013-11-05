@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+
+
+{% block nav-stats %}
+<li class="panel">
+    <a class="accordion-toggle" data-toggle="collapse"
+        data-parent="#side-nav" href="#forms-stat-collapse"><i class="icon-bar-chart"></i> <span class="name">Statistiche</span></a>
+    <ul id="forms-stat-collapse" class="panel-collapse open in">
+        <li class="active"><a href="{% url 'reports_daily_stats' %}">Statistiche serata</a></li>
+        <li><a href="{% url 'reports_make_balance' %}">Bilancio</a></li>
+    </ul>
+</li>
+{% endblock %}
+
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Statistiche</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 col-sm-6">
+            <section class="widget large">
+                <header>
+                    <h4><i class="icon-bar-chart"></i> Incassi<small class="hidden-xs">Riepilogo serata</small></h4>
+                </header>
+                <div class="body">
+                    <div id="sources-chart-pie" class="chart pie-chart">
+                        <svg></svg>
+                    </div>
+                </div>
+                <footer id="data-chart-footer" class="pie-chart-footer">
+                </footer>
+            </section>
+        </div>
+        <div class="col-md-9 col-sm-6">
+            <section class="widget large">
+                <header>
+                    <h4><i class="icon-glass"></i> Consumazioni Bar</h4>
+                </header>
+                <div id="sources-chart-stacked" class="body chart">
+                    <svg></svg>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 col-sm-6">
+            <section class="widget large">
+                <header>
+                    <h4><i class="icon-retweet"></i> Cambia Serata</h4>
+                </header>
+                <form method="post" id="change-date">
+                    <fieldset>
+                        <br/>
+                        <blockquote>Vuoi vedere l'andamento di un'altra serata?</blockquote>
+                        <div class="row"><div class="col-sm-8">
+                            <div class="control-group">
+                                <label for="btn-enabled-date" class="control-label">Seleziona una data</label>
+
+                                <div class="input-group">
+                                    <input id="btn-enabled-date" class="form-control" type="text" name="btn-enabled-date" value="">
+
+                                <span class="input-group-btn"><a href="#" id="btn-select-calendar" class="btn btn-danger"
+                                                                 data-date-format="yyyy/mm/dd" data-date="2013/02/25">
+                                    <i class="icon-calendar"></i>
+                                </a></span>
+                                </div>
+
+                            </div>
+                        </div></div>
+                    </fieldset>
+                    <div class="form-actions">
+                        <div>
+                            <button type="submit" class="btn btn-primary">Vai</button>
+                            <button type="button" class="btn btn-default">Annulla</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </div>
+        <div class="col-md-9 col-sm-6">
+            <section class="widget large">
+                <header>
+                    <h4><i class="icon-group"></i> Entrata</h4>
+                </header>
+                <div id="sources-chart-line" class="body chart">
+                    <svg></svg>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block 'page_scripts' %}
+<script type="text/javascript">
+
+var url_bar_product = "http://soci.fusolab.net/reports/get_daily_stats.json";
+var url_total_income = "TODO";
+var url_entrance = "TODO";
+
+var lineResize;
+function lineChartOperaHack(){
+    //lineChart is somehow not rendered correctly after updates. Need to reupdate
+    if ($.browser.opera){
+        clearTimeout(lineResize);
+        lineResize = setTimeout(lineChart.update, 300);
+    }
+}
+
+
+var testData = testData(['Entrate', 'Bar',],25),// just 25 points, since there are lots of charts
+    pieSelect = d3.select("#sources-chart-pie"),
+    pieFooter = d3.select("#data-chart-footer"),
+    stackedChart,
+    lineChart,
+    pieChart;
+//    barChart;
+
+//sources-chart-stacked
+// grafico consumazioni bar
+d3.json(url_bar_product, function(data){
+    nv.addGraph(function() {
+        var chart = nv.models.stackedAreaChart()
+            .x(function(d) { return d[0] })
+            .y(function(d) { return d[1] })
+            .clipEdge(true)
+            .margin({left: 0})
+            .color(keyColor)
+            .showControls(false)
+            .showLegend(true)
+            .style("stacked")
+            .controlsColor([$textColor, $textColor, $textColor]);
+
+      chart.xAxis
+        .showMaxMin(false)
+        .tickFormat(function(d) { return d3.time.format('%x')(new Date(d)) });
+        //.tickFormat(function(d) { return d3.time.format('%H:%M')(new Date(d)) });
+
+
+      chart.yAxis
+          .showMaxMin(true)
+          .orient("right")
+          .tickFormat(d3.format(',.1f'));
+
+        d3.select("#sources-chart-stacked svg")
+            .datum(data)
+            .transition().duration(500).call(chart);
+        nv.utils.windowResize(chart.update);
+
+        stackedChart = chart;
+
+        return chart;
+    });
+});
+
+
+function pieChartUpdate(d){
+    d.disabled = !d.disabled;
+    d3.select(this)
+        .classed("disabled", d.disabled);
+    if (!pieChart.pie.values()(testData).filter(function(d) { return !d.disabled }).length) {
+        pieChart.pie.values()(testData).map(function(d) {
+            d.disabled = false;
+            return d;
+        });
+        pieFooter.selectAll('.control').classed('disabled', false);
+    }
+    d3.select("#sources-chart-pie svg").transition().call(pieChart);
+}
+
+//sources-chart-pie
+//grafico totale incassi
+d3.json(url_total_income, function(data){
+    nv.addGraph(function() {
+
+        /*
+         * we need to display total amount of visits for some period
+         * calculating it
+         * pie chart uses y-property by default, so setting sum there.
+         */
+        for (var i = 0; i < testData.length; i++){
+            testData[i].y = Math.floor(d3.sum(testData[i].values, function(d){
+                return d.y;
+            }))
+        }
+
+        var chart = nv.models.pieChartTotal()
+            .x(function(d) {return d.key })
+            .margin({top: 0, right: 20, bottom: 20, left: 20})
+            .values(function(d) {return d })
+            .color(COLOR_VALUES)
+            .showLabels(false)
+            .showLegend(false)
+            .tooltipContent(function(key, y, e, graph) {
+                return '<h4>' + key + '</h4>' +
+                    '<p>' +  y + '</p>'
+            })
+            .total(function(count){
+                return "<div class='visits'>" + count + "<br/> &euro;</div>"
+            })
+            .donut(true);
+        chart.pie.margin({top: 10, bottom: -20});
+
+        var sum = d3.sum(testData, function(d){
+            return d.y;
+        });
+        pieFooter
+            .append("div")
+            .classed("controls", true)
+            .selectAll("div")
+            .data(testData)
+            .enter().append("div")
+            .classed("control", true)
+            .style("border-top", function(d, i){
+                return "3px solid " + COLOR_VALUES[i];
+            })
+            .html(function(d) {
+                return "<div class='key'>" + d.key + "</div>"
+                    + "<div class='value'>" + Math.floor(100 * d.y / sum) + "%</div>";
+            })
+            .on('click', function(d) {
+                pieChartUpdate.apply(this, [d]);
+                setTimeout(function() {
+                    stackedChart.update();
+                    lineChart.update();
+                    barChart.update();
+                    lineChartOperaHack();
+                }, 100);
+            });
+
+        d3.select("#sources-chart-pie svg")
+            .datum([testData])
+            .transition(500).call(chart);
+        nv.utils.windowResize(chart.update);
+
+        pieChart = chart;
+
+        return chart;
+    });
+});
+
+
+//sources-chart-line
+d3.json(url_entrance, function(data){
+    nv.addGraph(function() {
+        var chart = nv.models.lineChart()
+            .margin({top: 0, bottom: 25, left: 30, right: 0})
+            .showLegend(false)
+            .color(keyColor);
+
+        chart.yAxis
+            .showMaxMin(false)
+            .tickFormat(d3.format(',.f'));
+
+        chart.xAxis
+            .showMaxMin(false)
+            .tickFormat(function(d) { return d3.time.format('%b %d')(new Date(d)) });
+
+        //just to make it look different
+        //data[0].area = true;
+        //data[3].area = true;
+
+        d3.select('#sources-chart-line svg')
+            //.datum(sinAndCos())
+            .datum(testData)
+            .transition().duration(500)
+            .call(chart);
+
+        nv.utils.windowResize(chart.update);
+        lineChart = chart;
+
+        lineChartOperaHack();
+
+        return chart;
+    });
+});
+
+$(document).ready(function() {
+    $('.date-picker').datepicker( {
+        changeMonth: true,
+        changeYear: true,
+        showButtonPanel: true,
+        autoclose: true,
+        onClose: function(dateText, inst) { 
+        },
+    }).on('changeDate', function(e) {
+        $(this).datepicker('hide');    
+    });
+
+    $('.btn-select-calendar').on('click', function(e) {
+        var dateInput = $(this).parent().parent().find('input.date-picker');
+        dateInput.datepicker('show');
+    });
+    $('#change-date').submit(function() {
+        var new_date = $('#new-date').val();    
+        /*
+
+        //change the urls
+
+        url_bar_product = "TODO";
+        url_total_income = "TODO";
+        url_entrance = "TODO";
+
+        // update all the graphs
+        stackedChart.update();
+        lineChart.update();
+        barChart.update();
+        lineChartOperaHack();
+
+        */
+
+        return false;
+    });
+});
+
+
+</script>
+{% endblock %}
+

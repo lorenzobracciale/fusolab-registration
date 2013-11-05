@@ -8,7 +8,6 @@ urlpatterns = patterns('',
     url(r'^index.html$', 'base.views.home'),
     url(r'^tuttoapposto/(?P<next_page>\S+)$', 'base.views.tuttoapposto', name='tuttoapposto'),
     url(r'^regolamento/$', TemplateView.as_view(template_name='regolamento.html'), name='base_regolamento'),
-
     url(r'^disponibilita/$', TemplateView.as_view(template_name='base/disponibilita.html'), name='base_disponibilita'),
     url(r'^turni/$', TemplateView.as_view(template_name='base/turni.html'), name='base_turni'),
 )
