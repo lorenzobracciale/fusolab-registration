@@ -27,12 +27,10 @@ def send_ledbar_cmd(sender, instance, **kwargs):
     '''
     After being saved, each LedString sends an UPD message to the Arduino that controls the led bar
     '''
-    BARALED_IP = settings.IP_OPENER
-    BARALED_PORT = settings.PORT_OPENER
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(instance.coded_sentence, (BARALED_IP, BARALED_PORT))
+    sock.sendto("baraled:" + instance.coded_sentence, (settings.BARALED_IP, settings.BARALED_PORT))
     sock.close()
 
 
-post_save.connect(send_ledbar_cmd, sender=LedString, dispatch_uid="send_ledbar_cmd")
+post_save.connect(send_ledbar_cmd, sender=LedString)
 

@@ -32,8 +32,8 @@
                         <svg></svg>
                     </div>
                 </div>
-                <footer id="data-chart-footer" class="pie-chart-footer">
-                </footer>
+                <!--footer id="data-chart-footer" class="pie-chart-footer">
+                </footer-->
             </section>
         </div>
         <div class="col-md-9 col-sm-6">
@@ -99,11 +99,12 @@
 {% block 'page_scripts' %}
 <script type="text/javascript">
 
-var url_bar_product = "http://soci.fusolab.net/reports/get_daily_stats.json";
-var url_total_income = "TODO";
-var url_entrance = "TODO";
+var url_bar_product = "http://soci.fusolab.net/reports/2013/10/25/bar.json";
+var url_total_income = "http://soci.fusolab.net/reports/2013/10/25/total.json";
+var url_entrance = "http://soci.fusolab.net/reports/2013/10/25/ingresso.json";
 
 var lineResize;
+
 function lineChartOperaHack(){
     //lineChart is somehow not rendered correctly after updates. Need to reupdate
     if ($.browser.opera){
@@ -113,10 +114,10 @@ function lineChartOperaHack(){
 }
 
 
-var testData = testData(['Entrate', 'Bar',],25),// just 25 points, since there are lots of charts
-    pieSelect = d3.select("#sources-chart-pie"),
-    pieFooter = d3.select("#data-chart-footer"),
-    stackedChart,
+// var testData = testData(['Entrate', 'Bar',],25),// just 25 points, since there are lots of charts
+//     pieSelect = d3.select("#sources-chart-pie"),
+//    pieFooter = d3.select("#data-chart-footer"),
+var    stackedChart,
     lineChart,
     pieChart;
 //    barChart;
@@ -150,6 +151,7 @@ d3.json(url_bar_product, function(data){
         d3.select("#sources-chart-stacked svg")
             .datum(data)
             .transition().duration(500).call(chart);
+            
         nv.utils.windowResize(chart.update);
 
         stackedChart = chart;
@@ -159,96 +161,76 @@ d3.json(url_bar_product, function(data){
 });
 
 
-function pieChartUpdate(d){
-    d.disabled = !d.disabled;
-    d3.select(this)
-        .classed("disabled", d.disabled);
-    if (!pieChart.pie.values()(testData).filter(function(d) { return !d.disabled }).length) {
-        pieChart.pie.values()(testData).map(function(d) {
-            d.disabled = false;
-            return d;
-        });
-        pieFooter.selectAll('.control').classed('disabled', false);
-    }
-    d3.select("#sources-chart-pie svg").transition().call(pieChart);
-}
+// function pieChartUpdate(d){
+//     d.disabled = !d.disabled;
+//     d3.select(this)
+//         .classed("disabled", d.disabled);
+//     if (!pieChart.pie.values()(data).filter(function(d) { return !d.disabled }).length) {
+//         pieChart.pie.values()(data).map(function(d) {
+//             d.disabled = false;
+//             return d;
+//         });
+//         pieFooter.selectAll('.control').classed('disabled', false);
+//     }
+//     d3.select("#sources-chart-pie svg").transition().call(pieChart);
+// }
 
-//sources-chart-pie
 //grafico totale incassi
-d3.json(url_total_income, function(data){
-    nv.addGraph(function() {
-
-        /*
-         * we need to display total amount of visits for some period
-         * calculating it
-         * pie chart uses y-property by default, so setting sum there.
-         */
-        for (var i = 0; i < testData.length; i++){
-            testData[i].y = Math.floor(d3.sum(testData[i].values, function(d){
-                return d.y;
-            }))
-        }
-
-        var chart = nv.models.pieChartTotal()
-            .x(function(d) {return d.key })
-            .margin({top: 0, right: 20, bottom: 20, left: 20})
-            .values(function(d) {return d })
-            .color(COLOR_VALUES)
-            .showLabels(false)
-            .showLegend(false)
-            .tooltipContent(function(key, y, e, graph) {
-                return '<h4>' + key + '</h4>' +
-                    '<p>' +  y + '</p>'
-            })
-            .total(function(count){
-                return "<div class='visits'>" + count + "<br/> &euro;</div>"
-            })
-            .donut(true);
-        chart.pie.margin({top: 10, bottom: -20});
-
-        var sum = d3.sum(testData, function(d){
-            return d.y;
-        });
-        pieFooter
-            .append("div")
-            .classed("controls", true)
-            .selectAll("div")
-            .data(testData)
-            .enter().append("div")
-            .classed("control", true)
-            .style("border-top", function(d, i){
-                return "3px solid " + COLOR_VALUES[i];
-            })
-            .html(function(d) {
-                return "<div class='key'>" + d.key + "</div>"
-                    + "<div class='value'>" + Math.floor(100 * d.y / sum) + "%</div>";
-            })
-            .on('click', function(d) {
-                pieChartUpdate.apply(this, [d]);
-                setTimeout(function() {
-                    stackedChart.update();
-                    lineChart.update();
-                    barChart.update();
-                    lineChartOperaHack();
-                }, 100);
-            });
-
-        d3.select("#sources-chart-pie svg")
-            .datum([testData])
-            .transition(500).call(chart);
-        nv.utils.windowResize(chart.update);
-
-        pieChart = chart;
-
-        return chart;
-    });
-});
-
+// d3.json(url_total_income, function(data){
+// 
+//     nv.addGraph(function() {   
+//       
+//           var chart = nv.models.pieChart()
+//             .x(function(d) { return d.label })
+//             .y(function(d) { return d.value })
+//             .margin({top: 0, right: 20, bottom: 20, left: 20})
+//             .showLabels(true)
+//             .color(COLOR_VALUES)
+//             .donut(true);
+//         
+//         
+// //         pieFooter
+// //             .append("div")
+// //             .classed("controls", true)
+// //             .selectAll("div")
+// //             .data(data)
+// //             .enter().append("div")
+// //             .classed("control", true)
+// //             .style("border-top", function(d, i){
+// //                 return "3px solid " + COLOR_VALUES[i];
+// //             })
+// //             .html(function(d) {
+// //                 return "<div class='key'>" + d.key + "</div>"
+// //                     + "<div class='value'>" + d.value + "%</div>";
+// //             })
+// //             .on('click', function(d) {
+// //                 pieChartUpdate.apply(this, [d]);
+// //                 setTimeout(function() {
+// //                     stackedChart.update();
+// //                     lineChart.update();
+// //                     barChart.update();
+// //                     lineChartOperaHack();
+// //                 }, 100);
+// //             });
+// 
+//         d3.select("#sources-chart-pie svg")
+//             .datum(data)
+//             .transition(500).call(chart);
+//             
+//         nv.utils.windowResize(chart.update);
+// 
+//         pieChart = chart;
+// 
+//         return chart;
+//     });
+// });
 
 //sources-chart-line
 d3.json(url_entrance, function(data){
     nv.addGraph(function() {
         var chart = nv.models.lineChart()
+            .x(function(d) { return d[0] })
+            .y(function(d) { return d[1] })
             .margin({top: 0, bottom: 25, left: 30, right: 0})
             .showLegend(false)
             .color(keyColor);
@@ -267,7 +249,7 @@ d3.json(url_entrance, function(data){
 
         d3.select('#sources-chart-line svg')
             //.datum(sinAndCos())
-            .datum(testData)
+            .datum(data)
             .transition().duration(500)
             .call(chart);
 
@@ -277,7 +259,7 @@ d3.json(url_entrance, function(data){
         lineChartOperaHack();
 
         return chart;
-    });
+    });   
 });
 
 $(document).ready(function() {

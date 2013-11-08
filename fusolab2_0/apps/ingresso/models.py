@@ -64,7 +64,7 @@ def get_entrance_summary(closing):
     
     notes.append("apertura "+ str(closing.parent.amount))
     if closing.parent.note:
-        notes.append(closing.parent.note.replace("\r\n"," ")+"\n")
+        notes.append(" "+closing.parent.note.replace("\r\n"," ")+"\n")
     else:
         notes.append("\n")
 

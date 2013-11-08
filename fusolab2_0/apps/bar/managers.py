@@ -34,11 +34,11 @@ DEPOSIT_SUBTYPES = (
 
 def get_payment_display(key):
     d = dict(PAYMENT_SUBTYPES)
-    return d[key] if key in d else None
+    return d[key] if key in d else ""
         
 def get_deposit_display(key):
     d = dict(DEPOSIT_SUBTYPES)
-    return d[key] if key in d else None
+    return d[key] if key in d else ""
 
 class BalanceManager(models.Manager):
 
@@ -48,7 +48,7 @@ class BalanceManager(models.Manager):
         except ObjectDoesNotExist:
             return False
 
-    def get_parent_t(self, current_time):
+    def get_parent_t(self, current_time=datetime.now):
         try:
             return super(BalanceManager, self).get_query_set().filter(Q(operation__in=[OPENING,CASHPOINT]) & Q(date__lt=current_time)).latest('date')
         except ObjectDoesNotExist:

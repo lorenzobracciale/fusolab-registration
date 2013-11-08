@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import Count
 from bar.models import * 
+from ingresso.models import *
 from django.conf import settings
 from django.utils import simplejson
 from decimal import Decimal
@@ -27,36 +28,69 @@ class FuckYeahEncoder(simplejson.JSONEncoder):
         return simplejson.JSONEncoder.default(self, obj)
 
 @staff_member_required
-def get_bar_stats(request):
+def get_stats(request,what,yyyy=None,mm=None,dd=None):
     
+    start_time = BarBalance.objects.get_parent_t()
+    end_time = datetime.now()
+    if all((yyyy,mm,dd)):
+        end_time = datetime(int(yyyy),int(mm),int(dd)+1,12,00,00)
+        start_time = datetime(int(yyyy),int(mm),int(dd),12,00,00)
 
-    end_time = datetime(2013,10,26,00,00,00)
-    start_time = datetime(2013,10,24,00,00,00)
-    
-    data = []
-    series = {}
-    counter = {}
-    products = Product.objects.all()
-    
-    #initialize counter and data series dicts
-    for pa in products:
-        counter[pa.name] = 0
-        series[pa.name] = []
-    
-    #fill data series dict
-    for r in Receipt.objects.receipts_between(start_time,end_time):
-        for pp in PurchasedProduct.objects.filter(receipt=r):
-            counter[pp.name]+=1
-        for pb in products:
-            series[pb.name].append( [ int(r.date.strftime('%s')+'000') , counter[pb.name] * pb.cost ] )
-#            series[pb.name].append( [ r.date , counter[pb.name] * pb.cost ] )
-    
-    #build return list of dicts
-    for pc in products:
-        data.append( {"key" : pc.name.encode('utf-8') , "values" : series[pc.name] } )
+    data = []    
+   
+    if what == "bar":
+        
+        series = {}
+        counter = {}
+        products = Product.objects.all()
 
-    buffer = simplejson.dumps( data, cls=FuckYeahEncoder )
-    return HttpResponse(buffer, mimetype = "application/json" )
+        #initialize counter and data series dicts
+        for pa in products:
+            counter[pa.name] = 0
+            series[pa.name] = []
+    
+        #fill data series dict
+        for r in Receipt.objects.receipts_between(start_time,end_time):
+            for pp in PurchasedProduct.objects.filter(receipt=r):
+                counter[pp.name]+=1
+            for pb in products:
+                series[pb.name].append( [ int(r.date.strftime('%s')+'000') , counter[pb.name] * pb.cost ] )
+    
+        #build return list of dicts
+        for pc in products:
+            data.append( {"key" : pc.name.encode('utf-8') , "values" : series[pc.name] } )
+
+        buffer = simplejson.dumps( data, cls=FuckYeahEncoder )
+        return HttpResponse(buffer, mimetype = "application/json" )
+        
+    if what == "ingresso":
+        
+        counter_serie = []
+        counter = 0
+        amount_serie = [ ]
+        amount = 0
+        
+        for e in Entrance.objects.filter(date__range=[start_time,end_time]):
+            counter += 1
+            counter_serie.append( [ int(e.date.strftime('%s')+'000') , counter ] )
+            amount_serie.append( [ int(e.date.strftime('%s')+'000') , e.cost ] )
+        
+        data.append( {"key" : "Euro" ,"bar": true, "values" : amount_serie } )
+        data.append( {"key" : "Numerico" , "values" : counter_serie } )
+         
+        buffer = simplejson.dumps( data, cls=FuckYeahEncoder )
+        return HttpResponse(buffer, mimetype = "application/json" )
+    
+    if what == "total":
+        
+        values = []
+        values.append( {"label": "Bar", "value" : Receipt.objects.total_between(start_time,end_time)})
+        values.append( {"label": "Ingresso", "value" : Entrance.objects.total_between(start_time,end_time)})
+        data = { "key" : "Cumulative Return" , "values" : values }
+        buffer = simplejson.dumps( data, cls=FuckYeahEncoder )
+        return HttpResponse(buffer, mimetype = "application/json" )       
+    else:
+        raise Http404
 
 # @staff_member_required
 # def stats(request):
