@@ -20,7 +20,7 @@ def entrance_handler(sender, **kwargs):
         d = get_entrance_summary(saved_balance)
         if ('warning' in d):
             subject = ''           
-            template = get_template('closing_mail.html')
+            template = get_template('base/entrance_mail.html')
             context = Context(d)
             content = template.render(context)
             subject = 'WARNING riepilogo ingresso '+saved_balance.parent.date.strftime("%d/%m/%Y")

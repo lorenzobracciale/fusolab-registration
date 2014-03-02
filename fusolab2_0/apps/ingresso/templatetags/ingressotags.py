@@ -58,7 +58,7 @@ def alcoholic_l():
         alcoholic_lt = 0.0
         for alcholic in alcoholic_list:
             alcoholic_lt += PurchasedProduct.objects.filter(receipt__date__gte=open_date, name__icontains=alcholic['name'] ).count() * alcholic['lt']
-        return alcohol_lt
+        return alcoholic_lt 
     else:
         return 0
 

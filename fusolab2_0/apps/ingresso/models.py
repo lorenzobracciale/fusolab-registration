@@ -83,11 +83,14 @@ def get_entrance_summary(closing):
     except(IndexError, EntranceBalance.DoesNotExist):
         pass
         #send_mail('allarme chiusura bar', 'errore tragico #1', 'cassafusolab@gmail.com',NOTIFICATION_ADDRESS_LIST, fail_silently=False)
-    if Entrance.objects.total_between(closing.parent.date,closing.date):
-        d['receipt_count'] = Entrance.objects.total_between(closing.parent.date,closing.date)
+    
+    if Entrance.objects.count_between(closing.parent.date,closing.date) > 0:
+        d['receipt_count'] = Entrance.objects.count_between(closing.parent.date,closing.date)
+        d['receipt_amount'] = Entrance.objects.total_between(closing.parent.date,closing.date)
     else:
         d['receipt_count'] = 0
-    d['expected_balance']+=d['receipt_count']
+        d['receipt_amount'] = 0
+    d['expected_balance']+=d['receipt_amount']
     
     d[DEPOSIT] = 0
     d[PAYMENT] = 0

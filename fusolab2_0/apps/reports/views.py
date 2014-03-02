@@ -65,7 +65,7 @@ def excel(request, what, from_day, from_month, from_year, to_day, to_month, to_y
                 sheet.write(rowx, 4, data['pa'],money_format)
             sheet.write(rowx, 5, data['closing_amount'],money_format)
             
-            sheet.write(rowx, 6, data['receipt_count'],money_format)
+            sheet.write(rowx, 6, data['receipt_amount'],money_format)
             if rowx > 1:
                 sheet.write(rowx,7,'=B'+str(rowx+1)+'-F'+str(rowx),money_format)    
             sheet.write(rowx,8,'=K'+str(rowx+1)+'-J'+str(rowx+1),money_format)
@@ -146,7 +146,7 @@ def excel(request, what, from_day, from_month, from_year, to_day, to_month, to_y
                 sheet.write(rowx, 4, data['pa'],money_format)
             sheet.write(rowx, 5, data['closing_amount'],money_format)
             
-            sheet.write(rowx, 6, data['receipt_count'],money_format)
+            sheet.write(rowx, 6, data['receipt_amount'],money_format)
             if rowx > 1:
                 sheet.write(rowx,7,'=B'+str(rowx+1)+'-F'+str(rowx),money_format)    
             sheet.write(rowx,8,'=K'+str(rowx+1)+'-J'+str(rowx+1),money_format)
@@ -225,7 +225,7 @@ def excel(request, what, from_day, from_month, from_year, to_day, to_month, to_y
             sheet.write(rowx, 2, data['wi'],money_format)
             sheet.write(rowx, 3, data['de'],money_format)
             sheet.write(rowx, 4, data['pa'],money_format)        
-            sheet.write(rowx, 5, data['receipt_count'],money_format)
+            sheet.write(rowx, 5, data['receipt_amount'],money_format)
             sheet.write(rowx, 6, data['expected_checkpoint'],money_format)
             sheet.write(rowx, 7, data['checkpoint'],money_format)
             sheet.write(rowx, 8, data['check'],money_format)

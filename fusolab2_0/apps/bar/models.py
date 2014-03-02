@@ -142,10 +142,10 @@ def get_bar_summary(closing):
     d['expected_balance']+=d['opening_amount']
 
     if Receipt.objects.total_between(closing.parent.date,closing.date):
-        d['receipt_count'] = Receipt.objects.total_between(closing.parent.date,closing.date)
+        d['receipt_amount'] = Receipt.objects.total_between(closing.parent.date,closing.date)
     else:
-        d['receipt_count'] = 0
-    d['expected_balance']+=d['receipt_count']
+        d['receipt_amount'] = 0
+    d['expected_balance']+=d['receipt_amount']
 
     try:
         opening_transactions = BarBalance.objects.get_transactions_for(closing.parent)
@@ -229,11 +229,11 @@ def get_small_summary(checkpoint):
         receipts = receipts.exclude(date__range=[o[0],o[1]])
         
     if receipts:
-        d['receipt_count'] = receipts.aggregate(Sum('total'))['total__sum']
+        d['receipt_amount'] = receipts.aggregate(Sum('total'))['total__sum']
     else:
-        d['receipt_count'] = 0      
+        d['receipt_amount'] = 0      
     
-    d['expected_checkpoint'] += d['receipt_count']
+    d['expected_checkpoint'] += d['receipt_amount']
        
     d[DEPOSIT] = 0
     d[PAYMENT] = 0
@@ -243,7 +243,7 @@ def get_small_summary(checkpoint):
             d[transaction.operation]+=transaction.amount
             notes.append(transaction.get_operation_display() + " " + str(transaction.amount))
             if transaction.operation in [DEPOSIT]:
-                d['expected_balance']+=transaction.amount
+                d['expected_checkpoint']+=transaction.amount
                 if transaction.subtype:
                     notes.append(" "+get_deposit_display(transaction.subtype))
                 if transaction.note:
@@ -251,7 +251,7 @@ def get_small_summary(checkpoint):
                 else:
                     notes.append("\n")
             elif transaction.operation in [PAYMENT]:
-                d['expected_balance']-=transaction.amount
+                d['expected_checkpoint']-=transaction.amount
                 if transaction.subtype:
                     notes.append(" "+get_payment_display(transaction.subtype))
                 if transaction.note:
@@ -259,7 +259,7 @@ def get_small_summary(checkpoint):
                 else:
                     notes.append("\n")
             elif transaction.operation in [WITHDRAW]:
-                d['expected_balance']-=transaction.amount
+                d['expected_checkpoint']-=transaction.amount
                 if transaction.note:
                     notes.append(" "+transaction.note.replace("\r\n"," ")+"\n")
                 else:

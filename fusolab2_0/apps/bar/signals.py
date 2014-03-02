@@ -19,7 +19,7 @@ def bar_handler(sender, **kwargs):
     if saved_balance.operation == CLOSING:
         d = get_bar_summary(saved_balance)
         if ('warning' in d):
-            template = get_template('closing_mail.html')
+            template = get_template('base/bar_mail.html')
             context = Context(d)
             content = template.render(context)
             subject = 'WARNING riepilogo bar '+saved_balance.parent.date.strftime("%d/%m/%Y")

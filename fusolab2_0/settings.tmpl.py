@@ -5,7 +5,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-     ('XXXX', 'xxx@xxx.org'),
+     ('OrazioPirataDelloSpazio', 'ziducaixao@autistici.org'),
 )
 
 MANAGERS = ADMINS
@@ -13,9 +13,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'xxx',                      # Or path to database file if using sqlite3.
-        'USER': 'xxx',                      # Not used with sqlite3.
-        'PASSWORD': 'xxxxx',                  # Not used with sqlite3.
+        'NAME': 'fusoci',                      # Or path to database file if using sqlite3.
+        'USER': 'fusoci',                      # Not used with sqlite3.
+        'PASSWORD': 'secret',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -94,7 +94,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'gzw==4hc32u9f9h8saddsddas$0cqc#dfsdfds@7pf*9nzj'
+SECRET_KEY = 'secret'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -208,35 +208,29 @@ THUMBNAIL_ALIASES = {
     },
 }
 
-#Password normale
-EMAIL_HOST='smtp.xxx.it'
-EMAIL_PORT=25
-EMAIL_HOST_USER='xxx'
-EMAIL_HOST_PASSWORD='xxxx'
-#EMAIL_USE_TLS=True
-#EMAIL_HOST = 'localhost'
+EMAIL_HOST='localhost'
 DEFAULT_FROM_EMAIL = 'noreply@fusolab.net'
 #url tessera
 URL_CARD = 'http://127.0.0.1/cgi-bin/fusocard.cgi'
 
 #lista indirizzi email per i conrolli apertura/chiusura
-EMAIL_NOTIFICATION_LIST = ['xxxx@fusolab.net','xxxx.com']
+EMAIL_NOTIFICATION_LIST = ['amministrazione@fusolab.net','dario.luzzi@gmail.com']
 MONEY_DELTA = 10.0
 
 # password aperture cancello
-OPEN_GATE_PW = "xxxx" 
-OPEN_DOOR_PW = "xxxx"
-IP_OPENER = "xxx"
+OPEN_GATE_PW = "secret" 
+OPEN_DOOR_PW = "secret"
+IP_OPENER = "10.172.0.16"
 PORT_OPENER = 8888
 
 # arduini bar
-BAR_SOPRA_IP = "10.172.0.X"
+BAR_SOPRA_IP = "10.172.0.14"
 BAR_SOPRA_PORT = 10000
 
-BAR_SOTTO_IP = "10.172.0.X"
+BAR_SOTTO_IP = "10.172.0.17"
 BAR_SOTTO_PORT = 10000
 
 #bara di led
-BARALED_IP = "10.172.0.X"
+BARALED_IP = "10.172.0.18"
 BARALED_PORT = 8888 
 

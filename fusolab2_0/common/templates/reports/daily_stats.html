@@ -28,7 +28,7 @@
                     <h4><i class="icon-bar-chart"></i> Incassi<small class="hidden-xs">Riepilogo serata</small></h4>
                 </header>
                 <div class="body">
-                    <div id="sources-chart-pie" class="chart pie-chart">
+                    <div id="sources-chart-pie" class="body chart">
                         <svg></svg>
                     </div>
                 </div>
@@ -62,7 +62,7 @@
                                 <label for="btn-enabled-date" class="control-label">Seleziona una data</label>
 
                                 <div class="input-group">
-                                    <input id="btn-enabled-date" class="form-control" type="text" name="btn-enabled-date" value="">
+                                    <input id="new-date" class="form-control date-picker" type="text" name="btn-enabled-date" data-date-format="yyyy/mm/dd" value="">
 
                                 <span class="input-group-btn"><a href="#" id="btn-select-calendar" class="btn btn-danger"
                                                                  data-date-format="yyyy/mm/dd" data-date="2013/02/25">
@@ -99,9 +99,9 @@
 {% block 'page_scripts' %}
 <script type="text/javascript">
 
-var url_bar_product = "http://soci.fusolab.net/reports/2013/10/25/bar.json";
-var url_total_income = "http://soci.fusolab.net/reports/2013/10/25/total.json";
-var url_entrance = "http://soci.fusolab.net/reports/2013/10/25/ingresso.json";
+var url_bar_product = "http://soci.fusolab.net/reports/2013/11/16/bar.json";
+var url_total_income = "http://soci.fusolab.net/reports/2013/11/16/total.json";
+var url_entrance = "http://soci.fusolab.net/reports/2013/11/16/ingresso.json";
 
 var lineResize;
 
@@ -175,43 +175,17 @@ d3.json(url_bar_product, function(data){
 //     d3.select("#sources-chart-pie svg").transition().call(pieChart);
 // }
 
-//grafico totale incassi
+
+// //grafico totale incassi
 // d3.json(url_total_income, function(data){
 // 
 //     nv.addGraph(function() {   
 //       
-//           var chart = nv.models.pieChart()
-//             .x(function(d) { return d.label })
-//             .y(function(d) { return d.value })
-//             .margin({top: 0, right: 20, bottom: 20, left: 20})
-//             .showLabels(true)
-//             .color(COLOR_VALUES)
-//             .donut(true);
-//         
-//         
-// //         pieFooter
-// //             .append("div")
-// //             .classed("controls", true)
-// //             .selectAll("div")
-// //             .data(data)
-// //             .enter().append("div")
-// //             .classed("control", true)
-// //             .style("border-top", function(d, i){
-// //                 return "3px solid " + COLOR_VALUES[i];
-// //             })
-// //             .html(function(d) {
-// //                 return "<div class='key'>" + d.key + "</div>"
-// //                     + "<div class='value'>" + d.value + "%</div>";
-// //             })
-// //             .on('click', function(d) {
-// //                 pieChartUpdate.apply(this, [d]);
-// //                 setTimeout(function() {
-// //                     stackedChart.update();
-// //                     lineChart.update();
-// //                     barChart.update();
-// //                     lineChartOperaHack();
-// //                 }, 100);
-// //             });
+//   var chart = nv.models.pieChart()
+//       .x(function(d) { return d.label })
+//       .y(function(d) { return d.value })
+//       .color(keyColor)
+//       .showLabels(true);        
 // 
 //         d3.select("#sources-chart-pie svg")
 //             .datum(data)
@@ -226,40 +200,40 @@ d3.json(url_bar_product, function(data){
 // });
 
 //sources-chart-line
+// ingressi
 d3.json(url_entrance, function(data){
     nv.addGraph(function() {
-        var chart = nv.models.lineChart()
-            .x(function(d) { return d[0] })
-            .y(function(d) { return d[1] })
-            .margin({top: 0, bottom: 25, left: 30, right: 0})
-            .showLegend(false)
-            .color(keyColor);
-
-        chart.yAxis
-            .showMaxMin(false)
-            .tickFormat(d3.format(',.f'));
+        var chart = nv.models.linePlusBarChart()
+              .margin({top: 30, right: 60, bottom: 50, left: 70})
+              .x(function(d,i) { return i })
+              .y(function(d) { return d[1] })
+              .color(d3.scale.category10().range());
 
         chart.xAxis
-            .showMaxMin(false)
-            .tickFormat(function(d) { return d3.time.format('%b %d')(new Date(d)) });
+          .showMaxMin(false)
+          .tickFormat(function(d) {
+            var dx = data[0].values[d] && data[0].values[d][0];// || 0;
+            return d3.time.format('%H:%M')(new Date(dx))
+          });
 
-        //just to make it look different
-        //data[0].area = true;
-        //data[3].area = true;
+        chart.y1Axis
+            .tickFormat(function(d) { return '$' + d3.format(',f')(d) });
+
+        chart.y2Axis
+            .tickFormat(function(d) { return  d3.format(',f')(d) });
+
+        chart.bars.forceY([0]);
 
         d3.select('#sources-chart-line svg')
-            //.datum(sinAndCos())
             .datum(data)
-            .transition().duration(500)
-            .call(chart);
+          .transition().duration(500).call(chart);
 
         nv.utils.windowResize(chart.update);
+
         lineChart = chart;
-
-        lineChartOperaHack();
-
         return chart;
-    });   
+    });
+
 });
 
 $(document).ready(function() {
@@ -278,23 +252,51 @@ $(document).ready(function() {
         var dateInput = $(this).parent().parent().find('input.date-picker');
         dateInput.datepicker('show');
     });
-    $('#change-date').submit(function() {
+    $('#change-date').submit(function(e) {
+        e.preventDefault();
         var new_date = $('#new-date').val();    
-        /*
+        var chart;
 
         //change the urls
 
-        url_bar_product = "TODO";
-        url_total_income = "TODO";
-        url_entrance = "TODO";
-
+        url_bar_product = "http://soci.fusolab.net/reports/" + new_date + "/bar.json";
+        url_total_income = "http://soci.fusolab.net/reports/" + new_date + "/total.json";
+        url_entrance = "http://soci.fusolab.net/reports/" + new_date + "/ingresso.json";
+        
         // update all the graphs
-        stackedChart.update();
-        lineChart.update();
-        barChart.update();
-        lineChartOperaHack();
 
-        */
+        // consumazioni - stacked bar
+        //chart = stackedChart;
+        d3.json(url_bar_product, function(data){
+
+            $("#sources-chart-stacked svg").empty();
+            d3.select("#sources-chart-stacked svg")
+                .datum(data)
+                .transition().duration(1000).call(stackedChart);
+                
+            nv.utils.windowResize(stackedChart.update);
+        });
+
+
+        //chart = lineChart;
+        d3.json(url_entrance, function(data){
+            $("#sources-chart-line svg").empty();
+            d3.select('#sources-chart-line svg')
+                .datum(data)
+              .transition().duration(1000).call(lineChart);
+
+            nv.utils.windowResize(lineChart.update);
+
+
+        });
+        
+        
+        //stackedChart.update();
+        //lineChart.update();
+        //barChart.update();
+        // lineChartOperaHack();
+         
+
 
         return false;
     });

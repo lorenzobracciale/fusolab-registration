@@ -75,7 +75,7 @@ def get_stats(request,what,yyyy=None,mm=None,dd=None):
             counter_serie.append( [ int(e.date.strftime('%s')+'000') , counter ] )
             amount_serie.append( [ int(e.date.strftime('%s')+'000') , e.cost ] )
         
-        data.append( {"key" : "Euro" ,"bar": true, "values" : amount_serie } )
+        data.append( {"key" : "Euro" ,"bar": True, "values" : amount_serie } )
         data.append( {"key" : "Numerico" , "values" : counter_serie } )
          
         buffer = simplejson.dumps( data, cls=FuckYeahEncoder )
@@ -83,10 +83,11 @@ def get_stats(request,what,yyyy=None,mm=None,dd=None):
     
     if what == "total":
         
+        
         values = []
         values.append( {"label": "Bar", "value" : Receipt.objects.total_between(start_time,end_time)})
         values.append( {"label": "Ingresso", "value" : Entrance.objects.total_between(start_time,end_time)})
-        data = { "key" : "Cumulative Return" , "values" : values }
+        data.append({ "key" : "Cumulative Return" , "values" : values })
         buffer = simplejson.dumps( data, cls=FuckYeahEncoder )
         return HttpResponse(buffer, mimetype = "application/json" )       
     else:
