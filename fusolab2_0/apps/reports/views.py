@@ -57,22 +57,22 @@ def excel(request, what, from_day, from_month, from_year, to_day, to_month, to_y
         for rowx, bb in enumerate(BarBalance.objects.filter(qf).order_by('date'), start=1):
             data = get_bar_summary(bb)
             parent = BarBalance.objects.get_parent_o(bb)
-            sheet.write(rowx, 0, parent.date,date_format)
-            sheet.write(rowx, 1, data['opening_amount'],money_format)
+            sheet.write(rowx, 0, parent.date,date_format) #data
+            sheet.write(rowx, 1, data['opening_amount'],money_format) #apertura
             if parent:
-                sheet.write(rowx, 2, data['wi'],money_format)
-                sheet.write(rowx, 3, data['de'],money_format)
-                sheet.write(rowx, 4, data['pa'],money_format)
-            sheet.write(rowx, 5, data['closing_amount'],money_format)
+                sheet.write(rowx, 2, data['wi'],money_format) #prelevati
+                sheet.write(rowx, 3, data['de'],money_format) #depositati
+                sheet.write(rowx, 4, data['pa'],money_format) #pagamenti
+            sheet.write(rowx, 5, data['closing_amount'],money_format) #chiusura
             
-            sheet.write(rowx, 6, data['receipt_amount'],money_format)
+            sheet.write(rowx, 6, data['receipt_amount'],money_format) #ricevute
             if rowx > 1:
-                sheet.write(rowx,7,'=B'+str(rowx+1)+'-F'+str(rowx),money_format)    
-            sheet.write(rowx,8,'=K'+str(rowx+1)+'-J'+str(rowx+1),money_format)
-            sheet.write(rowx,9, '=G'+str(rowx+1)+'+D'+str(rowx+1)+'-E'+str(rowx+1)+'-C'+str(rowx+1),money_format)
-            sheet.write(rowx,10,'=F'+str(rowx+1)+'-B'+str(rowx+1),money_format)
-            sheet.write_string(rowx, 11, str(data['cashier']))
-            sheet.write_string(rowx, 12, ''.join(data['notes']),note_format)
+                sheet.write(rowx,7,'=B'+str(rowx+1)+'-F'+str(rowx),money_format) #check1    
+            sheet.write(rowx,8,'=K'+str(rowx+1)+'-J'+str(rowx+1),money_format) #check2
+            sheet.write(rowx,9, '=G'+str(rowx+1)+'+D'+str(rowx+1)+'-E'+str(rowx+1)+'-C'+str(rowx+1),money_format) #teorico
+            sheet.write(rowx,10,'=F'+str(rowx+1)+'-B'+str(rowx+1),money_format) #netto
+            sheet.write_string(rowx, 11, str(data['cashier'])) # nome cassiere
+            sheet.write_string(rowx, 12, ''.join(data['notes']),note_format) #note
 
         for col in range(13):
             sheet.write(rowx+1,col,'',line_format) 
