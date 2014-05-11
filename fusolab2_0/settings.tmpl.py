@@ -208,7 +208,9 @@ THUMBNAIL_ALIASES = {
     },
 }
 
-EMAIL_HOST='localhost'
+EMAIL_HOST='smtp.infosis.it'
+EMAIL_HOST_USER='inviapostaXXXX' #465
+EMAIL_HOST_PASSWORD='xxxx'
 DEFAULT_FROM_EMAIL = 'noreply@fusolab.net'
 #url tessera
 URL_CARD = 'http://127.0.0.1/cgi-bin/fusocard.cgi'
