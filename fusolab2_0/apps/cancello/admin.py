@@ -1,8 +1,14 @@
 from django.contrib import admin
+from django.contrib.auth.models import User
 from cancello.models import *
 
-# class GatePermissionAdmin(admin.ModelAdmin):
-#     search_fields = ['user__username',]
+class GatePermissionAdmin(admin.ModelAdmin):
+   search_fields = ['user__username',]
+   #ordering = ('user__username',)
+   def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "user":
+            kwargs["queryset"] = User.objects.filter(groups__name='turnisti')
+        return super(GatePermissionAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 # 
-# admin.site.register(GatePermission,GatePermissionAdmin)
-admin.site.register(GatePermission)
+admin.site.register(GatePermission,GatePermissionAdmin)
+#admin.site.register(GatePermission)
