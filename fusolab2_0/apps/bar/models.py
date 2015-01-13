@@ -59,7 +59,7 @@ class Receipt(models.Model):
 
 class Balance(models.Model):
     operation = models.CharField(max_length=2, choices=OPERATION_TYPES)	
-    subtype = models.CharField(max_length=2, blank=True, null=True)
+    subtype = models.CharField(max_length=2, blank=True, null=True, choices=PAYMENT_SUBTYPES + DEPOSIT_SUBTYPES)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     amount = models.DecimalField("Somma", max_digits=10, decimal_places=2,  validators=[MinValueValidator(Decimal('0.00'))])
     date = models.DateTimeField("Data", default=datetime.now)
