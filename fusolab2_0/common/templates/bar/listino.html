@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Listino</title>
+        <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/listino.css" />
+        <link href='http://fonts.googleapis.com/css?family=Titillium+Web:400,300,600' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.8.0.min.js"></script>  
+        <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.webticker.js"></script>  
+        <script type="text/javascript">
+        $(function(){
+            jQuery('#webticker').webTicker();
+            //jQuery("#webticker2").webTicker({speed: 40, direction: 'right', hoverpause:false});  
+            jQuery("#webticker2").webTicker({speed: 80});  
+        });
+        </script>
+    </head>
+    <body>
+        <div class="header"></div>
+        <table class="listino">
+            <tbody>
+                <tr>
+                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
+                </tr>
+                <tr>
+                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
+                </tr>
+                <tr>
+                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
+                </tr>
+                <tr>
+                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
+                </tr>
+                <tr>
+                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
+                </tr>
+                <tr>
+                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
+                </tr>
+                <tr>
+                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="separator"></div>
+        <div class="info-products">Info</div>
+        <div class="scroll-prices">
+            <ul id="webticker">
+                <li>Ingressi (INR) 142.0 <span class="rise">&#9650;</span></li> 
+                <li>BIRRE (BRR) 412.0 <span class="rise">&#9650;</span></li> 
+                <li>COCKTAIL (CKT) 112.0 <span class="dawn">&#9660;</span></li> 
+                <li>Ingressi (INR) 142.0 <span class="rise">&#9650;</span></li> 
+                <li>BIRRE (BRR) 412.0 <span class="rise">&#9650;</span></li> 
+                <li>COCKTAIL (CKT) 112.0 <span class="dawn">&#9660;</span></li> 
+                <li>Ingressi (INR) 142.0 <span class="rise">&#9650;</span></li> 
+                <li>BIRRE (BRR) 412.0 <span class="rise">&#9650;</span></li> 
+                <li>COCKTAIL (CKT) 112.0 <span class="dawn">&#9660;</span></li> 
+        </div>
+        <div class="scroll-messages">
+            <ul id="webticker2">
+                <li>ATTENZIONE si avvisano i gentilissimi soci fusolab tra poco cambiera' il listino</li> 
+                <li>Birra in calo: colpa del caldo?</li>
+                <li>Cocktail in aumento smodato: hai mai provato il fusococktail?</li>
+                <li>Arrivano i nostri: picco di 5 ingressi 2 minuti fa</li>
+            </ul>
+        </div>
+        <div class="footer"></div>
+    </body>
+</html>
+
