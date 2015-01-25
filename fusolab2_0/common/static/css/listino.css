@@ -11,23 +11,25 @@ html, body {
 
 .header {
     background: white url("/static/images/pixel_header.png") repeat-x local left; 
-    background-size: 972px;
-    height: 74px;
-    background-position: 0px 0px; 
+    background-size: 591px;
+    height: 37px;
+    background-position: 0px -12px;
 }
 
 .footer {
     background: white url("/static/images/pixel_header.png") repeat-x local left; 
-    background-size: 972px;
-    height: 74px;
-    background-position: 0px 0px;
+    background-size: 591px;
+    height: 37px;
+    background-position: 0px -13px;
 }
 
 .separator {
-    background: white url("/static/images/pixel_footer.png") repeat-x local left; 
-    background-size: 972px;
-    height: 74px;
-    background-position: 0px 0px; 
+    background: white url("/static/images/pixel_footer.png") repeat-x local left;
+    background-size: 591px;
+    height: 36px;
+    background-position: 0px -32px;
+    margin-top: -10px;
+    margin-bottom: 5px;
 }
 
 
@@ -37,23 +39,23 @@ table.listino {
 
 }
 table.listino tr {
-    color: black;
-    border-bottom: 5px solid white;
-    border-top: 5px solid white;
-    font-size: 3em;
+    border-bottom: 17px solid white;
+    /*border-top: 8px solid white;*/
+    font-size: 2.5em;
+    line-height: 1.2em;
+    font-weight: 600;
+    color: #3a3a3a;
 }
 
 table.listino td.price {
-    width:230px;
+    width:130px;
 }
 
 table.listino td.item-name {
-    /* width:130px; */
+    padding-left: 10px;
 }
 
 table.listino td {
-    color: black;
-    padding-bottom: 1em;
     text-transform: uppercase;
     background-color: #96C84C;
     padding: 0px;
@@ -61,7 +63,7 @@ table.listino td {
 
 .scroll-prices {
     background-color: #4A8549;
-    height: 60px;
+    height: 52px;
     color: white;
     font-size: 1.5em;
     text-transform: uppercase;
@@ -69,8 +71,8 @@ table.listino td {
 
 .scroll-messages {
     background-color: #B5D97F;
-    height: 50px;
-    color: white;
+    height: 45px;
+    color: #333;
     font-size: 1.2em;
     text-transform: uppercase;
 }
@@ -84,7 +86,8 @@ span.dawn {
 }
 
 .info-products {
-    height: 300px;
+    height: 400px;
+    width: 100%;
 }
 
 /* Web ticker */
