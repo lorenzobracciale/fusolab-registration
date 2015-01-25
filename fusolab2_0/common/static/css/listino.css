@@ -43,7 +43,7 @@ table.listino tr {
     /*border-top: 8px solid white;*/
     font-size: 2.5em;
     line-height: 1.2em;
-    font-weight: 600;
+    font-weight: 400;
     color: #3a3a3a;
 }
 
@@ -53,6 +53,14 @@ table.listino td.price {
 
 table.listino td.item-name {
     padding-left: 10px;
+}
+
+table.listino td.item-name small {
+    font-weight: 300;
+}
+table.listino td.item-name img {
+    height: 38px;
+    padding-left: 100px;
 }
 
 table.listino td {

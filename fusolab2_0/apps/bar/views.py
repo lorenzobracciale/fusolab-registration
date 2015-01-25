@@ -13,6 +13,7 @@ from bar.models import *
 from base.tests import in_turnisti
 from django.contrib.auth.decorators import user_passes_test
 from bar.forms import *
+import json
 
 
 @user_passes_test(in_turnisti)
@@ -109,4 +110,30 @@ def bar_smallbalance_form(request, balance_type):
     return render_to_response('bar/bar_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
 
 
+# listino
+def price_list(request):
+    bar_items = Product.objects.all().exclude(name__icontains = ' int').exclude(name__icontains = 'cibo aperitivo') #filter out internal products and extra stuff
+    # rename
+    new_names = {
+            'birra chiara': ('birra chiara', 'alla spina'),
+            'birra dm': ('doppio malto', 'alla spina'),
+            'birra in bottiglia': ('birra artigianale', ''),
+            }
+    for item in bar_items:
+        if item.name.lower() in new_names.keys():
+            item.name = new_names[item.name.lower()]
+        else:
+            item.name = (item.name, '')
+    ctx = {'items' : bar_items}
+    return render_to_response('bar/price_list.html', ctx , context_instance=RequestContext(request))
+
+def poll_price_list(request):
+    response_data = {}
+    response_data['messages'] = [ 'ATTENZIONE si avvisano i gentilissimi soci fusolab tra poco cambiera\' il listino', 'Birra in calo: colpa del caldo?', 'Cocktail in aumento smodato: hai mai provato il fusococktail?', 'Arrivano i nostri: picco di 5 ingressi 5 minuti fa' ]
+    prices = [] 
+    for p in Product.objects.all():
+        prices.append({'id': p.id, 'price': float(p.cost), 'name': p.name})
+    response_data['prices'] =  prices
+    response_data['stockmarket'] = ['Ingressi (INR) 142.0 <span class="rise">&#9650;</span>', 'BIRRE (BRR) 412.0 <span class="rise">&#9650;</span>', 'COCKTAIL (CKT) 112.0 <span class="dawn">&#9660;</span>']
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
 

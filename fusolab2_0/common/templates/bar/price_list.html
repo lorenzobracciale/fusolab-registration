@@ -15,8 +15,8 @@
         $(function(){
             // scroller
             // http://jonmifsud.com/open-source/jquery/jquery-webticker/
-            jQuery('#webticker').webTicker();
-            jQuery("#webticker2").webTicker({speed: 80});  
+            jQuery('#stock-ticker').webTicker();
+            jQuery("#message-ticker").webTicker({speed: 80});  
             // carousel
             // http://kenwheeler.github.io/slick/
             $('.carousel').slick({
@@ -28,53 +28,52 @@
                 slidesToShow: 1
             });
         });
-    /*
         // polling
         (function poll() {
             setTimeout(function() {
                 $.ajax({
-                    url: "/server/api/function",
+                    url: "{% url 'bar_poll_price_list' %}",
                     type: "GET",
                     success: function(data) {
-                        console.log("polling");
+                        // update messages
+                        var messages = '';
+                        $(data.messages).each(function( index ) {
+                            messages +=  '<li>' + data.messages[index] + '</li>';
+                        });
+                        $("#message-ticker").webTicker('update', messages);
+                        // update stock prices
+                        messages = '';
+                        $(data.stockmarket).each(function( index ) {
+                            messages +=  '<li>' + data.stockmarket[index] + '</li>';
+                        });
+                        $("#stock-ticker").webTicker('update', messages);
+                        // update prices
+                        $(data.prices).each(function( index ) {
+                            if ( $('.item_' + data.prices[index].id).length ) {
+                                $('.item_' + data.prices[index].id + ' td.price').val(data.prices.price);
+                            }
+                        });
+                        
+                        console.log(data.prices);
+                        console.log(data.stockmarket);
                     },
                     dataType: "json",
                     complete: poll,
-                    timeout: 2000
+                    timeout: 8000
                 })
-            }, 5000);
+            }, 30000);
         })()  
-        */
         </script>
     </head>
     <body>
         <div class="header"></div>
         <table class="listino">
             <tbody>
-                <tr>
-                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
+                {% for item in items %}
+                <tr class="item_{{item.id}}">
+                    <td class="item-name">{{ item.name.0 }}<small> {{ item.name.1 }}</small><img src="{{ STATIC_URL }}images/price_separator.png"></td><td class="price">{{ item.cost }} &euro;</td>
                 </tr>
-                <tr>
-                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
-                </tr>
-                <tr>
-                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
-                </tr>
-                <tr>
-                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
-                </tr>
-                <tr>
-                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
-                </tr>
-                <tr>
-                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
-                </tr>
-                <tr>
-                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
-                </tr>
-                <tr>
-                    <td class="item-name">COCKTAIL</td><td class="price">5.0 &euro;</td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
         <div class="separator"></div>
@@ -87,7 +86,7 @@
             </div>
         </div>
         <div class="scroll-prices">
-            <ul id="webticker">
+            <ul id="stock-ticker">
                 <li>Ingressi (INR) 142.0 <span class="rise">&#9650;</span></li> 
                 <li>BIRRE (BRR) 412.0 <span class="rise">&#9650;</span></li> 
                 <li>COCKTAIL (CKT) 112.0 <span class="dawn">&#9660;</span></li> 
@@ -99,7 +98,7 @@
                 <li>COCKTAIL (CKT) 112.0 <span class="dawn">&#9660;</span></li> 
         </div>
         <div class="scroll-messages">
-            <ul id="webticker2">
+            <ul id="message-ticker">
                 <li>ATTENZIONE si avvisano i gentilissimi soci fusolab tra poco cambiera' il listino</li> 
                 <li>Birra in calo: colpa del caldo?</li>
                 <li>Cocktail in aumento smodato: hai mai provato il fusococktail?</li>
