@@ -9,7 +9,9 @@ urlpatterns = patterns('',
     url(r'csv','bar.csv_tool.create_resume', name='create_resume'),
     url(r'^guida_bar/$', TemplateView.as_view(template_name='bar/guida.html'), name='bar_guide'),
     url(r'^price_list/$', 'bar.views.price_list', name='bar_price_list'),
+    url(r'^market/(?P<product>\w+)/(?P<granularity>\d+)/$', 'bar.views.get_market_stats', name='get_market_stats'),
     url(r'^poll_price_list/$', 'bar.views.poll_price_list', name='bar_poll_price_list'),
+    url(r'^barcash2/$', 'bar.views.barcash2', name='barcash2'),
     url(r'$', 'bar.views.barcash', name='barcash'),
 
 )

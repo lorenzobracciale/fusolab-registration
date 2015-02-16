@@ -1,7 +1,8 @@
 #from ingresso.managers import BalanceManager
 from decimal import Decimal
 from django.db import models
-from datetime import datetime
+from datetime import *
+from math import ceil
 from django.db.models import Sum, Q
 from django.core.exceptions import ObjectDoesNotExist
 from bar.models import *
@@ -99,7 +100,25 @@ class BalanceManager(models.Manager):
     def get_last_n(self,n):
         return super(BalanceManager, self).get_query_set().order_by('-date')[:n]
 
-
+class PurchasedProductManager(models.Manager):
+    
+    def product_trend(self, product, minutesinterval):
+    	delta = timedelta(seconds=minutesinterval*60)
+    	t = datetime.now()
+    	t1 = t - delta
+    	t2 = t - 2*delta
+    	last_amount = minutesinterval + super(PurchasedProductManager, self).get_query_set().filter(receipt__date__range=[t1,t]).filter(name=product).count()
+    	second_to_last_amount = minutesinterval + super(PurchasedProductManager, self).get_query_set().filter(receipt__date__range=[t2,t1]).filter(name=product).count()
+    	return ceil( (last_amount - second_to_last_amount) / (second_to_last_amount + 0.01) )
+    
+    def total_trend(self, minutesinterval):
+    	delta = timedelta(seconds=minutesinterval*60)
+    	t = datetime.now()
+    	t1 = t - delta
+    	t2 = t - 2*delta
+    	last_amount = minutesinterval + super(PurchasedProductManager, self).get_query_set().filter(receipt__date__range=[t1,t]).count()
+    	second_to_last_amount = minutesinterval + super(PurchasedProductManager, self).get_query_set().filter(receipt__date__range=[t2,t1]).count()
+    	return fake_num+ceil( (last_amount - second_to_last_amount) / (second_to_last_amount + 0.01) )
 
 class ReceiptManager(models.Manager):
 

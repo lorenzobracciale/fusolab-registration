@@ -20,6 +20,7 @@ class SmallBalanceAdmin(admin.ModelAdmin):
 # Re-register UserAdmin
 admin.site.register(PurchasedProduct)
 admin.site.register(Product)
+admin.site.register(PriceListDisplay)
 admin.site.register(Receipt)
 admin.site.register(BarBalance, BarBalanceAdmin)
 admin.site.register(SmallBalance, SmallBalanceAdmin)

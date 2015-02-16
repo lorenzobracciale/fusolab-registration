@@ -14,23 +14,55 @@ import simplejson
 
 DATE_FORMAT = "%d-%m-%Y" 
 TIME_FORMAT = "%H:%M:%S"
+PRICE_CHANGE_TYPES = (
+    ('r', 'rise'),        
+    ('f', 'fall'), 
+    ('s', 'stable'),           
+)
 
 #bar
 class Product(models.Model):
     keycode = models.IntegerField("tasto rapido per cassiere") #rapid keycode for cash 
     name = models.CharField("nome", max_length=30)
-    cost = models.DecimalField("prezzo", max_digits=5, decimal_places=2)
+    cost = models.DecimalField("prezzo attuale", max_digits=5, decimal_places=2)
+    default_price = models.DecimalField("prezzo standard", max_digits=5, decimal_places=2) 
+    symbol = models.CharField("sigla stile NASDAQ", max_length=30) #ad es. INRR BRR etcc
+    trend = models.CharField('trend', max_length=2, choices=PRICE_CHANGE_TYPES)	
+    updated = models.BooleanField('aggiornato', default=False)
+    min_price = models.DecimalField("prezzo minimo", max_digits=5, decimal_places=2)
+    max_price = models.DecimalField("prezzo massimo", max_digits=5, decimal_places=2)
+    can_change = models.BooleanField(default=True)
     #internal_cost = models.DecimalField("prezzo per interni", max_digits=5, decimal_places=2, blank=True)
     def __unicode__(self):
-        return u'%d %s %s%s' % (self.keycode, self.name, self.cost, 'e' )
+        return u'%d %s %s euro (%s - %s)' % (self.keycode, self.name, self.default_price, self.min_price, self.max_price )
     class Meta:
         verbose_name = "Prodotto"
         verbose_name_plural = "Prodotti"
+
+class PriceListDisplay(models.Model):
+    """ Singleton for the message in the display """ 
+    messages  = models.TextField('messaggi separati da ;', max_length=3000)
+    entrance_number = models.IntegerField('Numero ingressi', default=0)
+    entrance_symbol = models.CharField("sigla stile NASDAQ", max_length=30, default="INRR")
+    entrance_trend = models.CharField('trend', max_length=2, choices=PRICE_CHANGE_TYPES)
+    variation_active = models.BooleanField('aggiornato', default=False)
+    def __unicode__(self):
+        return self.messages
+    class Meta:
+        verbose_name = "Display prezzi"
+        verbose_name_plural = "Display prezzi"
+    def save(self):
+        self.id=1
+        super(PriceListDisplay, self).save()
+    def delete(self):
+        pass
 
 class PurchasedProduct(models.Model):
     name = models.CharField("nome", max_length=30)
     cost = models.DecimalField("prezzo", max_digits=5, decimal_places=2)
     receipt = models.ForeignKey('Receipt')
+    
+    objects = PurchasedProductManager()
     
     def __unicode__(self):
         return self.name + " " + self.receipt.date.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))

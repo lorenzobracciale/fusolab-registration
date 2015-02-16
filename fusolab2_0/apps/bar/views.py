@@ -13,13 +13,21 @@ from bar.models import *
 from base.tests import in_turnisti
 from django.contrib.auth.decorators import user_passes_test
 from bar.forms import *
+from math import ceil
 import json
+import qsstats
+import time
 
 
 @user_passes_test(in_turnisti)
 def barcash(request):
     p = Product.objects.all()
     return render_to_response('bar/cash.html', { 'products': p } , context_instance=RequestContext(request))
+
+@user_passes_test(in_turnisti)
+def barcash2(request):
+    p = Product.objects.all()
+    return render_to_response('bar/cash2.html', { 'products': p } , context_instance=RequestContext(request))
 
 
 @user_passes_test(in_turnisti)
@@ -54,6 +62,36 @@ def addpurchasedproduct(request):
 
                pp.name = p_type.name
                pp.cost = p_type.cost
+               total = total + float(pp.cost) 
+               pp.receipt = r
+               pp.save()
+       r.total = total
+       r.save()
+       #return HttpResponse( "{'receipt_id' : " + str(r.id) + "}", mimetype="application/json")
+       response_data = { 'receipt_id' : r.id }
+       return HttpResponse( simplejson.dumps(response_data), mimetype="application/json" )
+    else:
+       return HttpResponseNotFound("errore: non sono stati trovati dati")
+
+@csrf_exempt
+@user_passes_test(in_turnisti)
+def addpurchasedproduct2(request):
+    data = request.POST.get('q')
+    total = 0.0
+    if (data):
+       r = Receipt()
+
+       r.cashier = request.user.get_profile()
+       r.total = total
+       r.save()
+       jdata = simplejson.loads(data)
+       for p in jdata: #data.getlist('purchased_products') :
+           p_type = Product.objects.get(id = int(p['type']) ) 
+           for i in range(0, int(p['quantity'] ) ):
+               pp = PurchasedProduct()
+
+               pp.name = p_type.name
+               pp.cost = float(p['price'])#p_type.cost
                total = total + float(pp.cost) 
                pp.receipt = r
                pp.save()
@@ -137,3 +175,39 @@ def poll_price_list(request):
     response_data['stockmarket'] = ['Ingressi (INR) 142.0 <span class="rise">&#9650;</span>', 'BIRRE (BRR) 412.0 <span class="rise">&#9650;</span>', 'COCKTAIL (CKT) 112.0 <span class="dawn">&#9660;</span>']
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
+def datetimeIterator(from_date=None, to_date=None, delta=timedelta(minutes=1)):
+    from_date = from_date or datetime.now()
+    while to_date is None or from_date <= to_date:
+        yield from_date
+        from_date = from_date + delta
+    return
+
+def get_market_stats(request,product,granularity):
+    #granularity = 30
+    response_data = {}
+    s = []  
+    # if not BarBalance.objects.is_open():
+    #     pass
+    #     #return HttpResponse(json.dumps(response_data), content_type="application/json")                
+    # else:
+        #start = BarBalance.objects.get_parent_t().date
+    start = datetime.datetime(2015,01,17,19,7,31)
+    #now = datetime.now()
+    now = datetime.datetime(2015,01,18,6,9,0)
+    interval = datetime.timedelta(seconds=int(granularity)*60)
+    qs = PurchasedProduct.objects.filter(receipt__date__range=[start,now])
+
+    qqs = qs.filter(name=product)
+    sold = []
+    d = []
+    i = 0
+    for sample_time in datetimeIterator(start,now,interval):
+        e = int(granularity) + qqs.filter( receipt__date__range = [sample_time,sample_time+interval] ).count()
+        sold.append( e )
+        if i > 0: 
+            stamp  = sample_time+interval
+            d.append( [  int(time.mktime(stamp.timetuple())*1000) , ceil(100*(sold[i]-sold[i-1])/(sold[i-1]+0.01))] )
+        i+=1
+    s.append( { 'key' : product , 'values' : d } )
+    response_data['data']  = s
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
