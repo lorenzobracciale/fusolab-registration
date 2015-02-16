@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
 {% load ifbalanceopen %}
+{% load ifstockmarket %}
 <head>
 	<title>Cassa Fusolab 2.0</title>
 	<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
@@ -77,6 +78,33 @@
         printreceipt(true);
       }
 
+      function activate_stock_market() {
+          $.get('/bar/stock-market/activate/', function (data) {
+                $('#footer').html(data);      
+                (function poll() {
+                   setTimeout(function() {
+                        poll_prices();
+                    }, 10000);
+                })();
+            }).error(function() { 
+                alert('Non ho potuto abilitare prezzi pazzi (e non chiedermi perche'!)');
+            });
+      }
+
+      function deactivate_stock_market() {
+          $.get('/bar/stock-market/deactivate/', function (data) {
+                $('#footer').html(data);      
+            }).error(function() { 
+                alert('Non ho potuto disabilitare prezzi pazzi (e non chiedermi perche'!)');
+            });
+      }
+
+      function poll_prices() {
+            /* Poll the prices */
+      
+      
+      }
+
       function printreceipt(dontprint) {
            /* push in db and print */
           var json_list = { 'purchased_products' : [] };
@@ -86,17 +114,19 @@
               return;
 
 
-          $('#product-receipt ul .product-id').each(function(index) {
-              var tid = $(this).text() ;
+          $('#product-receipt ul > li').each(function(index) {
+              var tid = $(this).find('.product-id').text(); // type id
+              var tcost= $(this).find('.product-cost').text(); // type id
 
-              if ( !( tid in products) ) 
-                products[tid] = 0;
+              if ( !( tid in products) )  {
+                  products[tid] = {'quantity': 0, 'price': tcost};
+              }
 
-              products[tid] += 1;
+              products[tid]['quantity'] += 1 ;
           } );
 
           $.each(products, function(key, value) {
-                  json_list.purchased_products.push( { "type" : key.toString() , "quantity" : value.toString()  } );
+                  json_list.purchased_products.push( { "type" : key.toString() , "quantity" : value['quantity'].toString(), 'cost': value['price'].toString() } );
           });
 
           $.ajax({
@@ -148,6 +178,13 @@
                         ;
                     } 
               });
+             {% ifstockmarket active %}
+                (function poll() {
+                       setTimeout(function() {
+                            poll_prices();
+                        }, 10000);
+                    })();
+             {%endifstockmarket %}
       });
   </script>
 
@@ -159,18 +196,23 @@
 </div>
 {% ifbalanceopen bar %}
 <div id="cash-manager">
-    <a href="/bar/balance/payment/">Pagamento</a>
+    <a href="/bar/balance/withdraw/">Prelievo</a>
     <a href="/bar/balance/deposit/">Deposito</a>
-    <a href="/bar/balance/withdraw/">Prelievo tesoriere</a>
+    <a href="/bar/balance/payment/">Pagamento</a>
+    {% ifstockmarket active %}
+    <a href="/bar/stock-market/deactivate/">Disattiva Stock Market</a>
+    {% else %}
+    <a href="/bar/stock-market/activate/">Attiva Stock Market</a>
+    {% endifstockmarket %}
     <a href="/bar/balance/close/">Chiudi Cassa</a>
 </div>
 {% else %}
 <div id="cash-manager">
     {% if user.is_staff %}
     <a href="/bar/smallbalance/point/">Punto di Cassa</a>
-    <a href="/bar/smallbalance/payment/">Pagamento</a>
+    <a href="/bar/smallbalance/withdraw/">Prelievo</a>
     <a href="/bar/smallbalance/deposit/">Deposito</a>
-    <a href="/bar/smallbalance/withdraw/">Prelievo tesoriere</a>
+    <a href="/bar/smallbalance/payment/">Pagamento</a>
     {% endif %}
     <a href="/bar/balance/open/">Apri Cassa</a>
 </div>
@@ -196,9 +238,7 @@
                         <li id="cancel-last"><a href="javascript:removelastitem()">Annulla Ultimo</a></li>
                         <li id="cancel-all"><a href="javascript:clearitems()">Annulla Tutto</a></li>
                         <!-- li id="members-cost"><a href="javascript:membercost()">Prezzo di Costo</a></li -->
-                        {% ifbalanceopen bar %}
                         <li id="print-receipt"><a href="javascript:printreceipt()">Stampa</a></li>
-                        {% endifbalanceopen %}
                         <li id="dont-print-receipt"><a href="javascript:dontprintreceipt()">Stampa Peffinta</a></li>
                     </ul>
                 </div>

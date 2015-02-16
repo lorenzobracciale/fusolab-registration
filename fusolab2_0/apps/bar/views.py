@@ -1,5 +1,6 @@
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
+from django.shortcuts import redirect
 from django.template import RequestContext, loader
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
@@ -24,10 +25,10 @@ def barcash(request):
     p = Product.objects.all()
     return render_to_response('bar/cash.html', { 'products': p } , context_instance=RequestContext(request))
 
-@user_passes_test(in_turnisti)
-def barcash2(request):
-    p = Product.objects.all()
-    return render_to_response('bar/cash2.html', { 'products': p } , context_instance=RequestContext(request))
+#@user_passes_test(in_turnisti)
+#def barcash2(request):
+#    p = Product.objects.all()
+#    return render_to_response('bar/cash2.html', { 'products': p } , context_instance=RequestContext(request))
 
 
 @user_passes_test(in_turnisti)
@@ -44,38 +45,38 @@ def deletereceipt(request, receiptid):
 
 
 @csrf_exempt
-@user_passes_test(in_turnisti)
-def addpurchasedproduct(request):
-    data = request.POST.get('q')
-    total = 0.0
-    if (data):
-       r = Receipt()
-
-       r.cashier = request.user.get_profile()
-       r.total = total
-       r.save()
-       jdata = simplejson.loads(data)
-       for p in jdata: #data.getlist('purchased_products') :
-           p_type = Product.objects.get(id = int(p['type']) ) 
-           for i in range(0, int(p['quantity'] ) ):
-               pp = PurchasedProduct()
-
-               pp.name = p_type.name
-               pp.cost = p_type.cost
-               total = total + float(pp.cost) 
-               pp.receipt = r
-               pp.save()
-       r.total = total
-       r.save()
-       #return HttpResponse( "{'receipt_id' : " + str(r.id) + "}", mimetype="application/json")
-       response_data = { 'receipt_id' : r.id }
-       return HttpResponse( simplejson.dumps(response_data), mimetype="application/json" )
-    else:
-       return HttpResponseNotFound("errore: non sono stati trovati dati")
+#@user_passes_test(in_turnisti)
+#def addpurchasedproduct(request):
+#    data = request.POST.get('q')
+#    total = 0.0
+#    if (data):
+#       r = Receipt()
+#
+#       r.cashier = request.user.get_profile()
+#       r.total = total
+#       r.save()
+#       jdata = simplejson.loads(data)
+#       for p in jdata: #data.getlist('purchased_products') :
+#           p_type = Product.objects.get(id = int(p['type']) ) 
+#           for i in range(0, int(p['quantity'] ) ):
+#               pp = PurchasedProduct()
+#
+#               pp.name = p_type.name
+#               pp.cost = p_type.cost
+#               total = total + float(pp.cost) 
+#               pp.receipt = r
+#               pp.save()
+#       r.total = total
+#       r.save()
+#       #return HttpResponse( "{'receipt_id' : " + str(r.id) + "}", mimetype="application/json")
+#       response_data = { 'receipt_id' : r.id }
+#       return HttpResponse( simplejson.dumps(response_data), mimetype="application/json" )
+#    else:
+#       return HttpResponseNotFound("errore: non sono stati trovati dati")
 
 @csrf_exempt
 @user_passes_test(in_turnisti)
-def addpurchasedproduct2(request):
+def addpurchasedproduct(request):
     data = request.POST.get('q')
     total = 0.0
     if (data):
@@ -146,6 +147,25 @@ def bar_smallbalance_form(request, balance_type):
     else:
         raise Http404
     return render_to_response('bar/bar_balance_forms.html', { 'formname': formname, 'form': form } , context_instance=RequestContext(request))
+
+
+def stock_market_activate(request):
+    pd = PriceListDisplay.object.get(pk=1)
+    pd.variation_active = True
+    pd.save()
+    return HttpResponse("OK attivato")
+
+
+def stock_market_deactivate(request):
+    pd = PriceListDisplay.object.get(pk=1)
+    pd.variation_active = False
+    pd.save()
+    #Restore price to their default
+    for p in Product.objects.filter(can_change=True):
+        p.cost = p.default_price
+        p.save()
+    return HttpResponse("OK disattivato")
+
 
 
 # listino

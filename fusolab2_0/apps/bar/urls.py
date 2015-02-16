@@ -11,7 +11,9 @@ urlpatterns = patterns('',
     url(r'^price_list/$', 'bar.views.price_list', name='bar_price_list'),
     url(r'^market/(?P<product>\w+)/(?P<granularity>\d+)/$', 'bar.views.get_market_stats', name='get_market_stats'),
     url(r'^poll_price_list/$', 'bar.views.poll_price_list', name='bar_poll_price_list'),
-    url(r'^barcash2/$', 'bar.views.barcash2', name='barcash2'),
+    #url(r'^barcash2/$', 'bar.views.barcash2', name='barcash2'),
+    url(r'^stock-market/activate/$', 'bar.views.stock_market_activate', name='stock_market_activaate'),
+    url(r'^stock-market/deactivate/$', 'bar.views.stock_market_deactivate', name='stock_market_deactivaate'),
     url(r'$', 'bar.views.barcash', name='barcash'),
 
 )

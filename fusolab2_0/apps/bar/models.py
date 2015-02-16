@@ -45,7 +45,7 @@ class PriceListDisplay(models.Model):
     entrance_number = models.IntegerField('Numero ingressi', default=0)
     entrance_symbol = models.CharField("sigla stile NASDAQ", max_length=30, default="INRR")
     entrance_trend = models.CharField('trend', max_length=2, choices=PRICE_CHANGE_TYPES)
-    variation_active = models.BooleanField('aggiornato', default=False)
+    variation_active = models.BooleanField('Prezzi pazzi attivo?', default=False)
     def __unicode__(self):
         return self.messages
     class Meta:
@@ -55,6 +55,7 @@ class PriceListDisplay(models.Model):
         self.id=1
         super(PriceListDisplay, self).save()
     def delete(self):
+        #inhibit delete
         pass
 
 class PurchasedProduct(models.Model):
