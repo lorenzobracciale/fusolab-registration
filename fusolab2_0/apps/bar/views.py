@@ -150,14 +150,14 @@ def bar_smallbalance_form(request, balance_type):
 
 
 def stock_market_activate(request):
-    pd = PriceListDisplay.object.get(pk=1)
+    pd = PriceListDisplay.objects.get(pk=1)
     pd.variation_active = True
     pd.save()
     return HttpResponse("OK attivato")
 
 
 def stock_market_deactivate(request):
-    pd = PriceListDisplay.object.get(pk=1)
+    pd = PriceListDisplay.objects.get(pk=1)
     pd.variation_active = False
     pd.save()
     #Restore price to their default
@@ -165,6 +165,12 @@ def stock_market_deactivate(request):
         p.cost = p.default_price
         p.save()
     return HttpResponse("OK disattivato")
+
+def stock_market_current_prices(request):
+    prices = []
+    for p in Product.objects.all():
+        prices.append({'id': p.id, 'price': float(p.cost)})
+    return HttpResponse(json.dumps(prices), content_type="application/json")
 
 
 

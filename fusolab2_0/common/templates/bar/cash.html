@@ -10,8 +10,9 @@
     <script type="text/javascript" src="/static/js/jquery-ui-1.10.3.custom.min.js"></script>  
     <script type="text/javascript" src="/static/js/jquery.printElement.min.js"></script>
   <script type="text/javascript"> 
-      $
      var  total = 0.0;
+     var isStockMarketActive = False;
+     var current_prices = [];
 
       function refresh_total () {
         $('.total').each(function(index) {
@@ -82,28 +83,44 @@
           $.get('/bar/stock-market/activate/', function (data) {
                 $('#footer').html(data);      
                 (function poll() {
-                   setTimeout(function() {
-                        poll_prices();
-                    }, 10000);
+                   setTimeout(poll_price, 10000);
                 })();
             }).error(function() { 
-                alert('Non ho potuto abilitare prezzi pazzi (e non chiedermi perche'!)');
+                alert('Non ho potuto abilitare prezzi pazzi (e non chiedermi perche!)');
             });
       }
 
       function deactivate_stock_market() {
           $.get('/bar/stock-market/deactivate/', function (data) {
                 $('#footer').html(data);      
+                isStockMarketActive = False;
+                // restore the default prices
+                poll_prices();
             }).error(function() { 
-                alert('Non ho potuto disabilitare prezzi pazzi (e non chiedermi perche'!)');
+                alert('Non ho potuto disabilitare prezzi pazzi (e non chiedermi perche!)');
             });
       }
 
-      function poll_prices() {
-            /* Poll the prices */
-      
-      
-      }
+    function poll_prices() {
+        /* Poll the prices */
+        console.log("polling");
+        $.ajax({ url: "/bar/stock-market/current-prices/", success: function(data) {
+                    current_prices.length = 0;
+                    $.each(data, function(i, item) {
+                        $("#product-" + data[i].id + " > .product-cost").text(data[i].price.toFixed(2))
+                        // if we are doing a receipt, wait before changing the price
+                        if ($('product-receipt li').length) {
+                            current_prices.push({'id': [data[i].id], 'price': data[i].price});
+                        }
+                    });
+                }, dataType: "json", complete: function() {
+                    if (isStockMarketActive) {
+                        setTimeout(poll_prices, 10000);
+                    }
+                }
+        });
+        // end poll
+    }
 
       function printreceipt(dontprint) {
            /* push in db and print */
@@ -145,6 +162,13 @@
                         ]
                     }); 
                 }
+                if (current_prices.length > 0 ) {
+                    $.each(current_prices, function(i, item) {
+                        $("#product-" + current_prices[i].id + " > .product-cost").text(current_prices[i].price.toFixed(2))
+                    });
+
+                    
+                }
             },
             error: function(e) { 
                 alert("Errore, non posso connettermi al server FusoHeart, contattare un nerd!"); 
@@ -178,7 +202,8 @@
                         ;
                     } 
               });
-             {% ifstockmarket active %}
+             {% ifstockmarket deactive %}
+                isStockMarketActive = True;
                 (function poll() {
                        setTimeout(function() {
                             poll_prices();
@@ -224,7 +249,7 @@
                 <ul>
                 <div id="external-cost-buttons">
                 {% for p in products %}
-                    <li><a href="javascript:additem({{ p.id }})"><span class="product-n">{{ p.keycode }}</span><span class="product-name">{{ p.name }}</span><span class="product-cost">{{ p.cost }}</span></a></li>
+                    <li><a id="product-{{p.id}}" href="javascript:additem({{ p.id }})"><!-- span class="product-n">{{ p.keycode }}</span --><span class="product-name">{{ p.name }}</span><span class="product-cost">{{ p.cost }}</span></a></li>
                 {% endfor %}
                 </div>
                 <!-- div id="internal-cost-buttons" style="display:none">

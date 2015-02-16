@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     #url(r'^barcash2/$', 'bar.views.barcash2', name='barcash2'),
     url(r'^stock-market/activate/$', 'bar.views.stock_market_activate', name='stock_market_activaate'),
     url(r'^stock-market/deactivate/$', 'bar.views.stock_market_deactivate', name='stock_market_deactivaate'),
+    url(r'^stock-market/current-prices/$', 'bar.views.stock_market_current_prices', name='stock_market_current_prices'),
     url(r'$', 'bar.views.barcash', name='barcash'),
 
 )
