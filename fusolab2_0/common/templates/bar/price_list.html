@@ -36,26 +36,28 @@
                     type: "GET",
                     success: function(data) {
                         // update messages
-                        var messages = '';
-                        $(data.messages).each(function( index ) {
-                            messages +=  '<li>' + data.messages[index] + '</li>';
-                        });
-                        $("#message-ticker").webTicker('update', messages);
-                        // update stock prices
-                        messages = '';
-                        $(data.stockmarket).each(function( index ) {
-                            messages +=  '<li>' + data.stockmarket[index] + '</li>';
-                        });
-                        $("#stock-ticker").webTicker('update', messages);
-                        // update prices
-                        $(data.prices).each(function( index ) {
-                            if ( $('.item_' + data.prices[index].id).length ) {
-                                $('.item_' + data.prices[index].id + ' td.price').val(data.prices.price);
-                            }
-                        });
-                        
-                        console.log(data.prices);
-                        console.log(data.stockmarket);
+                        if (data.prices.length > 0) {
+                            var messages = '';
+                            $(data.messages).each(function( index ) {
+                                messages +=  '<li>' + data.messages[index] + '</li>';
+                            });
+                            $("#message-ticker").webTicker('update', messages);
+                            // update stock prices
+                            messages = '';
+                            $(data.stockmarket).each(function( index ) {
+                                messages +=  '<li>' + data.stockmarket[index] + '</li>';
+                            });
+                            $("#stock-ticker").webTicker('update', messages);
+                            // update prices
+                            $(data.prices).each(function( index ) {
+                                if ( $('.item_' + data.prices[index].id).length ) {
+                                    $('.item_' + data.prices[index].id + ' td.price').val(data.prices.price);
+                                }
+                            });
+                            
+                            console.log(data.prices);
+                            console.log(data.stockmarket);
+                        }
                     },
                     dataType: "json",
                     complete: poll,

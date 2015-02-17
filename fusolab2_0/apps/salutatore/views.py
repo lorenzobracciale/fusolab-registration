@@ -1,5 +1,6 @@
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, HttpResponseServerError
 from django.utils import simplejson
+import json
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
@@ -12,7 +13,34 @@ from salutatore.models import Greeting, ToBeSaid
 from sorl.thumbnail import get_thumbnail
 from base.utils import * 
 
-def salutatore(request, cardid=None, manual_speech=None):
+def salutatore(request, cardid=None):
+    resp = {}
+    last_greeting = current_greeting = c = None
+    try:
+        c = Card.objects.get(sn = cardid)
+        name = c.user.user.first_name
+        # save current greeting
+        current_greeting = Greeting(user = c.user)
+        current_greeting.save()
+        last_greeting = Greeting.objects.filter(user = c.user).order_by('-date')[1]
+    except Card.DoesNotExist:
+        name = "signor nessuno"
+    except Greeting.DoesNotExist, IndexError:
+        pass
+
+    if last_greeting and current_greeting:
+        resp['last_time'] = (current_greeting.date - last_greeting.date).total_seconds()
+    else:
+        resp['last_time'] = 0 # first time
+    resp['name'] = name
+    if c and c.user.salutatore:
+        resp['personal'] = c.user.salutatore
+    else:
+        resp['personal'] = None
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+def OLDsalutatore(request, cardid=None, manual_speech=None):
     to_say, name = "", ""
     last_greeting, first_time, current_greeting = None, None, None
     c = None
@@ -46,11 +74,13 @@ def salutatore(request, cardid=None, manual_speech=None):
     response['Content-Length'] = os.path.getsize( '/var/www/fusolab/media/salutatore/saluto.mp3' )
     return response
 
+# deprecated
 def say(request, sentence):
     if sentence == "criticalmass":
         sentence = "Benvenuta critical mass al fusolab, la sai questa e' fortissima: due ciclisti si incontrano a trastevere quando uno dei due dice all'altro: sai come si chiama questo fiume? e l'altro: no. Aaaarhrhrhrhhahahahahahharrrhhh ahh ahhhh ahhhhrrrrr"
     return salutatore(request, manual_speech=sentence)
 
+# deprecated
 @csrf_exempt
 @login_required
 def sentences_list(request):

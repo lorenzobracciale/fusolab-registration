@@ -193,12 +193,37 @@ def price_list(request):
 
 def poll_price_list(request):
     response_data = {}
-    response_data['messages'] = [ 'ATTENZIONE si avvisano i gentilissimi soci fusolab tra poco cambiera\' il listino', 'Birra in calo: colpa del caldo?', 'Cocktail in aumento smodato: hai mai provato il fusococktail?', 'Arrivano i nostri: picco di 5 ingressi 5 minuti fa' ]
+    messages = []
+    stockmarket = []
     prices = [] 
+    # TODO these messages can be set according to price variation
+    frasi_simpatiche = [
+        'ATTENZIONE si avvisano i gentilissimi soci fusolab tra poco cambiera\' il listino',
+        'Birra in calo: colpa del caldo?',
+        'E\' tua la jaguar parcheggiata davanti all\'ingresso?',
+    ]
+    messages = frasi_simpatiche
+
+    isUpdated = False
     for p in Product.objects.all():
         prices.append({'id': p.id, 'price': float(p.cost), 'name': p.name})
-    response_data['prices'] =  prices
-    response_data['stockmarket'] = ['Ingressi (INR) 142.0 <span class="rise">&#9650;</span>', 'BIRRE (BRR) 412.0 <span class="rise">&#9650;</span>', 'COCKTAIL (CKT) 112.0 <span class="dawn">&#9660;</span>']
+        if p.trend == 'r':
+            s = "%s (%s) %d <span class='rise'>&#9650;</span>" % (p.name, p.symbol, p.cost)
+        elif p.trend == 'f':
+            s = "%s (%s) %d <span class='dawn'>&#9660;</span>" % (p.name, p.symbol, p.cost)
+
+        if p.updated:
+            isUpdated = True
+    #if response_data is empty, no update happens
+    if isUpdated:
+        response_data['prices'] =  prices
+        response_data['messages'] = messages
+        response_data['stockmarket'] = stockmarket
+    else:
+        response_data['prices'] = []
+        response_data['messages'] = []
+        response_data['stockmarket'] = []
+    #response_data['stockmarket'] = ['Ingressi (INR) 142.0 <span class="rise">&#9650;</span>', 'BIRRE (BRR) 412.0 <span class="rise">&#9650;</span>', 'COCKTAIL (CKT) 112.0 <span class="dawn">&#9660;</span>']
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 def datetimeIterator(from_date=None, to_date=None, delta=timedelta(minutes=1)):
