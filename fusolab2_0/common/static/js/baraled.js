@@ -148,7 +148,7 @@ $(function(){
         var originalSuccess, originalError;
         originalError = options.error;
         options.error = function (model, xhr, options) {
-            $("#ecce-homo").attr("src", "http://soci.fusolab.net/static/images/ecce-homo.jpg");
+            $("#ecce-homo").attr("src", "/static/images/ecce-homo.jpg");
             $("#myModal").modal('show');
         }
         Backbone.originalSync(method, model, options);

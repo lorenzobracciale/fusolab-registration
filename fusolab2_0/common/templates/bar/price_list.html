@@ -9,15 +9,87 @@
         <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.8.0.min.js"></script>  
         <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.webticker.js"></script>  
         <script type="text/javascript" src="{{ STATIC_URL }}js/slick/slick.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/d3.min.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/nv.d3.min.js"></script>
         <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}js/slick/slick.css"/>
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/nv.d3.css"/>
 
         <script type="text/javascript">
-        $(function(){
-            // scroller
+        var graph_data = {};
+        var charts = {};
+        (function polldata() {
+            {% for item in items %}
+                $.getJSON( "/bar/market/{{item.id}}/15/", function( data ) {
+                    graph_data[{{item.id}}] = data.data;
+                    // update
+                    nv.utils.windowResize(function() { charts[{{item.id}}].update() });
+                });
+            {% endfor %}
+
+            setTimeout(function() {
+                polldata();
+            }, 60*1000);
+        })();  
+
+        function creaGrafico(el, dataid, graph_data) {
+          var colors = d3.scale.category10().range();
+          for (var i = 0; i < dataid; i++) {
+            var x = colors.shift();
+            colors.push(x);
+          }
+
+          nv.addGraph(function() {
+               charts[dataid] = nv.models.cumulativeLineChart()
+                .x(function(d) { return d[0] })
+                //adjusting, 100% is 1.00, not 100 as it is in the data
+                .y(function(d) { return d[1] / 100 })
+                .color(colors)
+                .useInteractiveGuideline(false)
+                .showLegend(false)
+                ;
+
+              charts[dataid].xAxis
+                .tickFormat(function(d) {
+                  return d3.time.format('%H:%M')(new Date(d))
+                });
+
+              charts[dataid].yAxis.tickFormat(d3.format(',.1%'));
+                // '#graph-1 svg')
+
+              d3.select(el)
+                .datum(graph_data[dataid])
+                .transition().duration(500)
+                .call(charts[dataid])
+                ;
+
+              nv.utils.windowResize(charts[dataid].update);
+
+              return charts[dataid];
+            });
+        }
+
+
+
+        $(function() {
+            // initialize scroller
             // http://jonmifsud.com/open-source/jquery/jquery-webticker/
             jQuery('#stock-ticker').webTicker();
             jQuery("#message-ticker").webTicker({speed: 80});  
-            // carousel
+            // ogni 10 min riempi graph-data con il json
+            // initialize graphs
+            {% for item in items %}
+               // {"data": [{"values":   "key": "Birra in bottiglia"}]}
+                //graph_data.c1 = {'key': 'ciao', 't': 1};
+                $.getJSON( "/bar/market/{{item.id}}/5/", function( data ) {
+                    graph_data[{{item.id}}] = data.data;
+                   creaGrafico('#graph-{{item.id}} svg', {{item.id}}, graph_data);
+                });
+
+            {% endfor %}
+
+
+
+            // initialize carousel
             // http://kenwheeler.github.io/slick/
             $('.carousel').slick({
                 autoplay: true,
@@ -50,20 +122,20 @@
                             $("#stock-ticker").webTicker('update', messages);
                             // update prices
                             $(data.prices).each(function( index ) {
-                                if ( $('.item_' + data.prices[index].id).length ) {
-                                    $('.item_' + data.prices[index].id + ' td.price').val(data.prices.price);
+                                if ( $('.item_' + data.prices[index].id).length ) { // if an element exists, uptate the price
+                                    $('.item_' + data.prices[index].id + ' td.price').html(parseFloat(data.prices[index].price).toFixed(2) + "&euro;");
                                 }
                             });
-                            
-                            console.log(data.prices);
-                            console.log(data.stockmarket);
+                             
+                            //console.log(data.prices);
+                            //console.log(data.stockmarket);
                         }
                     },
                     dataType: "json",
                     complete: poll,
-                    timeout: 8000
+                    timeout: 4000
                 })
-            }, 30000);
+            }, 5000);
         })()  
         </script>
     </head>
@@ -85,7 +157,12 @@
                 <div><img src="{{ STATIC_URL }}images/listino/mojito.jpg"/></div>
                 <div><img src="{{ STATIC_URL }}images/listino/moscow_mule.jpg"/></div>
                 <div><img src="{{ STATIC_URL }}images/listino/pina_colada.jpg"/></div -->
-                <div><img src="{{ STATIC_URL }}images/listino/prova_cocktail.jpg"/></div>
+                <!-- div><img src="{{ STATIC_URL }}images/listino/prova_cocktail.jpg"/></div -->
+                {% for item in items %}
+                <div id="graph-{{item.id}}"><span class="title-graph">{{item.name.0}} <small>{{ item.name.1}}</small></span>
+                    <svg></svg>
+                </div>
+                {% endfor %}
             </div>
         </div>
         <div class="scroll-prices">

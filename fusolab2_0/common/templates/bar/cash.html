@@ -11,7 +11,7 @@
     <script type="text/javascript" src="/static/js/jquery.printElement.min.js"></script>
   <script type="text/javascript"> 
      var  total = 0.0;
-     var isStockMarketActive = False;
+     var isStockMarketActive = false;
      var current_prices = [];
 
       function refresh_total () {
@@ -22,22 +22,24 @@
 
       function additem(p_id, internal) {
           var cost = 0.0;
+          // product-id product-cost
+          var product_cost = $('#product-' + p_id + ' .product-cost').text();
+          var product_name = $('#product-' + p_id + ' .product-name').text();
+          var product_id = p_id;
+          $('#product-receipt ul').append("<li><span class='product-name'>" + product_name + "</span><span class='product-id'>" + product_id + "</span><span class='product-cost'>" + product_cost + "</span></li>");
+          cost = parseFloat(product_cost.replace(",", "."));
+          total += cost; 
+
+          {% comment %}
           {% for p in products %} 
           if (p_id == {{ p.id }}) {
               //if (internal == null) {
               $('#product-receipt ul').append("<li><span class='product-name'>{{ p.name }}</span><span class='product-id'>{{p.id }}</span><span class='product-cost'>{{ p.cost }}</span></li>");
               cost = parseFloat("{{ p.cost }}".replace(",", "."));
-              {% comment %}
-              /*} else {
-                // price for internal
-                  $('#product-receipt ul').append("<li><span class='product-name'>{{ p.name }}</span><span class='product-id'>{{p.id }}</span><span class='product-cost'>{{ p.internal_cost }}</span></li>");
-                  cost = parseFloat("{{ p.internal_cost }}".replace(",", "."));
-                  }
-                  */
-              {% endcomment %}
               total += cost; 
           }
           {% endfor  %}
+          {% endcomment %}
           refresh_total();
       };
 
@@ -93,7 +95,7 @@
       function deactivate_stock_market() {
           $.get('/bar/stock-market/deactivate/', function (data) {
                 $('#footer').html(data);      
-                isStockMarketActive = False;
+                isStockMarketActive = false;
                 // restore the default prices
                 poll_prices();
             }).error(function() { 
@@ -202,8 +204,8 @@
                         ;
                     } 
               });
-             {% ifstockmarket deactive %}
-                isStockMarketActive = True;
+             {% ifstockmarket active %}
+                isStockMarketActive = true;
                 (function poll() {
                        setTimeout(function() {
                             poll_prices();

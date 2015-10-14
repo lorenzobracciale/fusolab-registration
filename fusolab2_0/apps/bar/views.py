@@ -92,7 +92,7 @@ def addpurchasedproduct(request):
                pp = PurchasedProduct()
 
                pp.name = p_type.name
-               pp.cost = float(p['price'])#p_type.cost
+               pp.cost = float(p['cost'].replace(",", "."))#p_type.cost
                total = total + float(pp.cost) 
                pp.receipt = r
                pp.save()
@@ -176,7 +176,7 @@ def stock_market_current_prices(request):
 
 # listino
 def price_list(request):
-    bar_items = Product.objects.all().exclude(name__icontains = ' int').exclude(name__icontains = 'cibo aperitivo') #filter out internal products and extra stuff
+    bar_items = Product.objects.all().exclude(name__icontains = ' int').exclude(name__icontains = 'cibo') #filter out internal products and extra stuff
     # rename
     new_names = {
             'birra chiara': ('birra chiara', 'alla spina'),
@@ -205,15 +205,21 @@ def poll_price_list(request):
     messages = frasi_simpatiche
 
     isUpdated = False
-    for p in Product.objects.all():
+    for p in Product.objects.filter(can_change=True):
         prices.append({'id': p.id, 'price': float(p.cost), 'name': p.name})
         if p.trend == 'r':
-            s = "%s (%s) %d <span class='rise'>&#9650;</span>" % (p.name, p.symbol, p.cost)
+            s = "%s (%s) %.1f <span class='rise'>&#9650;</span>" % (p.name, p.symbol, p.cost)
         elif p.trend == 'f':
-            s = "%s (%s) %d <span class='dawn'>&#9660;</span>" % (p.name, p.symbol, p.cost)
+            s = "%s (%s) %.1f <span class='dawn'>&#9660;</span>" % (p.name, p.symbol, p.cost)
+        else: #stable
+            s = "%s (%s) %.1f <span class='stable'>&#8211;</span>" % (p.name, p.symbol, p.cost)
+        stockmarket.append(s)
 
         if p.updated:
+            p.updated = False #reset the updated flag
+            p.save()
             isUpdated = True
+
     #if response_data is empty, no update happens
     if isUpdated:
         response_data['prices'] =  prices
@@ -233,18 +239,19 @@ def datetimeIterator(from_date=None, to_date=None, delta=timedelta(minutes=1)):
         from_date = from_date + delta
     return
 
-def get_market_stats(request,product,granularity):
+def get_market_stats(request,productid,granularity):
     #granularity = 30
     response_data = {}
     s = []  
+    product = Product.objects.get(pk = productid).name
     # if not BarBalance.objects.is_open():
     #     pass
     #     #return HttpResponse(json.dumps(response_data), content_type="application/json")                
     # else:
-        #start = BarBalance.objects.get_parent_t().date
-    start = datetime.datetime(2015,01,17,19,7,31)
-    #now = datetime.now()
-    now = datetime.datetime(2015,01,18,6,9,0)
+    start = BarBalance.objects.get_parent_t().date
+    #start = datetime.datetime(2015,01,17,19,7,31)
+    now = datetime.datetime.now()
+    #now = datetime.datetime(2015,01,18,6,9,0)
     interval = datetime.timedelta(seconds=int(granularity)*60)
     qs = PurchasedProduct.objects.filter(receipt__date__range=[start,now])
 

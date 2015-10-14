@@ -93,12 +93,27 @@ span.dawn {
     color: #FA352F;
 }
 
+span.stable {
+    color: #FFDB58; /* mustaard sallly */
+}
+
+.carousel svg {
+      /* height: 512px; */
+      height: 480px;
+}
+
 .info-products {
     margin-top: 0px; 
     margin-bottom: 0px; 
     /* height: 540px; */
     height: 512px;
     width: 100%;
+}
+
+.title-graph {
+    font-size: 2em;
+    margin: auto;
+
 }
 
 /* Web ticker */

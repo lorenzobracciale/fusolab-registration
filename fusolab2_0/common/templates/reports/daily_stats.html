@@ -99,9 +99,9 @@
 {% block 'page_scripts' %}
 <script type="text/javascript">
 
-var url_bar_product = "http://soci.fusolab.net/reports/2013/11/16/bar.json";
-var url_total_income = "http://soci.fusolab.net/reports/2013/11/16/total.json";
-var url_entrance = "http://soci.fusolab.net/reports/2013/11/16/ingresso.json";
+var url_bar_product = "/reports/2013/11/16/bar.json";
+var url_total_income = "/reports/2013/11/16/total.json";
+var url_entrance = "/reports/2013/11/16/ingresso.json";
 
 var lineResize;
 
@@ -259,9 +259,9 @@ $(document).ready(function() {
 
         //change the urls
 
-        url_bar_product = "http://soci.fusolab.net/reports/" + new_date + "/bar.json";
-        url_total_income = "http://soci.fusolab.net/reports/" + new_date + "/total.json";
-        url_entrance = "http://soci.fusolab.net/reports/" + new_date + "/ingresso.json";
+        url_bar_product = "/reports/" + new_date + "/bar.json";
+        url_total_income = "/reports/" + new_date + "/total.json";
+        url_entrance = "/reports/" + new_date + "/ingresso.json";
         
         // update all the graphs
 
