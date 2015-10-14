@@ -2,9 +2,9 @@
 Ciao,
 per attivare il tuo profilo Fusolab vai a questo indirizzo: 
 
-http://soci.fusolab.net/base/activate/{{ activation_key }}/
+http://cassasotto.fusolab.net/base/activate/{{ activation_key }}/
 
-Una volta attivato potrai entrare su sul sito http://soci.fusolab.net ed interagire con cose o persone all'interno del Fusolab!
+Una volta attivato potrai entrare su sul sito http://cassasotto.fusolab.net ed interagire con cose o persone all'interno del Fusolab!
 
 Se non sei stato tu a registrarti, ti preghiamo di non fare nulla. Non riceverai piu' email e questo account scadra' automaticamente tra {{ expiration_days|apnumber }} giorni.
 
