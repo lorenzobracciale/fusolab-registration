@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Tuttapposssto{% endblock %}
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Profilo modificato con successo</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="body">
+                {% if activation_key %}
+                <p>Tutto ok! Ora puoi effettuare il <a class="btn btn-primary" href="{% url 'auth_login' %}">Login</a></p>
+                </p>
+                {% else %}
+                <p>Torna alla  
+                <a class="btn btn-primary" href="{% url 'home' %}">Homepage <i class="icon-glyphicon-home"></i></a> 
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

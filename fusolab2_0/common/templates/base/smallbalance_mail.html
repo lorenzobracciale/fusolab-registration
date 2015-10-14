@@ -1,0 +1,43 @@
+<html>
+<body>
+<table>
+    <tr>
+        <th></th>
+        <th>punto di cassa atteso</th>
+        <th>punto di cassa corrente</th>
+    </tr>
+    <tr>
+        <td>{% if warning %}WARNING{% endif %}
+        </td>
+        <td>{{ expected_checkpoint }}</td>
+        <td>{{ checkpoint }}</td>
+    </tr>
+</table>
+<table>
+    <tr>
+        <th>data</th>
+        <th>cassiere</th>
+        <th>punto di cassa precedente</th>
+        <th>ricevute</th>
+        <th>depositi</th>
+        <th>prelievi</th>
+        <th>pagamenti</th>
+        <th>punto di cassa corrente</th>
+    </tr>
+    <tr>
+        <td>{{ date }}</td>
+        <td>{{ cashier }}</td>
+        <td>{{ last_checkpoint }}</td>
+        <td>{{ receipt_amount }}</td>
+        <td>{{ de }}</td>
+        <td>{{ wi }}</td>
+        <td>{{ pa }}</td>
+        <td>{{ checkpoint }}</td>
+    </tr>
+</table>
+{% for i in notes %}
+<div>{{ i }}</div>
+{% endfor %}
+
+</body>
+</html>

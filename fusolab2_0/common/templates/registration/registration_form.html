@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% block 'title' %}Registrazione Fusolab 2.0{% endblock %}
+<div class="wrap">
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Benvenuto al Fusolab</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <section class="widget">
+                <header>
+                    <h4>
+                        <i class="icon-align-left"></i>
+                        Modulo di Iscrizione
+                    </h4>
+                </header>
+                <div class="body">
+                    <form class="form-horizontal" method="post" action="">
+                        {% csrf_token %} 
+                        <fieldset>
+                            <legend class="section">Compila tutti i campi</legend>
+                            {{ form.non_field_errors }}
+                            <div id="lol-content"> </div>
+                            <div class="control-group">
+                                <label class="control-label" for="normal-field">{{ form.first_name.label }}</label>
+                                <div class="controls form-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.html_name }}" value="{{ form.first_name.value |default_if_none:""  }}" class="form-control parsley-validated {% if form.first_name.errors %}parsley-error{% endif %}" placeholder="Nome" data-trigger="change" data-minlength="3" required="required">
+                                        {% if form.first_name.errors %}
+                                        <ul class="parsley-error-list" style="display: block;">
+                                            <li class="type" style="display: list-item;">{{ form.first_name.errors.as_text }}</li>
+                                        </ul>
+                                        {% endif %} 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="normal-field">{{ form.last_name.label }}</label>
+                                <div class="controls form-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.html_name }}" value="{{ form.last_name.value |default_if_none:"" }}" class="form-control parsley-validated {% if form.last_name.errors %}parsley-error{% endif %}" placeholder="Cognome" data-trigger="change" data-minlength="3" required="required">
+                                        {% if form.last_name.errors %}
+                                        <ul class="parsley-error-list" style="display: block;">
+                                            <li class="type" style="display: list-item;">{{ form.last_name.errors.as_text }}</li>
+                                        </ul>
+                                        {% endif %} 
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="normal-field">{{ form.born_date.label }}</label>
+                                <div class="controls form-group">
+                                    <div class="col-sm-8">
+                                        <!-- input type="text" id="{{ form.born_date.id_for_label }}" name="{{ form.born_date.html_name }}" value="{{ form.born_date.value |default_if_none:"" }}" class="form-control date-picker parsley-validated {% if form.born_date.errors %}parsley-error{% endif %}" placeholder="Ad es. 31/01/1987" pattern="[0-9]{2}\/[0-9]{2}\/[0-9]{4}" data-trigger="change" {% if form.born_date.field.required %}required="required"{% endif %} readonly="" data-date-minviewmode="days" data-date-viewmode="years" data-date-format="dd/mm/yyyy" -->
+                                        <input type="text" id="{{ form.born_date.id_for_label }}" name="{{ form.born_date.html_name }}" value="{{ form.born_date.value |default_if_none:"" }}" class="form-control parsley-validated {% if form.born_date.errors %}parsley-error{% endif %}" placeholder="Ad es. 31/01/1987" pattern="[0-9]{2}\/[0-9]{2}\/[0-9]{4}" data-trigger="change" {% if form.born_date.field.required %}required="required"{% endif %}>
+                                        {% if form.born_date.errors %}
+                                        <ul class="parsley-error-list" style="display: block;">
+                                            <li class="type" style="display: list-item;">{{ form.born_date.errors.as_text }}</li>
+                                        </ul>
+                                        {% endif %} 
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="normal-field">{{ form.born_place.label }}</label>
+                                <div class="controls form-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" id="{{ form.born_place.id_for_label }}" name="{{ form.born_place.html_name }}" value="{{ form.born_place.value |default_if_none:"" }}" class="form-control parsley-validated {% if form.born_place.errors %}parsley-error{% endif %}" placeholder="Dove sei nato" data-trigger="change" data-minlength="3" required="required">
+                                        {% if form.born_place.errors %}
+                                        <ul class="parsley-error-list" style="display: block;">
+                                            <li class="type" style="display: list-item;">{{ form.born_place.errors.as_text }}</li>
+                                        </ul>
+                                        {% endif %} 
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label" for="normal-field">{{ form.email.label }}</label>
+                                <div class="controls form-group">
+                                    <div class="col-sm-8">
+                                        <input type="email" id="{{ form.email.id_for_label }}" name="{{ form.email.html_name }}" value="{{ form.email.value |default_if_none:"" }}" class="form-control parsley-validated {% if form.born_place.errors %}parsley-error{% endif %}" data-trigger="change" data-validation-minlength="5" placeholder="La tua email" required="required">
+                                        {% if form.email.errors %}
+                                        <ul class="parsley-error-list" style="display: block;">
+                                            <li class="type" style="display: list-item;">{{ form.email.errors.as_text }}</li>
+                                        </ul>
+                                        {% endif %} 
+                                    </div>
+                                </div>
+                            </div>
+
+                            <section class="widget">
+                                <div class="body">
+                                    <blockquote>
+                                            Chiede di essere ammesso/a e partecipare in qualita' di socio
+                                            all'Associazione di Promozione Sociale FUSOLAB ONLUS, conferma di aver preso
+                                            visione dello statuto, di accettare e condividerne le finalita' e gli
+                                            obiettivi, di voler collaborare per il raggiungimento dello scopo sociale,
+                                            di essere a conoscenza dei regolamenti interni e di rispettarli. 
+                                            Autorizzo al trattamento dei dati personali ai sensi della L. 675/96 e
+                                            successive modifiche. Dal canto suo l'Associazione di Promozione Sociale
+                                            FUSOLAB ONLUS garantisce l'utilizzo dei dati personali richiesti dal
+                                            presente modulo esclusivamente per lo svolgimento e la gestione delle
+                                            attivita' legate agli scopi dell'associazione.
+                                    </blockquote>
+                                </div>
+                            </section>
+                            <div class="control-group">
+                                    <label class="checkbox">
+                                        <input type="checkbox" id="{{ form.accepted_eula.id_for_label }}" name="{{ form.accepted_eula.html_name }}" class="iCheck form-control parsley-validated {% if form.accepted_eula.errors %}parsley-error{% endif %}" checked="checked">
+                                        {{ form.accepted_eula.label }}
+                                    </label>
+                                {% if form.accepted_eula.errors %}
+                                <ul class="parsley-error-list" style="display: block;">
+                                    <li class="type" style="display: list-item;">{{ form.accepted_eula.errors.as_text }}</li>
+                                </ul>
+                                {% endif %} 
+                            </div>
+                        </fieldset>
+                        <br />
+                        <div>
+                            <button type="submit" class="btn btn-primary btn-lg btn-block">Iscriviti</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block 'page_scripts' %}
+<!-- page specific -->
+<script src="{{ STATIC_URL }}light-blue/js/forms-elemets.js"></script>
+{% if form.non_field_errors %}
+    <script src="/static/js/soundmanager2-nodebug-jsmin.js"></script>
+    <script type="text/javascript">
+        soundManager.setup({
+          url: '/static/swf/',
+          flashVersion: 9, // optional: shiny features (default = 8)
+          useFlashBlock: false, // optionally, 
+          onready: function() {
+            // Ready to use; soundManager.createSound() etc. can now be called.
+            soundManager.createSound({
+              id: 'mySound',
+              url: '/static/sound/sitcom.mp3',
+              autoLoad: true,
+              autoPlay: true,
+              volume: 100
+            });
+          }
+        });
+        $(document).ready( function() {
+            if ( $('ul.errorlist li:first-child').text().search(/LOL/i) >= 0 ) {
+                $('#lol-content').prepend('<img src="/static/images/jackie.jpg" />')
+                            $('#form-content').toggle('fast', function() {
+                    // Animation complete.
+                    setTimeout(function() {
+                        $('#lol-content').empty();
+                        $('#form-content').toggle();
+                    } , 12000);
+                });
+
+            } 
+        } );
+    {% endif %}
+</script>
+
+{% endblock %}
+
+
+</body>

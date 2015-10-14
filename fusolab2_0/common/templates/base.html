@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block 'title' %}{% endblock %}</title>
+    <link href="{{ STATIC_URL }}light-blue/css/application.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ STATIC_URL }}light-blue/img/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta charset="utf-8">
+</head>
+
+{% load ifusergroup %}
+{% load thumbnail %}
+
+{% block 'body' %}
+<body class="background-dark">
+    <div class="logo">
+        <h4><a href="index.html">Fusolab<strong>2.0</strong></a></h4>
+    </div>
+    {% block 'sidebar' %}
+    {% if user.is_authenticated %}
+    <nav id="sidebar" class="sidebar nav-collapse collapse">
+        <ul id="side-nav" class="side-nav">
+            {% block nav-home %}<li><a href="{% url 'home' %}"><i class="icon-home"></i> <span class="name">Dashboard</span></a></li>{% endblock %}
+
+            {% ifusergroup turnisti %}
+                {% block nav-cassa-bar %}<li><a href="{% url 'barcash' %}"><i class="icon-glass"></i> <span class="name">Cassa Bar</span></a></li>{% endblock %}
+                {% block nav-ingresso %}<li><a href="{% url 'ingresso_home' %}"><i class="icon-edit"></i> <span class="name">Ingresso</span></a></li>{% endblock %}
+                {% block nav-regolamento %}<li><a href="{% url 'base_regolamento' %}"><i class="icon-legal"></i> <span class="name">Regolamento</span></a></li>{% endblock %}
+                {% block nav-guide %}
+                <li class="panel">
+                    <a class="accordion-toggle collapsed" data-toggle="collapse"
+                        data-parent="#side-nav" href="#forms-guide-collapse"><i class="icon-info-sign"></i> <span class="name">Guide</span></a>
+                    <ul id="forms-guide-collapse" class="panel-collapse collapse">
+                        <li><a href="{% url 'ingresso_guide' %}">Turno Ingresso</a></li>
+                        <li><a href="{% url 'bar_guide' %}">Turno Bar</a></li>
+                    </ul>
+                </li>
+                {% endblock %}
+                {% block nav-turni %}
+                <li class="panel">
+                    <a class="accordion-toggle collapsed" data-toggle="collapse"
+                        data-parent="#side-nav" href="#forms-turni-collapse"><i class="icon-calendar"></i> <span class="name">Turni</span></a>
+                    <ul id="forms-turni-collapse" class="panel-collapse collapse">
+                        <li><a href="{% url 'base_disponibilita' %}">Disponibilita'</a></li>
+                        <li><a href="{% url 'base_turni' %}">Turni</a></li>
+                    </ul>
+                </li>
+                {% endblock %}
+
+                {% block nav-stats %}
+                <li class="panel">
+                    <a class="accordion-toggle collapsed" data-toggle="collapse"
+                        data-parent="#side-nav" href="#forms-stat-collapse"><i class="icon-bar-chart"></i> <span class="name">Statistiche</span></a>
+                    <ul id="forms-stat-collapse" class="panel-collapse collapse">
+                        <li><a href="{% url 'reports_daily_stats' %}">Statistiche serata</a></li>
+                        <li><a href="{% url 'reports_make_balance' %}">Bilancio</a></li>
+                    </ul>
+                </li>
+                {% endblock %}
+                {% block nav-opener %}<li><a href="{% url 'cancello_opener' %}"><i class="icon-unlock"></i> <span class="name">Apri Porte</span></a></li>{% endblock %}
+            {% endifusergroup %}
+
+        </ul>
+    </nav>
+    {% endif %}
+    {% endblock %}
+
+    <div class="wrap">
+
+    {% block 'page_header' %}
+    <header class="page-header">
+        <div class="navbar">
+            <ul class="nav navbar-nav navbar-right pull-right">
+                {% if user.is_authenticated %}
+                <li class="hidden-xs dropdown">
+                    <a href="#" title="Account" id="account"
+                       class="dropdown-toggle"
+                       data-toggle="dropdown">
+                        <i class="icon-user"></i>
+                    </a>
+                    <ul id="account-menu" class="dropdown-menu account" role="menu">
+                        <li role="presentation" class="account-picture">
+
+                        {% thumbnail request.user.get_profile.photo "50x50"  as im %}
+                        <img class="img-circle" src="{{ im.url }}">
+                        {% endthumbnail %}
+                        <!-- img src="{{ MEDIA_URL }}{{ request.user.get_profile.photo }} " alt="" -->
+                        {{ request.user.first_name }} {{ request.user.last_name }}  
+                        </li>
+                        <li role="presentation">
+                            <a href="{% url 'base_account_edit' %}" class="link">
+                                <i class="icon-user"></i>
+                                   Profilo 
+                            </a>
+                        </li>
+                        {% comment %}
+                        <li role="presentation">
+                            <a href="component_calendar.html" class="link">
+                                <i class="icon-calendar"></i>
+                                Calendario
+                            </a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#" class="link">
+                                <i class="icon-inbox"></i>
+                                Inbox
+                            </a>
+                        </li>
+                        {% endcomment %}
+                    </ul>
+                </li> 
+                <li class="visible-xs">
+                    <a href="#" class="btn-navbar" data-toggle="collapse" data-target=".sidebar" title="">
+                        <i class="icon-reorder"></i>
+                    </a>
+                </li>
+                <li class="hidden-xs"><a href="{% url 'auth_logout' %}"><i class="icon-signout"></i></a></li>
+                {% else %}
+                <li class="hidden-xs"><a href="{% url 'auth_login' %}"><i class="icon-signin"></i></a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </header>
+    {% endblock %}
+
+
+    {% block 'content' %}
+    {% endblock %}
+
+    {% block 'generic_scripts' %}
+    <!-- jquery and friends -->
+    <script src="{{ STATIC_URL }}light-blue/lib/jquery/jquery.1.9.0.min.js"> </script>
+    <script src="{{ STATIC_URL }}light-blue/lib/jquery/jquery-migrate-1.1.0.min.js"> </script>
+
+    <!-- jquery plugins -->
+    <script src="{{ STATIC_URL }}light-blue/lib/jquery-maskedinput/jquery.maskedinput.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/parsley/i18n/messages.it.js"> </script>
+    <script src="{{ STATIC_URL }}light-blue/lib/parsley/parsley.js"> </script>
+
+    <script src="{{ STATIC_URL }}light-blue/lib/icheck.js/jquery.icheck.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/select2.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/jquery.autogrow-textarea.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/sparkline/jquery.sparkline.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/jquery-ui-1.10.1.custom.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/jquery.slimscroll.js"></script>
+
+    <!-- d3, nvd3-->
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/lib/d3.v2.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/nv.d3.custom.js"></script>
+
+    <!-- nvd3 models -->
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/scatter.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/axis.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/legend.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/stackedArea.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/stackedAreaChart.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/multiBar.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/multiBarChart.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/line.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/lineChart.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/stream_layers.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/pie.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/linePlusBarChart.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/historicalBar.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/nvd3/src/models/pieChart.js"></script>
+
+
+    <!--backbone and friends -->
+    <script src="{{ STATIC_URL }}light-blue/lib/backbone/underscore-min.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/backbone/backbone-min.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/backbone/backbone.localStorage-min.js"></script>
+
+    <!-- bootstrap default plugins -->
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap/transition.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap/collapse.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap/alert.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap/tooltip.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap/popover.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap/button.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap/dropdown.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap/modal.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap/modal.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap/tab.js"> </script>
+
+    <!-- bootstrap custom plugins -->
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap-datepicker.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap-select/bootstrap-select.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/wysihtml5/wysihtml5-0.3.0_rc2.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap-wysihtml5/bootstrap-wysihtml5.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap-switch.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/lib/bootstrap-colorpicker.js"></script>
+
+    <!-- basic application js-->
+    <script src="{{ STATIC_URL }}light-blue/js/app.js"></script>
+    <script src="{{ STATIC_URL }}light-blue/js/settings.js"></script>
+
+    {% block 'page_scripts' %}
+    {% endblock %}
+
+    {% endblock %}
+    {% block 'bottom' %}
+    {% endblock %}
+</body>
+{% endblock %}
+</html>

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Benvenuto!{% endblock %}
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            {% if account %}
+            <h2 class="page-title">Sei dentro!</h2>
+            {% else %}
+            <h2 class="page-title">Errore</h2>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="body">
+                {% if account %}
+                    <p>Tutto ok! Ora puoi effettuare il <a class="btn btn-primary" href="{% url 'auth_login' %}">Login</a></p>
+                {% else %}
+                    <p>Errore :-(</p>
+                    <p>Se hai gia' attivato il tuo profilo, puoi fare direttamente il <a class="btn btn-primary" href="{% url 'auth_login' %}">Login</a></p>
+                    <p>Altrimenti la tua chiave di attivazione e' scaduta. <a class="btn btn-primary" href="{% url 'auth_password_reset' %}">Riattivala</a></p>
+                {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Tutto Apposssto!</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <section class="widget">
+                <header>
+                    <h4><i class="icon-ok"></i> La sua soddisfazione è il nostro miglior premo</h4>
+                </header>
+                <div class="body">
+                    <img src="/static/images/linobanfi.jpg" />
+                    <p>Attendi 3 secondi per il reindirizzamento...</p>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block 'page_scripts' %}
+<script type="text/javascript">
+    var delay = 3000; //Your delay in milliseconds
+    setTimeout(function(){ window.location = "/{{ next_page }}"; }, delay);
+</script>
+{% endblock %}
+
+

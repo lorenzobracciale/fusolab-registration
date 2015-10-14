@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrazione completata{% endblock %}
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Registrazione completata <small>Benvenuto al Fusolab!</small></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="body">
+                <p>Adesso puoi entrare al Fusolab!</p>
+                <p>Ti abbiamo mandato un link con il codice per attivare il tuo profilo che puoi attivare con calma da casa.</p>
+                <p>Una volta attivo, potrai interagire con persone e cose (!!!) all'interno del FusoLab!</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block 'page_scripts' %}
+<script type="text/javascript"> 
+    $(document).ready( function() { 
+        setTimeout(function() {
+          window.location.href = "{% url 'home' %}";
+        }, 10000);
+    });
+</script>
+{% endblock %}
+

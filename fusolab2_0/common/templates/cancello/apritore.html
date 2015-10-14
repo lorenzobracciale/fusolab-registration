@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Apri Cancello{% endblock %}
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Apri Porte <small>Bussa e ti sara' aperto</small></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 col-sm-4 col-xs-6">
+            <div class="box">
+                <div class="icon">
+                    <i class="icon-cancello eicon-lock-open" style="display: none"></i>
+                    <i class="icon-cancello eicon-lock"></i>
+                </div>
+                <div id="apri-cancello-timer" class="description">
+                </div>
+                <button id="apri-cancello" type="button" class="btn btn-success btn-lg" data-placement="top" data-original-title=".btn .btn-success .btn-lg">
+                    Apri Cancello
+                </button>
+                <br/> <br/>
+                <blockquote>Premilo e il cancello automatico magicamente si aprira'! 
+                </blockquote>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-4 col-xs-6">
+            <div class="box">
+                <div class="icon">
+                    <i class="icon-porta eicon-lock-open" style="display: none"></i>
+                    <i class="icon-porta eicon-lock"></i>
+                </div>
+                <div id="apri-porta-timer" class="description">
+                </div>
+                <button id="apri-porta" type="button" class="btn btn-success btn-lg" data-placement="top" data-original-title=".btn .btn-success .btn-lg">
+                    Apri Porta
+                </button>
+                <br/> <br/>
+                <blockquote>Premilo e sbatacchia la porta d'ingresso nei 3 secondi successivi
+                </blockquote>
+            </div>
+
+        </div>
+    </div>
+    {% if user.is_active and user.is_staff %}
+    <div class="row">
+         <div class="col-md-10">
+            Vuoi ma non puoi? Per aprire le porte ti deve autorizzare Dario
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block 'page_scripts' %}
+<script type="text/javascript"> 
+    $(document).ready( function() { 
+        var portaTimeout = null;
+        var cancelloTimeout = null;
+        $(document).on('click', '#apri-cancello', function() {
+            $('#apri-cancello-timer').load("{% url 'open_gate' %}");
+            $('.icon-cancello').toggle();
+            if (cancelloTimeout) {
+                window.clearTimeout(cancelloTimeout);
+            }
+            cancelloTimeout = setTimeout(function(){
+                $('.icon-cancello').toggle();
+                $('#apri-cancello-timer').html('');
+            },20000);
+        });
+        $(document).on('click', '#apri-porta', function() {
+            $('#apri-porta-timer').load("{% url 'open_door' %}");
+            $('.icon-porta').toggle();
+            if (portaTimeout) {
+                window.clearTimeout(portaTimeout);
+            }
+            portaTimeout = setTimeout(function(){
+                $('.icon-porta').toggle();
+                $('#apri-porta-timer').html('');
+            },3000);
+        });
+
+    });
+</script>
+{% endblock %}
+

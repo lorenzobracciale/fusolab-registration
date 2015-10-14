@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Benvenuto!{% endblock %}
+
+MAI USATA
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Ci siamo quasi...</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="body">
+                <p>Ci servono alcuni tuoi dati per completare l'attivazione. Una volta fatta potrai accedere tramite questo sito ed interagire con persone e cose all'interno del FusoLab. Vai su <a class="btn btn-primary" href="{% url 'base_activate_edit' %}">Profilo</a></p>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

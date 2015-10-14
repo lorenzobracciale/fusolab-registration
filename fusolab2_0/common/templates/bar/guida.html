@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block nav-guide %}
+<li class="panel active">
+    <a class="accordion-toggle" data-toggle="collapse"
+        data-parent="#side-nav" href="#forms-collapse"><i class="icon-info-sign"></i> <span class="name">Guide</span></a>
+    <ul id="forms-collapse" class="panel-collapse open in">
+        <li><a href="{% url 'ingresso_guide' %}">Turno Ingresso</a></li>
+        <li class="active"><a href="{% url 'bar_guide' %}">Turno Bar</a></li>
+    </ul>
+</li>
+{% endblock %}
+
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Guida Turno Cassa Bar <small>Cose utili da sapere</small></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <section class="box">
+                <div class="body">
+                    <div class="wrapper">
+                        <iframe src="https://docs.google.com/document/d/1i0rCwgB-G8ZQjnKe32D-W1Ih_ZROPd3iUfl_vYOjrcE/pub?embedded=false" width="100%" height="700" frameborder="0" style="overflow-x: hidden; overflow-y: scroll; "></iframe>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

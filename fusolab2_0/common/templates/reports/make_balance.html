@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+
+{% block nav-stats %}
+<li class="panel">
+    <a class="accordion-toggle" data-toggle="collapse"
+        data-parent="#side-nav" href="#forms-stat-collapse"><i class="icon-bar-chart"></i> <span class="name">Statistiche</span></a>
+    <ul id="forms-stat-collapse" class="panel-collapse open in">
+        <li><a href="{% url 'reports_daily_stats' %}">Statistiche serata</a></li>
+        <li class="active"><a href="{% url 'reports_make_balance' %}">Bilancio</a></li>
+    </ul>
+</li>
+{% endblock %}
+
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-8">
+            <h2 class="page-title">Bilancio <small>FusoLab</small></h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <section class="widget">
+                <header>
+                    <h4>
+                        <i class="icon-cloud-download"></i>
+                        Scarica il bilancio
+                    </h4>
+                </header>
+                <div class="body">
+
+                    <form id="make_balance_form" class="form-horizontal" method="post">
+                        <fieldset>
+                            <legend class="section">Seleziona il periodo di riferimento</legend>
+                        </fieldset>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="control-group">
+                                    <label for="from-date" class="control-label">Data di inizio</label>
+                                    <div class="controls form-group">
+                                        <div class="input-group">
+                                            <input  id="from-date" class="form-control date-picker" type="text" name="from-date" value="" data-date-format="dd/mm/yyyy" data-date="10/10/2013">
+                                            <span class="input-group-btn"><a href="#" class="btn btn-danger btn-select-calendar">
+                                            <i class="icon-calendar"></i>
+                                            </a></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="to-date" class="control-label">Data di fine</label>
+                                    <div class="controls form-group">
+                                        <div class="input-group">
+                                            <input id="to-date" class="form-control date-picker" type="text" name="to-date" value="" data-date-format="dd/mm/yyyy" data-date="10/10/2013">
+                                            <span class="input-group-btn"><a href="#" class="btn btn-danger btn-select-calendar">
+                                            <i class="icon-calendar"></i>
+                                            </a></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="select-obj" class="control-label">Bilancio di</label>
+                                    <div class="controls form-group">
+                                        <select name="select-obj" class="selectpicker" data-style="btn-success btn-lg"
+                                                tabindex="-1" id="select-obj">
+                                            <option value="bar">Bar</option>
+                                            <option value="ingresso">Ingresso</option>
+                                            <option value="interregno">Interregno</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <div>
+                                <button type="submit" class="btn btn-primary">Crea bilancio</button>
+                                <button type="reset" class="btn btn-default">Annulla</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block 'page_scripts' %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('.date-picker').datepicker( {
+        changeMonth: true,
+        changeYear: true,
+        showButtonPanel: true,
+        autoclose: true,
+        onClose: function(dateText, inst) { 
+        },
+    }).on('changeDate', function(e) {
+        $(this).datepicker('hide');    
+    });
+
+    $('.btn-select-calendar').on('click', function(e) {
+        var dateInput = $(this).parent().parent().find('input.date-picker');
+        dateInput.datepicker('show');
+    });
+
+    $('.selectpicker').selectpicker();
+        
+    $('#make_balance_form').submit(function() {
+        var from_date = $('#from-date').val();
+        var to_date = $('#to-date').val();
+        var what = $('#select-obj').val();
+        if (!(from_date && to_date && what)) {
+            alert("seleziona tutti i campi");
+        } else {
+            window.location.href = '/reports/excel/' + what + '/' + from_date + '/' + to_date + '/';
+        }
+        return false;
+    });
+});
+</script>
+
+{% endblock %}
+

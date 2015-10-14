@@ -3,3 +3,5 @@
 *.pyc
 local_settings.py
 settings.py
+fusolab2_0/common/static/light-blue/
+fusolab2_0/common/media/

@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block nav-ingresso %}<li class="active"><a href="{% url 'ingresso_home' %}"><i class="icon-edit"></i> <span class="name">Ingresso</span></a></li>{% endblock %}
+
+{% load ifbalanceopen %}
+
+{% block 'content' %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-title">Ingresso</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            {% ifbalanceopen ingresso %} 
+            <div class="row">
+                <div class="col-md-8">
+                    <section class="widget">
+                        <header>
+                            <h4><i class="icon-group"></i> Registrazione Ingressi <small> da fare per ogni persona che entra</small></h4>
+                        </header>
+                        <div class="body">
+                            <div class="controls form-group">
+                                <div class="input-group col-sm-12">
+                                    <span class="input-group-addon">&euro;</span>
+                                    <input id="entrance-cost" class="form-control" size="16" type="text" placeholder="Inserisci il costo, ad es. 3.5">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-danger" href="#" id='record-entrance'><i class="icon-pencil"></i> Registra</button>
+                                    </div>
+                                </div>
+                                <div id="record-entrance-value"> </div>
+                            </div>
+                            <blockquote>Esempio: se entrano 4 persone pagando 3&euro; scrivi 3 e premi 4 volte il pulsante Registra.
+                                Se la persona che non paga, scrivi come costo 0. 
+                            </blockquote> 
+                        </div> 
+                    </section>
+                </div> 
+                <div class="col-md-4">
+                    <section class="widget">
+                        <header>
+                            <h4><i class="icon-bar-chart"></i> Ingressi Registrati</h4>
+                        </header>
+                        <div class="body">
+                            <div class="box">
+                                <div class="big-text">
+                                    +<span id="customers_n">{{ customers_n }}</span>
+                                </div>
+                                <div class="description">
+                                    <i class="icon-group"></i>
+                                    Ingressi 
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div> 
+            </div> 
+            {% endifbalanceopen %} 
+            
+
+            <section class="widget">
+                <header>
+                    <h4><i class="icon-credit-card"></i> Tesseratore<small> Cerca cognome o email</small></h4>
+                </header>
+                <div class="body">
+                    <div class="controls form-group">
+                        <div class="input-group">
+                            <input id="q" type="search" class="form-control" id="search-input" placeholder="Cognome o e-mail">
+                            <span class="input-group-btn">
+                                <button id="searchSubmit" type="button" class="btn btn-transparent">Cerca</button>
+                                <button class="btn btn-success" href="#" id='read-card'>Leggi tessera</button>
+                            </span>
+                        </div>
+                    </div> 
+                </div> 
+            </section>
+            
+            <section class="widget">
+                <span id="spinner" style="display: none"><img src="{{ STATIC_URL }}images/spinner.gif"/></span>
+                <div id="results"></div>
+            </section>
+        </div>
+        <div class="col-md-4">
+            <section class="widget">
+                <header>
+                    <h4><i class="icon-cog"></i> Cassa ingresso</h4>
+                </header>
+                <div class="body">
+                    {% ifbalanceopen ingresso %}
+                    <a class="btn btn-warning btn-block" href="/ingresso/balance/withdraw/">Prelievo</a>
+                    <a class="btn btn-success btn-block" href="/ingresso/balance/deposit/">Deposito</a>
+                    <a class="btn btn-info btn-block" href="/ingresso/balance/payment/">Pagamento</a>
+                    <a class="btn btn-danger btn-block" href="/ingresso/balance/close/">Chiudi Cassa</a>
+                    {% else %}
+                    <a class="btn btn-success btn-block" href="/ingresso/balance/open/">Apri Cassa</a>
+                    {% endifbalanceopen %}
+                </div>
+                {% ifbalanceopen ingresso %}
+                <br/>
+                <blockquote>Chiudere la cassa solo dopo aver pagato tutti</blockquote>
+                {% endifbalanceopen %}
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block 'page_scripts' %} 
+<script type="text/javascript">
+$(document).ready(function() {
+
+    /* on click on search button, call ajax */
+    $('#searchSubmit').click(function() {
+        q = $('#q').val();
+        if (q == "") {
+            $('#results').html('Inserisci una email o un cognome');
+            return; 
+        } 
+        $('#results').html('&nbsp;').load('/ingresso/users/' + encodeURIComponent(q) + '/', 
+            function (responseText, textStatus, req) {
+                if (textStatus == "error") {
+                    return "oh noes!!!!";
+            }
+        });
+    });
+
+    /* bind enter to textinput card */
+    $('#q').keypress(function (e) {
+      if (e.which == 13) {
+        $('#searchSubmit').trigger('click');
+      }
+    });
+
+    /* read the card */
+    $(document).on('click', '#read-card', function() {
+        $.ajax({
+            type: 'GET',
+            url: "{{ URL_CARD }}",
+            data: {},
+            dataType: "json",
+            success: function(card) {
+                if (card && card.sn.length !==  0) {
+                        $("#results").html('&nbsp;').load('/ingresso/viewcard/?sn=' + card.sn);
+                } else {
+                         alert("Non e' stata avvicinata nessuna tessera al lettore oppure il lettore non e' collegato correttamente.");
+                }
+            },
+            error: function(x,y,z) {
+                //alert(x.responseText);
+                alert("Non e' stata avvicinata nessuna tessera al lettore oppure il lettore non e' collegato correttamente.");
+            }
+        });
+    });
+
+
+    /* register entrance */
+    $("#record-entrance").on('click', function() {
+        var init_data = $('#entrance-cost').val();
+        var cost_str = init_data.replace(",","."); //accept 3.2 and 3,2
+        var cost_float = parseFloat(cost_str);
+
+        if (isNaN(cost_float) || cost_str != cost_float.toString()) {
+            alert("Il costo dell'entrata non e' valido, se entra gratis mettere 0");
+            return;
+        }
+
+        var jqxhr = $.getJSON( "/ingresso/insert/"  + encodeURIComponent(cost_float.toString()) + '/', function(data) {
+            $('#record-entrance-value').html('&nbsp;' + data['txt']);
+            if (typeof(data['customers_n']) !== 'undefined') {
+                $('#customers_n').html( data['customers_n'] ); 
+            }
+        })
+          .fail(function() {
+            $('#record-entrance-value').html('&nbsp; Non sono riuscito a registrare l\'ingresso :(');
+          });
+ 
+    });
+
+    /* delete entrance */
+    $(document).on('click', ".cancel-entrance", function() {
+        var e_id = $(this).attr('data-eid');
+        var href='/ingresso/delete/' + e_id + '/';
+        var jqxhr = $.getJSON( href, function(data) {
+            $('#record-entrance-value').html('&nbsp;' + data['txt']);
+            if (typeof(data['customers_n']) !== 'undefined') {
+                $('#customers_n').html( data['customers_n'] ); 
+            }
+        });
+    });
+
+    /* bind cost input to register entrance button*/
+    $('#entrance-cost').keypress(function (e) {
+      if (e.which == 13) {
+        $('#record-entrance').trigger('click');
+      }
+    });
+
+    /* bind a card */
+    $(document).on('click', '.make-card', function() {
+        var userid = $(this).attr('data-uid'); 
+        if (userid) {
+            $.getJSON( '{{ URL_CARD }}', function(card) { //read the card
+                if (card && card.sn.length !== 0) {
+                    $.ajax({    //write in the db
+                        url: "/ingresso/makecard/",
+                        type: "GET",
+                        data: {'userid': userid, 'sn': card.sn},
+                        dataType: "html",
+                        success: function(resp) {
+                            $("#results").html('<i class="icon-ok-sign"></i> ' + resp)
+                        }
+                    });
+                } else {
+                     alert("Non e' stata avvicinata nessuna tessera al lettore oppure il lettore non e' collegato correttamente.");
+                }
+            }); 
+        } else {
+            alert("Errore: no user");
+        }
+    });
+});
+
+$(document).ajaxStart(function() {
+    $('#spinner').show();
+}).ajaxStop(function() {
+    $('#spinner').hide();
+});
+
+</script>
+{% endblock %}
+
+
